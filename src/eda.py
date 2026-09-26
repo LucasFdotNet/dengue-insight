@@ -38,7 +38,7 @@ def gerar_analise_exploratoria(cidade, df):
 def run_eda():
     processed_files = [f for f in os.listdir('data/processed') if f.endswith('_processed.csv')]
     for file in processed_files:
-        cidade = file.split('_')[0]
+        cidade = file.removesuffix('_processed.csv')
         df = pd.read_csv(os.path.join('data/processed', file))
         df['data_iniSE'] = pd.to_datetime(df['data_iniSE'])
         gerar_analise_exploratoria(cidade, df)

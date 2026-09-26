@@ -63,7 +63,7 @@ def run_preprocessing():
     raw_files = [f for f in os.listdir('data/raw') if f.endswith('_raw.csv')]
     
     for file in raw_files:
-        cidade = file.split('_')[0]
+        cidade = file.removesuffix('_raw.csv')
         logging.info(f"Processando {cidade}...")
         df = load_and_clean_data(os.path.join('data/raw', file))
         df_processed = feature_engineering(df)

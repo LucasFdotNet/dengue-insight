@@ -2,17 +2,16 @@ import os
 import requests
 import pandas as pd
 import logging
+from datetime import date
 from io import StringIO
+from src.cidades import CIDADES
 
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
 
-CIDADES = {
-    'campinas': 3509502,
-    'cosmopolis': 3512803,
-    'piracicaba': 3538709
-}
 
-def fetch_infodengue_data(geocode, ey_start=2018, ey_end=2024):
+
+
+def fetch_infodengue_data(geocode, ey_start=2010, ey_end=None):
     url = "https://info.dengue.mat.br/api/alertcity"
     params = {
         "geocode": geocode,
@@ -21,7 +20,7 @@ def fetch_infodengue_data(geocode, ey_start=2018, ey_end=2024):
         "ew_start": 1,
         "ew_end": 53,
         "ey_start": ey_start,
-        "ey_end": ey_end
+        "ey_end": ey_end or date.today().year
     }
     try:
         response = requests.get(url, params=params, timeout=30)
@@ -33,9 +32,10 @@ def fetch_infodengue_data(geocode, ey_start=2018, ey_end=2024):
 
 def run_ingestion():
     os.makedirs('data/raw', exist_ok=True)
-    for cidade, geocode in CIDADES.items():
-        logging.info(f"Buscando dados de {cidade.capitalize()} ({geocode})...")
-        df = fetch_infodengue_data(geocode)
+
+    for cidade, info in CIDADES.items():
+        logging.info(f"Buscando dados de {info['nome']} ({info['geocode']})...")
+        df = fetch_infodengue_data(info["geocode"])
         if df is not None and not df.empty:
             filepath = f"data/raw/{cidade}_raw.csv"
             df.to_csv(filepath, index=False)

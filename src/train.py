@@ -68,7 +68,7 @@ def run_training():
     all_metrics = []
     
     for file in processed_files:
-        cidade = file.split('_')[0]
+        cidade = file.removesuffix('_processed.csv')
         df = pd.read_csv(os.path.join('data/processed', file))
         logging.info(f"Treinando modelos para {cidade}...")
         df_metricas = train_and_evaluate_city(cidade, df)
