@@ -42,6 +42,7 @@ FEATURES = [
 ]
 
 PASTA_MODELOS = 'models/trained_models'
+ARQUIVO_PREVISOES_PASSADAS = 'reports/previsoes_walkforward.csv'
 
 
 def caminho_modelo(horizonte):
@@ -104,6 +105,10 @@ def avaliar_walk_forward(treino, validacao):
                     'Cidade': te['cidade'].map(lambda k: CIDADES[k]['nome']),
                     'Ano': ano,
                     'Horizonte': f'Semana +{horizonte}',
+                    'cidade': te['cidade'],
+                    'h': horizonte,
+                    'data_alvo': te['data_iniSE'] + pd.Timedelta(weeks=horizonte),
+                    'previsto': previsto,
                     'real': real,
                     'erro_lgbm': real - previsto,
                     'erro_baseline': real - te['casos_est'],  # persistência: repete os casos atuais
@@ -152,6 +157,13 @@ def run_training():
         logging.info(f"[{linha['Grupo']} | {linha['Horizonte']}] Baseline MAE: {linha['Baseline_MAE']:.2f} "
                      f"vs LGBM MAE: {linha['LGBM_MAE']:.2f} (razão {linha['Razao_MAE']:.2f})")
     logging.info("Métricas salvas em reports/metricas_modelos.csv, metricas_por_ano.csv e metricas_gerais.csv.")
+
+    # Previsões fora da amostra (cada semana prevista por um modelo que não a viu no treino),
+    # usadas pelo app para mostrar como o modelo teria se saído no passado
+    previsoes = erros[['cidade', 'h', 'data_alvo', 'real', 'previsto']].copy()
+    previsoes['previsto'] = previsoes['previsto'].round(1)
+    previsoes.sort_values(['cidade', 'h', 'data_alvo']).to_csv(ARQUIVO_PREVISOES_PASSADAS, index=False)
+    logging.info(f"Previsões do walk-forward salvas em {ARQUIVO_PREVISOES_PASSADAS}.")
 
     treinar_producao(treino)
 
