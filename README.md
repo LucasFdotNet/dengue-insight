@@ -37,8 +37,10 @@ São 19 municípios de SP, configurados em [`src/cidades.py`](src/cidades.py) (c
 
 O sistema opera em um pipeline desacoplado em 5 etapas modulares:
 
-1. **Ingestão (`src/ingestion.py`):** Conecta à API pública do InfoDengue (Fiocruz/FGV) via requisições HTTP REST e extrai as séries temporais consolidadas das semanas epidemiológicas.
-2. **Pré-processamento (`src/preprocessing.py`):** Realiza limpeza, tratamento de valores faltantes por interpolação e gera defasagens temporais (*lag features* de 1 a 4 semanas) e médias móveis.
+1. **Ingestão:**
+   * **Casos (`src/ingestion.py`):** Conecta à API pública do InfoDengue (Fiocruz/FGV) via requisições HTTP REST e extrai as séries temporais consolidadas das semanas epidemiológicas.
+   * **Clima (`src/ingestion_clima.py`):** Obtém temperatura, precipitação e umidade diárias da reanálise ERA5 pela Open-Meteo e agrega por semana epidemiológica.
+2. **Pré-processamento (`src/preprocessing.py`):** Une casos e clima por semana, realiza limpeza, tratamento de valores faltantes por interpolação e gera defasagens temporais (*lag features* de 1 a 4 semanas) e médias móveis.
 3. **Treinamento e Validação (`src/train.py`):** Utiliza algoritmos baseados em Gradient Boosting (**LightGBM**) treinados de forma multi-horizonte (H+1 a H+4 semanas) com divisão temporal cronológica, avaliados por MAE, RMSE e R².
 4. **Análise Exploratória (`src/eda.py`):** Processa dados e gera matrizes de correlação de Pearson e gráficos comparativos de casos versus variáveis climáticas/ambientais.
 5. **Dashboard Interativo (`app.py`):** Interface web moderna para visualização em tempo real dos indicadores atuais, curvas históricas e projeções com intervalos das próximas 4 semanas.
@@ -73,6 +75,16 @@ O sistema opera em um pipeline desacoplado em 5 etapas modulares:
 3. **Instale as dependências**
    ```bash
    pip install -r requirements.txt
+   ```
+
+4. **Execute o pipeline** (a partir da raiz do projeto)
+   ```bash
+   python -m src.ingestion
+   python -m src.ingestion_clima
+   python -m src.preprocessing
+   python -m src.train
+   python -m src.eda
+   streamlit run app.py
    ```
 
 ---
