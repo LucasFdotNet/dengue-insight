@@ -106,14 +106,13 @@ st.markdown("### 🔮 Projeções de machine learning (próximas 4 semanas)")
 predicoes, data_base = get_predictions(cidade, df_cidade)
 
 if not predicoes:
-    if CIDADES[cidade]["papel"] == "validacao":
-        st.info(f"{nome} é um município de validação espacial, por isso não tem modelo próprio.")
-    else:
-        st.error(f"Não há modelo treinado para {nome}. Execute train.py e recarregue o painel.")
+    st.error("Não há modelo treinado. Execute train.py e recarregue o painel.")
 else:
     base = pd.to_datetime(data_base, dayfirst=True)
     valor_base = df_cidade.loc[df_cidade["data_iniSE"] == base, "casos_est"].iloc[0]
     st.caption(f"Previsões geradas a partir da semana de {base:%d/%m/%Y}.")
+    if CIDADES[cidade]["papel"] == "validacao":
+        st.info(f"{nome} é um município de validação espacial: seus dados não foram usados no treino do modelo.")
 
     # predict.py devolve chaves no formato "Semana +H (dd/mm/aaaa)"; extrai H de cada uma
     por_horizonte = {int(chave.split("+")[1].split(" ")[0]): valor for chave, valor in predicoes.items()}

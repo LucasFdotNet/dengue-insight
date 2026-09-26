@@ -1,4 +1,5 @@
 import os
+import numpy as np
 import pandas as pd
 import logging
 from src.cidades import CIDADES
@@ -51,6 +52,14 @@ def feature_engineering(df):
     # Médias móveis
     df_feat['casos_est_roll_4'] = df_feat['casos_est'].rolling(window=4).mean()
     df_feat['tmin_roll_4'] = df_feat['tmin'].rolling(window=4).mean()
+    
+    # Features em escala logarítmica e relativas, usadas pelo modelo único
+    # (comparáveis entre municípios de tamanhos diferentes; ver README)
+    df_feat['log_casos'] = np.log1p(df_feat['casos_est'])
+    for lag in range(1, 5):
+        # variação em relação a 'lag' semanas atrás: > 0 se os casos cresceram
+        df_feat[f'var_log_{lag}'] = df_feat['log_casos'] - np.log1p(df_feat[f'casos_est_lag_{lag}'])
+    df_feat['semana_ano'] = df_feat['data_iniSE'].dt.isocalendar().week.astype(int)
     
     # Targets futuros (1 a 4 semanas à frente)
     for horizon in range(1, 5):
