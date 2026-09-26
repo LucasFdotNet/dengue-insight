@@ -5,7 +5,7 @@ import numpy as np
 import logging
 from lightgbm import LGBMRegressor
 from sklearn.metrics import mean_absolute_error, mean_squared_error, r2_score
-from src.cidades import cidades_por_papel
+from src.cidades import CIDADES, cidades_por_papel
 
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
 
@@ -20,6 +20,7 @@ def train_and_evaluate_city(cidade, df):
     os.makedirs('models/trained_models', exist_ok=True)
     os.makedirs('reports', exist_ok=True)
     
+    nome = CIDADES[cidade]['nome']
     metricas = []
     
     for horizon in range(1, 5):
@@ -51,7 +52,7 @@ def train_and_evaluate_city(cidade, df):
         
         # Registro comparativo
         metricas.append({
-            'Cidade': cidade.capitalize(),
+            'Cidade': nome,
             'Horizonte': f'Semana +{horizon}',
             'Baseline_MAE': round(mae_base, 2),
             'LGBM_MAE': round(mae_lgbm, 2),
@@ -61,7 +62,7 @@ def train_and_evaluate_city(cidade, df):
             'LGBM_R2': round(r2_lgbm, 4)
         })
         
-        logging.info(f"[{cidade.capitalize()} | H+{horizon}] Baseline MAE: {mae_base:.2f} vs LGBM MAE: {mae_lgbm:.2f}")
+        logging.info(f"[{nome} | H+{horizon}] Baseline MAE: {mae_base:.2f} vs LGBM MAE: {mae_lgbm:.2f}")
         joblib.dump(model, f"models/trained_models/{cidade}_model_h{horizon}.joblib")
         
     return pd.DataFrame(metricas)
