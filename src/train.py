@@ -9,10 +9,11 @@ valores acima dos já vistos no treino. Motivação e testes: "Decisões de Proj
 no README.
 
 Etapas:
-  1. Avaliação walk-forward anual: para cada ano de teste, treina só com semanas
-     anteriores a ele e testa no ano inteiro, nos municípios de treino e nos de
-     validação espacial (que nunca entram em nenhum treino). Sempre comparado ao
-     baseline de persistência (casos daqui a H semanas = casos atuais).
+  1. Avaliação walk-forward com retreino mensal: no início de cada mês, treina um
+     modelo só com o que já era conhecido até ali e prevê as semanas daquele mês,
+     nos municípios de treino e nos de validação espacial (que nunca entram em
+     nenhum treino). Simula o uso real do modelo, retreinado todo mês. Sempre
+     comparado ao baseline de persistência (casos daqui a H semanas = casos atuais).
   2. Modelo de produção: treinado com toda a série dos municípios de treino e
      salvo para o predict.py e o app.
 """
@@ -81,21 +82,32 @@ def linhas_validas(df, horizonte):
     return validas.groupby('cidade', sort=False).head(-SEMANAS_INSTAVEIS)
 
 
-def avaliar_walk_forward(treino, validacao):
-    """Erros absolutos semana a semana do modelo e do baseline, por ano de teste."""
-    ultimo_ano = treino['data_iniSE'].dt.year.max()
+def avaliar_walk_forward(treino, validacao, horizontes=HORIZONTES, lacuna=0):
+    """Erros semana a semana do modelo e do baseline, com retreino mensal.
+
+    Cada linha usa os dados da semana t para prever a semana t + H. 'lacuna' simula
+    dados atrasados: a previsão é feita na semana t + lacuna, quando as últimas
+    'lacuna' semanas ainda não são confiáveis (usado em experimento_atraso.py).
+    """
+    ultima_semana = treino['data_iniSE'].max()
+    meses = pd.period_range(f'{PRIMEIRO_ANO_TESTE}-01', ultima_semana, freq='M')
+    atraso = pd.Timedelta(weeks=lacuna)
     erros = []
-    for horizonte in HORIZONTES:
+    for horizonte in horizontes:
+        passo = pd.Timedelta(weeks=horizonte)
         dados_treino = linhas_validas(treino, horizonte)
-        for ano in range(PRIMEIRO_ANO_TESTE, ultimo_ano + 1):
-            inicio, fim = pd.Timestamp(f'{ano}-01-01'), pd.Timestamp(f'{ano + 1}-01-01')
-            # O alvo de cada semana de treino (H semanas à frente) precisa estar antes do ano de teste
-            tr = dados_treino[dados_treino['data_iniSE'] + pd.Timedelta(weeks=horizonte) < inicio]
+        dados_teste = [(grupo, linhas_validas(dados, horizonte)) for grupo, dados in
+                       [('treino', treino), ('validacao', validacao)]]
+        for mes in meses:
+            inicio, fim = mes.start_time, (mes + 1).start_time
+            # Retreino no início do mês: só entram semanas cujo alvo já era conhecido (e confiável) antes dele
+            tr = dados_treino[dados_treino['data_iniSE'] + passo < inicio - atraso]
             modelo = novo_modelo().fit(tr[FEATURES], alvo_relativo(tr, horizonte))
 
-            for grupo, dados in [('treino', treino), ('validacao', validacao)]:
-                te = linhas_validas(dados, horizonte)
-                te = te[(te['data_iniSE'] >= inicio) & (te['data_iniSE'] < fim)]
+            for grupo, dados in dados_teste:
+                # Semanas em que a previsão seria feita dentro deste mês
+                momento = dados['data_iniSE'] + atraso
+                te = dados[(momento >= inicio) & (momento < fim)]
                 if te.empty:
                     continue
                 real = te[f'target_h{horizonte}']
@@ -103,17 +115,17 @@ def avaliar_walk_forward(treino, validacao):
                 erros.append(pd.DataFrame({
                     'Grupo': grupo,
                     'Cidade': te['cidade'].map(lambda k: CIDADES[k]['nome']),
-                    'Ano': ano,
+                    'Ano': (te['data_iniSE'] + passo).dt.year,
                     'Horizonte': f'Semana +{horizonte}',
                     'cidade': te['cidade'],
                     'h': horizonte,
-                    'data_alvo': te['data_iniSE'] + pd.Timedelta(weeks=horizonte),
+                    'data_alvo': te['data_iniSE'] + passo,
                     'previsto': previsto,
                     'real': real,
                     'erro_lgbm': real - previsto,
-                    'erro_baseline': real - te['casos_est'],  # persistência: repete os casos atuais
+                    'erro_baseline': real - te['casos_est'],  # persistência: repete os casos da semana t
                 }))
-        logging.info(f"Walk-forward H+{horizonte} concluído.")
+        logging.info(f"Walk-forward H+{horizonte} concluído ({len(meses)} retreinos mensais).")
     return pd.concat(erros, ignore_index=True)
 
 
