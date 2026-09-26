@@ -8,6 +8,8 @@ from sklearn.metrics import mean_absolute_error, mean_squared_error, r2_score
 
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
 
+SEMANAS_INSTAVEIS = 8  # semanas finais cujo casos_est (nowcast) ainda é revisado
+
 FEATURES = [
     'casos_est_lag_1', 'casos_est_lag_2', 'casos_est_lag_3', 'casos_est_lag_4',
     'casos_est_roll_4', 'tmin_lag_1', 'tmin_roll_4', 'rt_lag_1', 'p_inc100k'
@@ -21,8 +23,8 @@ def train_and_evaluate_city(cidade, df):
     
     for horizon in range(1, 5):
         target = f'target_h{horizon}'
-        df_valid = df.dropna(subset=FEATURES + [target]).copy()
-        
+        df_valid = df.dropna(subset=FEATURES + [target]).iloc[:-SEMANAS_INSTAVEIS].copy()        
+
         # Divisão cronológica: 80% treino, 20% teste
         split_idx = int(len(df_valid) * 0.8)
         train_data = df_valid.iloc[:split_idx]
