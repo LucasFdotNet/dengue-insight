@@ -38,9 +38,9 @@ PRIMEIRO_ANO_TESTE = 2015  # garante ao menos 5 anos de histórico (2010-2014) n
 FEATURES = [
     'log_casos',                                        # nível atual (escala log)
     'var_log_1', 'var_log_2', 'var_log_3', 'var_log_4',  # crescimento em relação a 1-4 semanas atrás
-    'rt_lag_1',                                          # taxa de reprodução da semana anterior
     'semana_ano',                                        # sazonalidade
 ]
+# Rt e clima ficam fora do modelo: não melhoraram a previsão (ver experimento_variaveis.py e o README)
 
 # Tendência: "sobe" ou "cai" se a variação passa de 20% E de 5 casos; senão, "estável".
 # O mínimo absoluto evita que oscilações pequenas (ex.: 2 -> 3 casos, +50%) contem como subida.
@@ -89,19 +89,20 @@ def carregar(papel):
     return pd.concat(partes, ignore_index=True)
 
 
-def linhas_validas(df, horizonte):
+def linhas_validas(df, horizonte, features=FEATURES):
     # Primeiro o dropna, depois o corte: assim também saem as semanas cujo alvo
     # (H semanas à frente) cai dentro das semanas instáveis
-    validas = df.dropna(subset=FEATURES + [f'target_h{horizonte}'])
+    validas = df.dropna(subset=features + [f'target_h{horizonte}'])
     return validas.groupby('cidade', sort=False).head(-SEMANAS_INSTAVEIS)
 
 
-def avaliar_walk_forward(treino, validacao, horizontes=HORIZONTES, lacuna=0):
+def avaliar_walk_forward(treino, validacao, horizontes=HORIZONTES, lacuna=0, features=FEATURES):
     """Erros semana a semana do modelo e do baseline, com retreino mensal.
 
     Cada linha usa os dados da semana t para prever a semana t + H. 'lacuna' simula
     dados atrasados: a previsão é feita na semana t + lacuna, quando as últimas
     'lacuna' semanas ainda não são confiáveis (usado em experimento_atraso.py).
+    'features' permite testar outros conjuntos de variáveis (usado em experimento_variaveis.py).
     """
     ultima_semana = treino['data_iniSE'].max()
     meses = pd.period_range(f'{PRIMEIRO_ANO_TESTE}-01', ultima_semana, freq='M')
@@ -109,14 +110,14 @@ def avaliar_walk_forward(treino, validacao, horizontes=HORIZONTES, lacuna=0):
     erros = []
     for horizonte in horizontes:
         passo = pd.Timedelta(weeks=horizonte)
-        dados_treino = linhas_validas(treino, horizonte)
-        dados_teste = [(grupo, linhas_validas(dados, horizonte)) for grupo, dados in
+        dados_treino = linhas_validas(treino, horizonte, features)
+        dados_teste = [(grupo, linhas_validas(dados, horizonte, features)) for grupo, dados in
                        [('treino', treino), ('validacao', validacao)]]
         for mes in meses:
             inicio, fim = mes.start_time, (mes + 1).start_time
             # Retreino no início do mês: só entram semanas cujo alvo já era conhecido (e confiável) antes dele
             tr = dados_treino[dados_treino['data_iniSE'] + passo < inicio - atraso]
-            modelo = novo_modelo().fit(tr[FEATURES], alvo_relativo(tr, horizonte))
+            modelo = novo_modelo().fit(tr[features], alvo_relativo(tr, horizonte))
 
             for grupo, dados in dados_teste:
                 # Semanas em que a previsão seria feita dentro deste mês
@@ -125,7 +126,7 @@ def avaliar_walk_forward(treino, validacao, horizontes=HORIZONTES, lacuna=0):
                 if te.empty:
                     continue
                 real = te[f'target_h{horizonte}']
-                previsto = reconstruir_casos(te, modelo.predict(te[FEATURES]))
+                previsto = reconstruir_casos(te, modelo.predict(te[features]))
                 erros.append(pd.DataFrame({
                     'Grupo': grupo,
                     'Cidade': te['cidade'].map(lambda k: CIDADES[k]['nome']),
