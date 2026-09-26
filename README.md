@@ -228,6 +228,33 @@ Registro das decisões que afetam os dados, o modelo ou a avaliação, com o mot
   * **O modelo continua útil, e sua vantagem aumenta:** com dados atrasados, repetir o último valor conhecido fica muito pior, e o modelo passa a errar de 20% a 32% menos que o baseline (contra 6% a 27% sem lacuna). Quanto mais incerta a situação, mais vale ter um modelo que antecipa a tendência.
   * **Para o uso real:** as previsões do painel devem ser lidas como estimativas de tendência (subida ou queda), com margem de erro maior nas semanas mais próximas do que a validação da decisão 6 sugere.
 
+### 11. Avaliação da tendência (sobe, estável ou cai)
+
+* **Pergunta:** mesmo errando o número exato de casos, o modelo acerta **a tendência**, isto é, se os casos vão subir, ficar estáveis ou cair nas próximas 1 a 4 semanas? Para a vigilância, essa é muitas vezes a pergunta mais útil.
+* **Definição:** comparando o valor previsto (ou o real) com o da semana de partida, a semana é classificada como **subida** ou **queda** quando a variação passa de **20% e de 5 casos**; caso contrário, **estável**. O mínimo de 5 casos evita que oscilações pequenas (por exemplo, de 2 para 3 casos, +50%) contem como subida em municípios com poucos casos. Os valores ficam em `LIMIAR_TENDENCIA` e `MIN_CASOS_TENDENCIA`, em `src/train.py`.
+* **Referências de comparação:**
+  * **"Sempre estável":** equivale ao baseline de persistência, que sempre diz que nada vai mudar;
+  * **"Tendência da última semana":** estende por H semanas a variação observada na última semana (se subiu 10%, continua subindo 10% por semana).
+* **Resultado nos municípios de treino** (validação *walk-forward* com retreino mensal, 2015 a 2026; arquivo `reports/metricas_tendencia.csv`):
+
+  | Antecedência | Modelo acerta a tendência | "Sempre estável" acerta | "Tendência da última semana" acerta | Subidas detectadas | Alarmes de subida corretos | Sentido oposto |
+  |---|---|---|---|---|---|---|
+  | 1 semana | 66% | 65% | 56% | 21% | 51% | 1% |
+  | 2 semanas | 65% | 54% | 49% | 43% | 59% | 3% |
+  | 3 semanas | 66% | 48% | 48% | 50% | 63% | 4% |
+  | 4 semanas | **68%** | **44%** | **49%** | **55%** | **66%** | 5% |
+
+  Nos municípios de validação espacial, o padrão se repete: com 4 semanas de antecedência, o modelo acerta 59% das tendências, contra 34% do "sempre estável", detecta 51% das subidas e acerta 65% dos alarmes de subida.
+* **Como ler:**
+  * **Subidas detectadas:** das semanas em que os casos realmente subiram, em quantas o modelo previu subida.
+  * **Alarmes de subida corretos:** das vezes em que o modelo previu subida, em quantas os casos realmente subiram.
+  * **Sentido oposto:** semanas em que o modelo previu subida e os casos caíram, ou o contrário.
+* **Conclusões:**
+  * **Para 1 semana, o modelo não acrescenta:** acerta a tendência tanto quanto dizer "vai ficar igual", porque em uma semana os casos raramente mudam mais de 20%.
+  * **De 2 a 4 semanas, o modelo é claramente melhor:** acerta de 11 a 24 pontos percentuais a mais que "sempre estável" e detecta cerca de metade das subidas, com cerca de 2 em cada 3 alarmes corretos.
+  * **O modelo quase nunca erra o sentido:** em no máximo 5% das semanas (6% nos municípios de validação) ele aponta subida quando os casos caem, ou o contrário. Quase todos os seus erros são de intensidade, ao prever "estável" quando houve movimento.
+* **No dashboard:** as previsões das próximas semanas mostram a variação e a tendência (subida, estável ou queda), e abaixo do gráfico de projeções há um bloco de acerto de tendência para o município, o período e a antecedência escolhidos, com a tabela "o que aconteceu" × "o que o modelo previu".
+
 ### Nota sobre os testes exploratórios
 
 As tabelas das decisões 5, 7 e 8 vêm de testes exploratórios feitos com a validação *walk-forward* com retreino **anual**, antes do retreino mensal (decisão 6) e de um ajuste no corte das semanas instáveis (decisão 3). Como todas as alternativas de cada tabela foram avaliadas da mesma forma, as comparações continuam válidas, mas os números podem diferir na segunda casa decimal dos de `reports/` e das tabelas das decisões 6 e 10, que são os resultados finais.

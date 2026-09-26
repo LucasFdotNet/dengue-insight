@@ -1,12 +1,14 @@
 import os
 
+import numpy as np
 import pandas as pd
 import plotly.graph_objects as go
 import streamlit as st
 
 from src.cidades import CIDADES
 from src.predict import get_predictions
-from src.train import ARQUIVO_PREVISOES_PASSADAS, PRIMEIRO_ANO_TESTE, SEMANAS_INSTAVEIS
+from src.train import (ARQUIVO_PREVISOES_PASSADAS, LIMIAR_TENDENCIA, MIN_CASOS_TENDENCIA, PRIMEIRO_ANO_TESTE,
+                       SEMANAS_INSTAVEIS, TENDENCIAS, classificar_tendencia)
 
 # Colunas que o CSV processado precisa ter. Se faltar alguma, o app para com erro
 # explícito em vez de exibir valores inventados.
@@ -163,12 +165,17 @@ else:
 
     cols_pred = st.columns(len(horizontes))
     for col, h, data, valor in zip(cols_pred, horizontes, datas_futuras, valores_futuros):
+        tendencia = classificar_tendencia([valor], [valor_base])[0]
+        variacao = f"{(valor - valor_base) / valor_base:+.0%}" if valor_base > 0 else f"{valor - valor_base:+.0f} casos"
+        # O Streamlit decide a seta pelo sinal no início do texto; subida em vermelho, queda em verde
         col.metric(
             label=f"Semana +{h} ({data:%d/%m/%Y})",
-            value=valor,
-            delta=int(valor - valor_base),
-            delta_color="inverse",
+            value=f"{valor} casos",
+            delta=f"{variacao} · {'subida' if tendencia == 'sobe' else 'queda' if tendencia == 'cai' else 'estável'}",
+            delta_color="off" if tendencia == "estável" else "inverse",
         )
+    st.caption(f"Tendência em relação à semana de {base:%d/%m/%Y} ({int(valor_base)} casos): subida ou queda quando "
+               f"a variação passa de {LIMIAR_TENDENCIA:.0%} e de {MIN_CASOS_TENDENCIA} casos; senão, estável.")
 
     # Previsões passadas: vêm da validação walk-forward, em que cada semana foi prevista por um
     # modelo treinado só com dados anteriores ao ano dela. Usar o modelo de produção aqui seria
@@ -201,6 +208,7 @@ else:
     ))
 
     resumo_passado = None
+    tendencia_passada = None
     if previsoes_passadas is not None:
         h_passado = col_h.radio(
             "Previsões passadas feitas com antecedência de:",
@@ -237,6 +245,11 @@ else:
                 f"**{erro_modelo:,.0f} casos por semana**; o baseline (repetir o valor de {h_passado} "
                 f"semana(s) antes) errou **{erro_baseline:,.0f}**."
             )
+            validas = ~np.isnan(baseline)
+            tendencia_passada = (
+                classificar_tendencia(passadas["real"].values[validas], baseline[validas]),
+                classificar_tendencia(passadas["previsto"].values[validas], baseline[validas]),
+            )
             if inclui_futuro:
                 resumo_passado += (
                     f" As últimas semanas não têm previsão passada porque os casos delas ainda estão sendo "
@@ -260,6 +273,44 @@ else:
     if resumo_passado:
         st.caption(resumo_passado)
 
+    # ------------------------------------------------------------ Acerto de tendência
+    if tendencia_passada is not None:
+        real_t, modelo_t = tendencia_passada
+        st.markdown(f"#### Acerto de tendência (previsões feitas {h_passado} semana(s) antes)")
+        acerto = (real_t == modelo_t).mean()
+        acerto_estavel = (real_t == "estável").mean()
+        subiu, previu_subida = real_t == "sobe", modelo_t == "sobe"
+
+        c1, c2, c3 = st.columns(3)
+        c1.metric(
+            "Tendência acertada", f"{acerto:.0%}",
+            delta=f"{(acerto - acerto_estavel) * 100:+.0f} p.p. vs. \"sempre estável\"",
+            help=f"Em quantas semanas o modelo acertou se os casos iriam subir, ficar estáveis ou cair. "
+                 f"Dizer sempre \"estável\" teria acertado {acerto_estavel:.0%}.",
+        )
+        c2.metric(
+            "Subidas detectadas", f"{(modelo_t[subiu] == 'sobe').mean():.0%}" if subiu.any() else "—",
+            help=f"Das {subiu.sum()} semanas em que os casos realmente subiram, em quantas o modelo previu subida.",
+        )
+        c3.metric(
+            "Alarmes de subida corretos", f"{(real_t[previu_subida] == 'sobe').mean():.0%}" if previu_subida.any() else "—",
+            help=f"Das {previu_subida.sum()} vezes em que o modelo previu subida, em quantas os casos realmente subiram.",
+        )
+
+        # Linhas: o que aconteceu; colunas: o que o modelo previu (contagem e % da linha)
+        contagem = pd.crosstab(pd.Categorical(real_t, TENDENCIAS), pd.Categorical(modelo_t, TENDENCIAS), dropna=False)
+        percentual = contagem.div(contagem.sum(axis=1).replace(0, np.nan), axis=0)
+        tabela = contagem.astype(str) + percentual.map(lambda v: f" ({v:.0%})" if pd.notnull(v) else "")
+        tabela.index = [f"Aconteceu: {t}" for t in TENDENCIAS]
+        tabela.columns = [f"Modelo previu: {t}" for t in TENDENCIAS]
+        st.table(tabela)
+        oposto = ((real_t == "sobe") & (modelo_t == "cai")) | ((real_t == "cai") & (modelo_t == "sobe"))
+        st.caption(
+            f"Semanas no período: {len(real_t)}. O modelo apontou o sentido oposto (subida quando caiu, ou queda "
+            f"quando subiu) em {oposto.mean():.0%} delas; os demais erros são de intensidade (prever estável "
+            f"quando houve movimento, ou o contrário)."
+        )
+
     with st.expander("Como as previsões passadas foram geradas?"):
         st.markdown(
             "As previsões passadas mostram o que o modelo **teria previsto na época**, sem conhecer o futuro. "
@@ -268,6 +319,10 @@ else:
             "semana exibida foi vista pelo modelo que a previu.\n\n"
             "O **baseline** é a previsão mais simples possível: repetir o número de casos de algumas semanas "
             "antes. O modelo só é útil se errar menos que ele.\n\n"
+            "**Tendência:** cada semana é classificada como subida ou queda quando a variação em relação à "
+            f"semana de partida passa de {LIMIAR_TENDENCIA:.0%} e de {MIN_CASOS_TENDENCIA} casos; senão, estável. "
+            "O acerto de tendência compara a classificação prevista com a que aconteceu. \"Sempre estável\" é "
+            "a referência equivalente ao baseline: dizer sempre que nada vai mudar.\n\n"
             "**Limitação:** a simulação usa os casos já revisados. Em tempo real, os casos das semanas mais "
             "recentes ainda estariam incompletos, porque as notificações chegam com atraso, e o modelo erraria "
             "mais. Um experimento em que as 4 semanas mais recentes ficam indisponíveis mostrou que o erro do "
