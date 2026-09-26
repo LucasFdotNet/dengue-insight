@@ -46,7 +46,7 @@ if not opcoes:
 cidade = st.sidebar.selectbox(
     "Selecione o município:",
     opcoes,
-    format_func=lambda k: f"{CIDADES[k]['nome']} ({ROTULO_PAPEL[CIDADES[k]['papel']]})",
+    format_func=lambda k: f"{CIDADES[k]['nome']} - {CIDADES[k]['uf']} ({ROTULO_PAPEL[CIDADES[k]['papel']]})",
 )
 nome = CIDADES[cidade]["nome"]
 
