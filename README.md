@@ -60,3 +60,15 @@ O sistema opera em um pipeline desacoplado em 5 etapas modulares:
    ```bash
    git clone [https://github.com/LucasFdotNet/dengue-insight.git](https://github.com/LucasFdotNet/dengue-insight.git)
    cd dengue-insight
+   ```
+
+2. **Opcional: crie e ative o seu ambiente virtual**
+   ```bash
+   python venv venv
+   venv/scripts/activate
+   ```
+
+3. **Instale as dependências**
+   ```bash
+   pip install -r requirements.txt
+   ```
