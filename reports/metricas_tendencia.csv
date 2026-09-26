@@ -1,0 +1,9 @@
+Grupo,Horizonte,Semanas,Acerto_modelo,Acerto_sempre_estavel,Acerto_tendencia_ultima_semana,Subidas_detectadas,Alarmes_subida_corretos,Quedas_detectadas,Sentido_oposto
+treino,Semana +1,7799,0.66,0.652,0.557,0.208,0.51,0.392,0.013
+validacao,Semana +1,3600,0.599,0.625,0.524,0.16,0.489,0.467,0.022
+treino,Semana +2,7786,0.649,0.54,0.488,0.428,0.59,0.569,0.032
+validacao,Semana +2,3594,0.568,0.476,0.437,0.41,0.601,0.619,0.04
+treino,Semana +3,7773,0.663,0.484,0.483,0.5,0.626,0.641,0.043
+validacao,Semana +3,3588,0.565,0.403,0.425,0.46,0.612,0.681,0.054
+treino,Semana +4,7760,0.675,0.437,0.485,0.545,0.658,0.667,0.047
+validacao,Semana +4,3582,0.588,0.341,0.425,0.511,0.653,0.701,0.061

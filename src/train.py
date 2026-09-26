@@ -42,6 +42,12 @@ FEATURES = [
     'semana_ano',                                        # sazonalidade
 ]
 
+# Tendência: "sobe" ou "cai" se a variação passa de 20% E de 5 casos; senão, "estável".
+# O mínimo absoluto evita que oscilações pequenas (ex.: 2 -> 3 casos, +50%) contem como subida.
+LIMIAR_TENDENCIA = 0.20
+MIN_CASOS_TENDENCIA = 5
+TENDENCIAS = ['sobe', 'estável', 'cai']
+
 PASTA_MODELOS = 'models/trained_models'
 ARQUIVO_PREVISOES_PASSADAS = 'reports/previsoes_walkforward.csv'
 
@@ -61,6 +67,14 @@ def alvo_relativo(df, horizonte):
 def reconstruir_casos(df, previsao_relativa):
     """Converte a previsão relativa de volta para número de casos (nunca negativo)."""
     return np.maximum(np.expm1(df['log_casos'] + previsao_relativa), 0)
+
+
+def classificar_tendencia(futuro, atual):
+    """Classifica a variação de 'atual' para 'futuro' em 'sobe', 'estável' ou 'cai'."""
+    futuro, atual = np.asarray(futuro, dtype=float), np.asarray(atual, dtype=float)
+    variacao = futuro - atual
+    limite = np.maximum(LIMIAR_TENDENCIA * atual, MIN_CASOS_TENDENCIA)
+    return np.where(variacao > limite, 'sobe', np.where(-variacao > limite, 'cai', 'estável'))
 
 
 def carregar(papel):
@@ -124,6 +138,8 @@ def avaliar_walk_forward(treino, validacao, horizontes=HORIZONTES, lacuna=0):
                     'real': real,
                     'erro_lgbm': real - previsto,
                     'erro_baseline': real - te['casos_est'],  # persistência: repete os casos da semana t
+                    'atual': te['casos_est'],
+                    'anterior': te['casos_est_lag_1'],
                 }))
         logging.info(f"Walk-forward H+{horizonte} concluído ({len(meses)} retreinos mensais).")
     return pd.concat(erros, ignore_index=True)
@@ -144,7 +160,35 @@ def resumir(erros, por):
             # < 1: o modelo erra menos que o baseline
             'Razao_MAE': round(mae_m / mae_b, 3),
         })
-    return erros.groupby(por, sort=False).apply(metricas, include_groups=False).reset_index()
+    resumo = erros.groupby(por, sort=False).apply(metricas, include_groups=False).reset_index()
+    return resumo.astype({'Semanas': int})
+
+
+def resumir_tendencia(erros):
+    """Acerto da tendência (sobe / estável / cai) do modelo e de duas referências simples."""
+    real = classificar_tendencia(erros['real'], erros['atual'])
+    modelo = classificar_tendencia(erros['previsto'], erros['atual'])
+    # Referência: estender por H semanas a variação da última semana
+    variacao_semanal = erros['atual'] / erros['anterior'].where(erros['anterior'] > 0)
+    extrapolado = (erros['atual'] * variacao_semanal ** erros['h']).fillna(erros['atual'])
+    ultima_semana = classificar_tendencia(extrapolado, erros['atual'])
+    df = erros[['Grupo', 'Horizonte']].assign(real=real, modelo=modelo, ultima_semana=ultima_semana)
+
+    def metricas(g):
+        subiu, previu_subida, caiu = g['real'] == 'sobe', g['modelo'] == 'sobe', g['real'] == 'cai'
+        oposto = ((g['real'] == 'sobe') & (g['modelo'] == 'cai')) | ((g['real'] == 'cai') & (g['modelo'] == 'sobe'))
+        return pd.Series({
+            'Semanas': len(g),
+            'Acerto_modelo': round((g['real'] == g['modelo']).mean(), 3),
+            'Acerto_sempre_estavel': round((g['real'] == 'estável').mean(), 3),
+            'Acerto_tendencia_ultima_semana': round((g['real'] == g['ultima_semana']).mean(), 3),
+            'Subidas_detectadas': round((g.loc[subiu, 'modelo'] == 'sobe').mean(), 3),
+            'Alarmes_subida_corretos': round((g.loc[previu_subida, 'real'] == 'sobe').mean(), 3),
+            'Quedas_detectadas': round((g.loc[caiu, 'modelo'] == 'cai').mean(), 3),
+            'Sentido_oposto': round(oposto.mean(), 3),
+        })
+    resumo = df.groupby(['Grupo', 'Horizonte'], sort=False).apply(metricas, include_groups=False).reset_index()
+    return resumo.astype({'Semanas': int})
 
 
 def treinar_producao(treino):
@@ -168,7 +212,9 @@ def run_training():
     for _, linha in geral.iterrows():
         logging.info(f"[{linha['Grupo']} | {linha['Horizonte']}] Baseline MAE: {linha['Baseline_MAE']:.2f} "
                      f"vs LGBM MAE: {linha['LGBM_MAE']:.2f} (razão {linha['Razao_MAE']:.2f})")
-    logging.info("Métricas salvas em reports/metricas_modelos.csv, metricas_por_ano.csv e metricas_gerais.csv.")
+    resumir_tendencia(erros).to_csv('reports/metricas_tendencia.csv', index=False)
+    logging.info("Métricas salvas em reports/metricas_modelos.csv, metricas_por_ano.csv, metricas_gerais.csv "
+                 "e metricas_tendencia.csv.")
 
     # Previsões fora da amostra (cada semana prevista por um modelo que não a viu no treino),
     # usadas pelo app para mostrar como o modelo teria se saído no passado
