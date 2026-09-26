@@ -5,6 +5,7 @@ import numpy as np
 import logging
 from lightgbm import LGBMRegressor
 from sklearn.metrics import mean_absolute_error, mean_squared_error, r2_score
+from src.cidades import cidades_por_papel
 
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
 
@@ -66,12 +67,15 @@ def train_and_evaluate_city(cidade, df):
     return pd.DataFrame(metricas)
 
 def run_training():
-    processed_files = [f for f in os.listdir('data/processed') if f.endswith('_processed.csv')]
     all_metrics = []
-    
-    for file in processed_files:
-        cidade = file.removesuffix('_processed.csv')
-        df = pd.read_csv(os.path.join('data/processed', file))
+
+    # Apenas municípios de treino; os de validação espacial nunca entram no treino
+    for cidade in cidades_por_papel('treino'):
+        filepath = os.path.join('data/processed', f'{cidade}_processed.csv')
+        if not os.path.exists(filepath):
+            logging.warning(f"Arquivo processado não encontrado para {cidade}; pulando.")
+            continue
+        df = pd.read_csv(filepath)
         logging.info(f"Treinando modelos para {cidade}...")
         df_metricas = train_and_evaluate_city(cidade, df)
         all_metrics.append(df_metricas)
