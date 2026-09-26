@@ -6,13 +6,14 @@ import streamlit as st
 
 from src.cidades import CIDADES
 from src.predict import get_predictions
-from src.train import ARQUIVO_PREVISOES_PASSADAS, SEMANAS_INSTAVEIS
+from src.train import ARQUIVO_PREVISOES_PASSADAS, PRIMEIRO_ANO_TESTE, SEMANAS_INSTAVEIS
 
 # Colunas que o CSV processado precisa ter. Se faltar alguma, o app para com erro
 # explícito em vez de exibir valores inventados.
 COLUNAS_OBRIGATORIAS = ["data_iniSE", "casos_est", "casos_est_min", "casos_est_max", "tmin", "rt", "nivel"]
 DIAS_DADOS_DESATUALIZADOS = 21
-SEMANAS_HISTORICO_PROJECAO = 52  # 12 meses de histórico no gráfico de projeções
+SEMANAS_HISTORICO_PROJECAO = 52  # 12 meses de histórico no período padrão do gráfico de projeções
+MAX_SEMANAS_COM_MARCADORES = 104  # acima disso, só linhas, para o gráfico não ficar poluído
 ROTULO_PAPEL = {"treino": "treino", "validacao": "validação"}
 FORMATO_DATA_HOVER = "%{x|%d/%m/%Y}: %{y:,.0f} casos"
 
@@ -169,23 +170,39 @@ else:
             delta_color="inverse",
         )
 
-    hist_recente = df_cidade[df_cidade["data_iniSE"] <= base].tail(SEMANAS_HISTORICO_PROJECAO)
-    inicio_janela = hist_recente["data_iniSE"].min()
-
-    fig_proj = go.Figure()
-    fig_proj.add_trace(go.Scatter(
-        x=hist_recente["data_iniSE"], y=hist_recente["casos_est"],
-        mode="lines+markers", name="Casos estimados (real)", line=dict(color="#0275d8"),
-        hovertemplate=FORMATO_DATA_HOVER + "<extra>Real</extra>",
-    ))
-
     # Previsões passadas: vêm da validação walk-forward, em que cada semana foi prevista por um
     # modelo treinado só com dados anteriores ao ano dela. Usar o modelo de produção aqui seria
     # enganoso, porque ele já viu essas semanas no treino.
     previsoes_passadas = load_previsoes_passadas()
+
+    # ------------------------------------------------------------ Período exibido
+    ULTIMOS_12 = "Últimos 12 meses"
+    TODO = f"Todo o período (desde {PRIMEIRO_ANO_TESTE})"
+    anos = list(range(base.year, PRIMEIRO_ANO_TESTE - 1, -1))
+    col_periodo, col_h = st.columns([1, 2])
+    periodo = col_periodo.selectbox("Período:", [ULTIMOS_12, TODO] + [str(a) for a in anos])
+    if periodo == ULTIMOS_12:
+        inicio_janela, fim_janela = base - pd.Timedelta(weeks=SEMANAS_HISTORICO_PROJECAO - 1), base
+    elif periodo == TODO:
+        inicio_janela, fim_janela = pd.Timestamp(f"{PRIMEIRO_ANO_TESTE}-01-01"), base
+    else:
+        inicio_janela, fim_janela = pd.Timestamp(f"{periodo}-01-01"), pd.Timestamp(f"{periodo}-12-31")
+    # A previsão das próximas semanas só aparece se o período inclui a semana atual
+    inclui_futuro = fim_janela >= base
+
+    janela = df_cidade[(df_cidade["data_iniSE"] >= inicio_janela) & (df_cidade["data_iniSE"] <= min(fim_janela, base))]
+    modo = "lines+markers" if len(janela) <= MAX_SEMANAS_COM_MARCADORES else "lines"
+
+    fig_proj = go.Figure()
+    fig_proj.add_trace(go.Scatter(
+        x=janela["data_iniSE"], y=janela["casos_est"],
+        mode=modo, name="Casos estimados (real)", line=dict(color="#0275d8"),
+        hovertemplate=FORMATO_DATA_HOVER + "<extra>Real</extra>",
+    ))
+
     resumo_passado = None
     if previsoes_passadas is not None:
-        h_passado = st.radio(
+        h_passado = col_h.radio(
             "Previsões passadas feitas com antecedência de:",
             horizontes,
             format_func=lambda h: f"{h} semana" + ("s" if h > 1 else ""),
@@ -195,6 +212,7 @@ else:
             (previsoes_passadas["cidade"] == cidade)
             & (previsoes_passadas["h"] == h_passado)
             & (previsoes_passadas["data_alvo"] >= inicio_janela)
+            & (previsoes_passadas["data_alvo"] <= fim_janela)
         ]
         if not passadas.empty:
             # Baseline de persistência: repete, para a semana alvo, os casos de H semanas antes
@@ -208,7 +226,7 @@ else:
             ))
             fig_proj.add_trace(go.Scatter(
                 x=passadas["data_alvo"], y=passadas["previsto"],
-                mode="lines+markers", name=f"Previsão passada ({h_passado} sem. antes)",
+                mode=modo, name=f"Previsão passada ({h_passado} sem. antes)",
                 line=dict(color="#d9534f", dash="dot"), marker=dict(size=4),
                 hovertemplate=FORMATO_DATA_HOVER + "<extra>Previsão passada</extra>",
             ))
@@ -217,18 +235,22 @@ else:
             resumo_passado = (
                 f"Nas {len(passadas)} semanas com previsão passada exibidas, o modelo errou em média "
                 f"**{erro_modelo:,.0f} casos por semana**; o baseline (repetir o valor de {h_passado} "
-                f"semana(s) antes) errou **{erro_baseline:,.0f}**. As últimas semanas não têm previsão "
-                f"passada porque os casos delas ainda estão sendo revisados ({SEMANAS_INSTAVEIS} semanas "
-                f"instáveis)."
+                f"semana(s) antes) errou **{erro_baseline:,.0f}**."
             )
+            if inclui_futuro:
+                resumo_passado += (
+                    f" As últimas semanas não têm previsão passada porque os casos delas ainda estão sendo "
+                    f"revisados ({SEMANAS_INSTAVEIS} semanas instáveis)."
+                )
 
-    # A série prevista começa na última semana observada, para as duas linhas se conectarem
-    fig_proj.add_trace(go.Scatter(
-        x=[base] + datas_futuras, y=[valor_base] + valores_futuros,
-        mode="lines+markers", name="Previsão (próximas semanas)",
-        line=dict(color="#d9534f", dash="dash", width=3),
-        hovertemplate=FORMATO_DATA_HOVER + "<extra>Previsão</extra>",
-    ))
+    if inclui_futuro:
+        # A série prevista começa na última semana observada, para as duas linhas se conectarem
+        fig_proj.add_trace(go.Scatter(
+            x=[base] + datas_futuras, y=[valor_base] + valores_futuros,
+            mode="lines+markers", name="Previsão (próximas semanas)",
+            line=dict(color="#d9534f", dash="dash", width=3),
+            hovertemplate=FORMATO_DATA_HOVER + "<extra>Previsão</extra>",
+        ))
     fig_proj.update_layout(
         xaxis_title="Semana epidemiológica (data de início)", yaxis_title="Casos estimados",
         xaxis_tickformat="%m/%Y", margin=dict(t=30),
