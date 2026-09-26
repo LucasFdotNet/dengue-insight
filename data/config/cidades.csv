@@ -12,12 +12,6 @@ santa_barbara,3545803,Santa Bárbara d'Oeste,SP,-22.7553,-47.4143,treino,183347,
 paulinia,3536505,Paulínia,SP,-22.7542,-47.1488,treino,110537,"Região de Campinas/Piracicaba, entre os polos (>100 mil hab.)"
 valinhos,3556206,Valinhos,SP,-22.9698,-46.9974,treino,126373,"Região de Campinas/Piracicaba, entre os polos (>100 mil hab.)"
 araras,3503307,Araras,SP,-22.3572,-47.3842,treino,130866,"Região de Campinas/Piracicaba, entre os polos (>100 mil hab.)"
-sao_jose_rio_preto,3549805,São José do Rio Preto,SP,-20.8113,-49.3758,validacao,480393,"Validação espacial: noroeste paulista, clima mais quente"
-ribeirao_preto,3543402,Ribeirão Preto,SP,-21.1699,-47.8099,validacao,698642,"Validação espacial: norte paulista, inverno mais seco"
-sorocaba,3552205,Sorocaba,SP,-23.4969,-47.4451,validacao,723682,"Validação espacial: sul do interior, clima mais ameno"
-presidente_prudente,3541406,Presidente Prudente,SP,-22.1207,-51.3925,validacao,225668,"Validação espacial: extremo oeste, mais distante da região de treino"
-bauru,3506003,Bauru,SP,-22.3246,-49.0871,validacao,379146,"Validação espacial: centro-oeste paulista, distância intermediária"
-santos,3548500,Santos,SP,-23.9535,-46.335,validacao,418608,"Validação espacial: litoral paulista, clima marítimo úmido"
 brasilia,5300108,Brasília,DF,-15.7795,-47.9297,treino,2817381,Treino nacional: capital da UF
 goiania,5208707,Goiânia,GO,-16.6864,-49.2643,treino,1437366,Treino nacional: capital da UF
 campo_grande,5002704,Campo Grande,MS,-20.4486,-54.6295,treino,898100,Treino nacional: capital da UF
@@ -68,8 +62,55 @@ caxias_do_sul,4305108,Caxias do Sul,RS,-29.1629,-51.1792,treino,463501,Treino na
 joinville,4209102,Joinville,SC,-26.3045,-48.8487,treino,616317,Treino nacional: maior município não capital da UF com >100 mil hab. a >50 km da capital
 juiz_de_fora,3136702,Juiz de Fora,MG,-21.7595,-43.3398,treino,540756,Treino nacional: maior município restante do país pelo mesmo critério (completa 50 cidades)
 montes_claros,3143302,Montes Claros,MG,-16.7282,-43.8578,treino,414240,Treino nacional: maior município restante do país pelo mesmo critério (completa 50 cidades)
+itabuna,2914802,Itabuna,BA,-14.7876,-39.2781,treino,186708,"Treino nacional: histórico de surtos na UF (incidência média anual de 1.751 casos/100 mil, 2010-2025)"
+luis_eduardo_magalhaes,2919553,Luís Eduardo Magalhães,BA,-12.0956,-45.7866,treino,107909,"Treino nacional: histórico de surtos na UF (incidência média anual de 1.448 casos/100 mil, 2010-2025)"
+teixeira_de_freitas,2931350,Teixeira de Freitas,BA,-17.5399,-39.74,treino,145216,"Treino nacional: histórico de surtos na UF (incidência média anual de 1.019 casos/100 mil, 2010-2025)"
+barreiras,2903201,Barreiras,BA,-12.1439,-44.9968,treino,159734,"Treino nacional: histórico de surtos na UF (incidência média anual de 954 casos/100 mil, 2010-2025)"
+sobral,2312908,Sobral,CE,-3.6891,-40.3482,treino,203023,"Treino nacional: histórico de surtos na UF (incidência média anual de 665 casos/100 mil, 2010-2025)"
+itapipoca,2306405,Itapipoca,CE,-3.4993,-39.5836,treino,131123,"Treino nacional: histórico de surtos na UF (incidência média anual de 578 casos/100 mil, 2010-2025)"
+jatai,5211909,Jataí,GO,-17.8784,-51.7204,treino,105729,"Treino nacional: histórico de surtos na UF (incidência média anual de 4.193 casos/100 mil, 2010-2025)"
+balsas,2101400,Balsas,MA,-7.5321,-46.0372,treino,101767,"Treino nacional: histórico de surtos na UF (incidência média anual de 538 casos/100 mil, 2010-2025)"
+varginha,3170701,Varginha,MG,-21.5556,-45.4364,treino,136467,"Treino nacional: histórico de surtos na UF (incidência média anual de 4.081 casos/100 mil, 2010-2025)"
+itabira,3131703,Itabira,MG,-19.6239,-43.2312,treino,113343,"Treino nacional: histórico de surtos na UF (incidência média anual de 3.226 casos/100 mil, 2010-2025)"
+passos,3147907,Passos,MG,-20.7193,-46.609,treino,111939,"Treino nacional: histórico de surtos na UF (incidência média anual de 2.934 casos/100 mil, 2010-2025)"
+conselheiro_lafaiete,3118304,Conselheiro Lafaiete,MG,-20.6634,-43.7846,treino,131621,"Treino nacional: histórico de surtos na UF (incidência média anual de 2.841 casos/100 mil, 2010-2025)"
+araxa,3104007,Araxá,MG,-19.5902,-46.9438,treino,111691,"Treino nacional: histórico de surtos na UF (incidência média anual de 2.833 casos/100 mil, 2010-2025)"
+patos_de_minas,3148004,Patos de Minas,MG,-18.5699,-46.5013,treino,159235,"Treino nacional: histórico de surtos na UF (incidência média anual de 2.776 casos/100 mil, 2010-2025)"
+altamira,1500602,Altamira,PA,-3.2041,-52.21,treino,126279,"Treino nacional: histórico de surtos na UF (incidência média anual de 814 casos/100 mil, 2010-2025)"
+itaituba,1503606,Itaituba,PA,-4.2667,-55.9926,treino,123314,"Treino nacional: histórico de surtos na UF (incidência média anual de 423 casos/100 mil, 2010-2025) (vaga redistribuída de PE)"
+garanhuns,2606002,Garanhuns,PE,-8.8824,-36.4966,treino,142506,"Treino nacional: histórico de surtos na UF (incidência média anual de 779 casos/100 mil, 2010-2025)"
+foz_do_iguacu,4108304,Foz do Iguaçu,PR,-25.5427,-54.5827,treino,285415,"Treino nacional: histórico de surtos na UF (incidência média anual de 4.900 casos/100 mil, 2010-2025)"
+umuarama,4128104,Umuarama,PR,-23.7656,-53.3201,treino,117095,"Treino nacional: histórico de surtos na UF (incidência média anual de 2.878 casos/100 mil, 2010-2025)"
+cascavel,4104808,Cascavel,PR,-24.9573,-53.459,treino,348051,"Treino nacional: histórico de surtos na UF (incidência média anual de 2.025 casos/100 mil, 2010-2025)"
+resende,3304201,Resende,RJ,-22.4705,-44.4509,treino,129612,"Treino nacional: histórico de surtos na UF (incidência média anual de 2.677 casos/100 mil, 2010-2025)"
+angra_dos_reis,3300100,Angra dos Reis,RJ,-23.0011,-44.3196,treino,167434,"Treino nacional: histórico de surtos na UF (incidência média anual de 1.776 casos/100 mil, 2010-2025)"
+itaperuna,3302205,Itaperuna,RJ,-21.1997,-41.8799,treino,101041,"Treino nacional: histórico de surtos na UF (incidência média anual de 1.711 casos/100 mil, 2010-2025)"
+nova_friburgo,3303401,Nova Friburgo,RJ,-22.2932,-42.5377,treino,189939,"Treino nacional: histórico de surtos na UF (incidência média anual de 1.082 casos/100 mil, 2010-2025)"
+rio_das_ostras,3304524,Rio das Ostras,RJ,-22.5174,-41.9475,treino,156491,"Treino nacional: histórico de surtos na UF (incidência média anual de 1.002 casos/100 mil, 2010-2025)"
+santa_cruz_do_sul,4316808,Santa Cruz do Sul,RS,-29.722,-52.4343,treino,133230,"Treino nacional: histórico de surtos na UF (incidência média anual de 1.179 casos/100 mil, 2010-2025)"
+erechim,4307005,Erechim,RS,-27.6364,-52.2697,treino,105705,"Treino nacional: histórico de surtos na UF (incidência média anual de 679 casos/100 mil, 2010-2025)"
+santa_maria,4316907,Santa Maria,RS,-29.6868,-53.8149,treino,271735,"Treino nacional: histórico de surtos na UF (incidência média anual de 465 casos/100 mil, 2010-2025)"
+chapeco,4204202,Chapecó,SC,-27.1004,-52.6152,treino,254785,"Treino nacional: histórico de surtos na UF (incidência média anual de 1.441 casos/100 mil, 2010-2025)"
+caraguatatuba,3510500,Caraguatatuba,SP,-23.6125,-45.4125,treino,134873,"Treino nacional: histórico de surtos na UF (incidência média anual de 4.543 casos/100 mil, 2010-2025)"
+catanduva,3511102,Catanduva,SP,-21.1314,-48.977,treino,115791,"Treino nacional: histórico de surtos na UF (incidência média anual de 4.228 casos/100 mil, 2010-2025)"
+aracatuba,3502804,Araçatuba,SP,-21.2076,-50.4401,treino,200124,"Treino nacional: histórico de surtos na UF (incidência média anual de 4.191 casos/100 mil, 2010-2025)"
+marilia,3529005,Marília,SP,-22.2171,-49.9501,treino,237627,"Treino nacional: histórico de surtos na UF (incidência média anual de 3.587 casos/100 mil, 2010-2025)"
+araraquara,3503208,Araraquara,SP,-21.7845,-48.178,treino,242228,"Treino nacional: histórico de surtos na UF (incidência média anual de 3.097 casos/100 mil, 2010-2025)"
+barretos,3505500,Barretos,SP,-20.5531,-48.5698,treino,122485,"Treino nacional: histórico de surtos na UF (incidência média anual de 3.042 casos/100 mil, 2010-2025)"
+sao_jose_dos_campos,3549904,São José dos Campos,SP,-23.1896,-45.8841,treino,697054,"Treino nacional: histórico de surtos na UF (incidência média anual de 2.960 casos/100 mil, 2010-2025)"
+assis,3504008,Assis,SP,-22.66,-50.4183,treino,101409,"Treino nacional: histórico de surtos na UF (incidência média anual de 2.809 casos/100 mil, 2010-2025)"
+sao_jose_rio_preto,3549805,São José do Rio Preto,SP,-20.8113,-49.3758,validacao,480393,"Validação espacial: noroeste paulista, clima mais quente"
+ribeirao_preto,3543402,Ribeirão Preto,SP,-21.1699,-47.8099,validacao,698642,"Validação espacial: norte paulista, inverno mais seco"
+sorocaba,3552205,Sorocaba,SP,-23.4969,-47.4451,validacao,723682,"Validação espacial: sul do interior, clima mais ameno"
+presidente_prudente,3541406,Presidente Prudente,SP,-22.1207,-51.3925,validacao,225668,"Validação espacial: extremo oeste, mais distante da região de treino"
+bauru,3506003,Bauru,SP,-22.3246,-49.0871,validacao,379146,"Validação espacial: centro-oeste paulista, distância intermediária"
+santos,3548500,Santos,SP,-23.9535,-46.335,validacao,418608,"Validação espacial: litoral paulista, clima marítimo úmido"
 rio_verde,5218805,Rio Verde,GO,-17.7923,-50.9192,validacao,225696,Validação espacial nacional: maior município restante da macrorregião pelo mesmo critério
 caruaru,2604106,Caruaru,PE,-8.2845,-35.9699,validacao,378048,Validação espacial nacional: maior município restante da macrorregião pelo mesmo critério
 parauapebas,1505536,Parauapebas,PA,-6.0678,-49.9037,validacao,267836,Validação espacial nacional: maior município restante da macrorregião pelo mesmo critério
 uberaba,3170107,Uberaba,MG,-19.7472,-47.9381,validacao,337836,Validação espacial nacional: maior município restante da macrorregião pelo mesmo critério
 maringa,4115200,Maringá,PR,-23.4205,-51.9333,validacao,409657,Validação espacial nacional: maior município restante da macrorregião pelo mesmo critério
+vitoria_da_conquista,2933307,Vitória da Conquista,BA,-14.8615,-40.8442,validacao,370879,"Validação espacial nacional: maior município restante da macrorregião em UF ainda sem município de validação (>100 mil hab., >50 km da capital)"
+blumenau,4202404,Blumenau,SC,-26.9155,-49.0709,validacao,361261,"Validação espacial nacional: maior município restante da macrorregião em UF ainda sem município de validação (>100 mil hab., >50 km da capital)"
+sinop,5107909,Sinop,MT,-11.8604,-55.5091,validacao,196312,"Validação espacial nacional: maior município restante da macrorregião em UF ainda sem município de validação (>100 mil hab., >50 km da capital)"
+manacapuru,1302504,Manacapuru,AM,-3.2907,-60.6216,validacao,101883,"Validação espacial nacional: maior município restante da macrorregião em UF ainda sem município de validação (>100 mil hab., >50 km da capital)"
