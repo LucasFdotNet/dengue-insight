@@ -12,10 +12,12 @@ O objetivo é fornecer uma ferramenta acessível para suporte à tomada de decis
 
 ### Municípios Monitorados
 
-São 19 municípios de SP, configurados em [`src/cidades.py`](src/cidades.py) (critérios em [Decisões de Projeto](#-decisões-de-projeto)).
+São 74 municípios, configurados em [`src/cidades.py`](src/cidades.py) (critérios em [Decisões de Projeto](#-decisões-de-projeto)): 19 de SP, foco do projeto, e 55 de outras regiões do Brasil, que dão ao modelo mais epidemias e climas diferentes para aprender.
 
-* **Treino (13):** Campinas, Cosmópolis, Limeira, Piracicaba, Rio Claro, Americana, Sumaré, Hortolândia, Indaiatuba, Santa Bárbara d'Oeste, Paulínia, Valinhos e Araras.
-* **Validação espacial (6):** São José do Rio Preto, Ribeirão Preto, Sorocaba, Presidente Prudente, Bauru e Santos.
+* **Treino, SP (13):** Campinas, Cosmópolis, Limeira, Piracicaba, Rio Claro, Americana, Sumaré, Hortolândia, Indaiatuba, Santa Bárbara d'Oeste, Paulínia, Valinhos, Araras.
+* **Treino, outras regiões (50):** Brasília (DF), Goiânia (GO), Campo Grande (MS), Cuiabá (MT), Maceió (AL), Salvador (BA), Fortaleza (CE), São Luís (MA), João Pessoa (PB), Recife (PE), Teresina (PI), Natal (RN), Aracaju (SE), Rio Branco (AC), Manaus (AM), Macapá (AP), Belém (PA), Porto Velho (RO), Boa Vista (RR), Palmas (TO), Vitória (ES), Belo Horizonte (MG), Rio de Janeiro (RJ), Curitiba (PR), Porto Alegre (RS), Florianópolis (SC), Anápolis (GO), Dourados (MS), Rondonópolis (MT), Arapiraca (AL), Feira de Santana (BA), Juazeiro do Norte (CE), Imperatriz (MA), Campina Grande (PB), Petrolina (PE), Parnaíba (PI), Mossoró (RN), Lagarto (SE), Itacoatiara (AM), Santarém (PA), Ji-Paraná (RO), Araguaína (TO), Cachoeiro de Itapemirim (ES), Uberlândia (MG), Campos dos Goytacazes (RJ), Londrina (PR), Caxias do Sul (RS), Joinville (SC), Juiz de Fora (MG), Montes Claros (MG).
+* **Validação espacial, SP (6):** São José do Rio Preto, Ribeirão Preto, Sorocaba, Presidente Prudente, Bauru, Santos.
+* **Validação espacial, outras regiões (5):** Rio Verde (GO), Caruaru (PE), Parauapebas (PA), Uberaba (MG), Maringá (PR).
 
 ---
 
@@ -89,6 +91,8 @@ O sistema opera em um pipeline desacoplado em 5 etapas modulares:
 
    Opcional: `python -m src.experimento_atraso` roda o experimento de dados atrasados (decisão 10).
 
+   **Sobre a ingestão de clima:** a Open-Meteo limita o uso gratuito por minuto, por hora e por dia, e a série de 16 anos de cada município consome boa parte desses limites. O script espera sozinho quando atinge o limite por minuto ou por hora, então a primeira execução completa (74 municípios) pode levar algumas horas. Se o limite diário for atingido, o script para, mantém o que já foi salvo e avisa para rodar de novo no dia seguinte; a nova execução continua de onde parou. Nas execuções seguintes, só as últimas 12 semanas de cada município são baixadas, o que é rápido. Para baixar tudo de novo, use `python -m src.ingestion_clima --completo`.
+
 ---
 
 ## 🧭 Decisões de Projeto
@@ -97,8 +101,11 @@ Registro das decisões que afetam os dados, o modelo ou a avaliação, com o mot
 
 ### 1. Municípios e papéis (treino × validação)
 
-* **Decisão:** 19 municípios de SP, configurados em [`src/cidades.py`](src/cidades.py). São 13 de **treino** (os polos UNIVESP dos integrantes e a região entre eles) e 6 de **validação espacial** (outras regiões do estado, com climas contrastantes).
-* **Critério de inclusão:** municípios com mais de 100 mil habitantes. A exceção é Cosmópolis, mantida por ser polo de integrante do grupo; suas métricas são reportadas à parte.
+* **Decisão:** 74 municípios, configurados em [`src/cidades.py`](src/cidades.py): 63 de **treino** e 11 de **validação espacial**.
+* **São Paulo (19), foco do projeto:** 13 de treino (os polos UNIVESP dos integrantes e a região entre eles) e 6 de validação (outras regiões do estado, com climas contrastantes). Critério: mais de 100 mil habitantes; a exceção é Cosmópolis, mantida por ser polo de integrante do grupo, com métricas reportadas à parte.
+* **Outras regiões do Brasil (55):** incluídas para dar ao modelo climas e padrões de epidemia diferentes dos de SP (os 13 municípios de treino de SP são vizinhos e têm clima muito parecido). Critério, aplicado com a população do Censo 2022 (IBGE):
+  * **Treino (50):** em cada uma das 26 UFs fora de SP, a capital e o maior município não capital com mais de 100 mil habitantes a mais de 50 km da capital. A distância evita municípios da mesma região metropolitana, que teriam o mesmo clima. AC, AP, DF e RR não têm esse segundo município; os 2 lugares restantes ficaram com os maiores municípios restantes do país pelo mesmo critério (Juiz de Fora e Montes Claros, MG).
+  * **Validação (5):** o maior município restante de cada macrorregião, pelo mesmo critério: Parauapebas (PA, Norte), Caruaru (PE, Nordeste), Rio Verde (GO, Centro-Oeste), Uberaba (MG, Sudeste) e Maringá (PR, Sul).
 * **Regra:** os municípios de validação **nunca** entram no treino, na seleção de features, no ajuste de hiperparâmetros nem na escolha de parâmetros como `SEMANAS_INSTAVEIS`. Eles servem apenas para medir se o modelo generaliza para outras regiões.
 
 ### 2. Período dos dados
@@ -111,6 +118,7 @@ Registro das decisões que afetam os dados, o modelo ou a avaliação, com o mot
 * **Decisão:** as últimas 10 semanas de cada município (`SEMANAS_INSTAVEIS` em `src/train.py`) ficam fora do treino e da avaliação.
 * **Motivo:** o número de casos das semanas mais recentes ainda é uma estimativa (*nowcast*): o InfoDengue revisa esses valores à medida que chegam notificações atrasadas. Treinar com eles ensinaria o modelo com números que ainda vão mudar.
 * **Como chegamos a 10:** o InfoDengue informa, para cada semana, um intervalo de incerteza do nowcast. Olhando os dados de 09/2026, as cidades de treino tinham de 7 a 10 semanas finais com esse intervalo ainda aberto. **Cosmópolis e Indaiatuba tinham 10**, o maior valor, e adotamos esse máximo. Campinas, Piracicaba e Hortolândia não publicam intervalo, mas a última semana delas também está visivelmente incompleta (em Campinas, 68 casos contra cerca de 130 nas semanas anteriores).
+* **Conferência com a base nacional:** ao incluir os municípios de outras regiões (decisão 1), medimos de novo nas 63 cidades de treino. O máximo continuou sendo 10 semanas (por exemplo, Manaus, Belém, Brasília e Teresina), então o valor foi mantido.
 * **Detalhe técnico:** o corte é feito depois de descartar as semanas sem alvo, para que também saiam as semanas cujo alvo (H semanas à frente) cai dentro do período instável. O corte fica no treino, e não no pré-processamento, porque o dashboard precisa mostrar as semanas recentes.
 
 ### 4. Fonte dos dados climáticos: Open-Meteo (ERA5)
