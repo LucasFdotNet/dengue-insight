@@ -41,7 +41,7 @@ O sistema opera em um pipeline desacoplado em 5 etapas modulares:
    * **Casos (`src/ingestion.py`):** Conecta à API pública do InfoDengue (Fiocruz/FGV) via requisições HTTP REST e extrai as séries temporais consolidadas das semanas epidemiológicas.
    * **Clima (`src/ingestion_clima.py`):** Obtém temperatura, precipitação e umidade diárias da reanálise ERA5 pela Open-Meteo e agrega por semana epidemiológica.
 2. **Pré-processamento (`src/preprocessing.py`):** Une casos e clima por semana, realiza limpeza, tratamento de valores faltantes por interpolação e gera defasagens temporais (*lag features* de 1 a 4 semanas) e médias móveis.
-3. **Treinamento e Validação (`src/train.py`):** Utiliza algoritmos baseados em Gradient Boosting (**LightGBM**) treinados de forma multi-horizonte (H+1 a H+4 semanas) com divisão temporal cronológica, avaliados por MAE, RMSE e R².
+3. **Treinamento e Validação (`src/train.py`):** Treina um modelo único de Gradient Boosting (**LightGBM**) com todos os municípios de treino, um por horizonte (H+1 a H+4 semanas). Avalia com validação *walk-forward* anual por MAE, RMSE e R², sempre comparando com um baseline de persistência, e salva o modelo de produção usado pelo dashboard.
 4. **Análise Exploratória (`src/eda.py`):** Processa dados e gera matrizes de correlação de Pearson e gráficos comparativos de casos versus variáveis climáticas/ambientais.
 5. **Dashboard Interativo (`app.py`):** Interface web moderna para visualização em tempo real dos indicadores atuais, curvas históricas e projeções com intervalos das próximas 4 semanas.
 
@@ -106,11 +106,10 @@ Registro das decisões que afetam os dados, o modelo ou a avaliação, com o mot
 
 ### 3. Descarte das semanas finais instáveis
 
-* **Decisão:** as últimas `SEMANAS_INSTAVEIS` semanas (hoje, 10) ficam fora do treino e da avaliação, em `src/train.py`.
-* **Motivo:** o `casos_est` das semanas recentes é uma estimativa (*nowcast*) que o InfoDengue ainda revisa conforme chegam notificações atrasadas.
-* **Detalhes:** o corte é aplicado depois do `dropna`, para que alvos que apontam para semanas instáveis também sejam descartados. O corte fica no treino, e não no pré-processamento, porque o dashboard e as previsões precisam das semanas recentes.
-* **Como o valor foi medido (09/2026, só cidades de treino):** para cada cidade, contamos quantas semanas finais ainda têm o intervalo `casos_est_min`–`casos_est_max` aberto, ou seja, ainda em nowcast. O resultado foi de 7 a 10 semanas; usamos o máximo, 10. Campinas, Piracicaba e Hortolândia não publicam nowcast (o intervalo é sempre zero), mas a última semana delas também está visivelmente incompleta (em Campinas, 68 casos contra cerca de 130 nas semanas anteriores).
-* **Limitação:** o critério mede onde o InfoDengue ainda aplica nowcast, não quanto os números mudam depois. Para medir a revisão real, seria preciso guardar as ingestões de semanas diferentes e compará-las.
+* **Decisão:** as últimas 10 semanas de cada município (`SEMANAS_INSTAVEIS` em `src/train.py`) ficam fora do treino e da avaliação.
+* **Motivo:** o número de casos das semanas mais recentes ainda é uma estimativa (*nowcast*): o InfoDengue revisa esses valores à medida que chegam notificações atrasadas. Treinar com eles ensinaria o modelo com números que ainda vão mudar.
+* **Como chegamos a 10:** o InfoDengue informa, para cada semana, um intervalo de incerteza do nowcast. Olhando os dados de 09/2026, as cidades de treino tinham de 7 a 10 semanas finais com esse intervalo ainda aberto. **Cosmópolis e Indaiatuba tinham 10**, o maior valor, e adotamos esse máximo. Campinas, Piracicaba e Hortolândia não publicam intervalo, mas a última semana delas também está visivelmente incompleta (em Campinas, 68 casos contra cerca de 130 nas semanas anteriores).
+* **Detalhe técnico:** o corte é feito depois de descartar as semanas sem alvo, para que também saiam as semanas cujo alvo (H semanas à frente) cai dentro do período instável. O corte fica no treino, e não no pré-processamento, porque o dashboard precisa mostrar as semanas recentes.
 
 ### 4. Fonte dos dados climáticos: Open-Meteo (ERA5)
 
@@ -127,10 +126,78 @@ Registro das decisões que afetam os dados, o modelo ou a avaliação, com o mot
   * os dados chegam com cerca de 6 dias de atraso, então a semana epidemiológica mais recente pode ficar sem clima.
 * **Agregação:** dados diários agrupados por semana epidemiológica (domingo a sábado, alinhada a `data_iniSE`).
 * **Atribuição:** dados ERA5 de Copernicus Climate Change Service, sob licença CC BY 4.0; acesso via Open-Meteo.
+* **Uso:** o clima aparece no dashboard e na análise exploratória, mas **não entra no modelo** de previsão. Ver a decisão 7.
 
-### Decisões pendentes
+### 5. Modelo único com alvo relativo
 
-* **Variáveis climáticas:** proposta de usar temperatura mínima, média e máxima, precipitação total da semana e umidade relativa média.
-* **Modelo único para todas as cidades de treino ou um modelo por cidade.**
-* **Tipo de alvo:** casos absolutos (atual) ou variação relativa, `log1p(y[t+h]) - log1p(y[t])`.
-* **Validação:** substituir o corte único 80/20 por validação *walk-forward* com janelas anuais.
+* **Decisão:** um único modelo, treinado com os 13 municípios de treino juntos (um modelo para cada horizonte, de 1 a 4 semanas), em vez de um modelo separado por município. O modelo prevê a **variação** dos casos, e não o número de casos.
+* **O que é o alvo relativo:** em vez de "quantos casos haverá daqui a H semanas", o modelo responde "quanto os casos vão crescer ou cair em relação a hoje", em escala logarítmica: `log(1 + casos daqui a H semanas) − log(1 + casos hoje)`. O número de casos é reconstruído a partir da previsão. Assim, uma cidade com 20 casos e outra com 2.000 que estejam dobrando têm o mesmo alvo, e o modelo aprende o comportamento da epidemia, não o tamanho da cidade.
+* **Motivos:**
+  * **Picos maiores que os do passado.** Modelos de árvore, como o LightGBM, não conseguem prever valores acima do maior valor visto no treino. Com o alvo absoluto, isso era grave: em Campinas, o treino chegava a no máximo 7.074 casos semanais e a epidemia de 2024 chegou a 11.789. Prevendo a variação, o modelo pode chegar a valores nunca vistos (por exemplo, "dobrar" a partir de um valor já alto).
+  * **Mais epidemias para aprender.** Juntando os 13 municípios, o modelo vê muito mais surtos (inícios, picos e quedas) do que veria em um único município.
+  * **Previsão para qualquer município.** Como não depende de um histórico próprio para treinar, o modelo único pode prever os municípios de validação, o que permite testar se ele generaliza para outras regiões. O nome do município não entra como informação no modelo; se entrasse, não seria possível aplicá-lo a municípios novos.
+* **Resultado que motivou a escolha** (validação *walk-forward*, 2015 a 2026, municípios de treino; os números são o erro médio do modelo dividido pelo erro médio do baseline, e **abaixo de 1 significa que o modelo erra menos que o baseline**):
+
+  | Abordagem | H+1 | H+2 | H+3 | H+4 |
+  |---|---|---|---|---|
+  | Um modelo por município, alvo absoluto (versão anterior) | 2,07 | 1,40 | 1,16 | 1,00 |
+  | Um modelo por município, alvo relativo | 0,89 | 0,83 | 0,76 | 0,76 |
+  | **Modelo único, alvo relativo (adotado)** | **0,87** | **0,79** | **0,75** | **0,72** |
+
+* **Variáveis usadas pelo modelo:** casos atuais (em log), variação dos casos em relação a 1, 2, 3 e 4 semanas atrás, `Rt` da semana anterior e semana do ano (sazonalidade). A variável `p_inc100k` (incidência por 100 mil habitantes) foi retirada porque é apenas `casos / população`, redundante com os casos.
+* **Hiperparâmetros:** fixos (300 árvores, taxa de aprendizado 0,05), sem ajuste fino. Testamos 150 e 600 árvores e a diferença foi desprezível.
+
+### 6. Validação *walk-forward* anual e baseline
+
+* **Decisão:** avaliar o modelo ano a ano. Para cada ano de teste, de 2015 em diante, o modelo é treinado **só com as semanas anteriores** a esse ano e testado no ano inteiro. Isso simula o uso real: prever o futuro sabendo apenas o passado.
+* **Por que não o corte único 80/20:** um único corte testava apenas um período (de 2023 em diante), dominado pela epidemia de 2024, e o resultado dependia muito de onde caía o corte. Com janelas anuais, cada ano é testado, e cada teste cobre um ano completo, com todas as estações.
+* **Baseline de persistência:** a referência de comparação é a previsão mais simples possível, "daqui a H semanas haverá o mesmo número de casos de hoje". Um modelo só é útil se errar menos que isso.
+* **Pandemia (2020–2021):** testamos treinar o modelo sem esses dois anos. O resultado praticamente não mudou (razão de 0,86 a 0,74 sem a pandemia, contra 0,87 a 0,72 com ela), então mantivemos todos os anos. Na avaliação, 2020 foi um ano em que o modelo empatou com o baseline (razão de 1,00 a 1,13).
+* **Anos em que o modelo perde para o baseline:** 2016 a 2018 e 2020. Em 2016–2018 o treino ainda tinha poucos anos de histórico, e 2017 foi um ano de poucos casos após as grandes epidemias de 2015–2016, quando repetir o valor atual é difícil de superar. 2026 também aparece acima de 1, mas é um ano incompleto (só até meados do ano).
+* **Relatórios gerados** em `reports/`: `metricas_gerais.csv` (por grupo e horizonte), `metricas_por_ano.csv` (por ano, com 2024 separado) e `metricas_modelos.csv` (por município, permitindo ver Cosmópolis à parte).
+* **Resultado atual** (razão modelo/baseline; abaixo de 1, o modelo é melhor):
+
+  | Grupo | H+1 | H+2 | H+3 | H+4 |
+  |---|---|---|---|---|
+  | Municípios de treino (13) | 0,87 | 0,79 | 0,76 | 0,73 |
+  | Municípios de validação espacial (6) | 0,98 | 0,87 | 0,86 | 0,83 |
+
+  O modelo é mais útil nos horizontes mais longos. Para a semana seguinte (H+1), fica próximo do baseline, principalmente nos municípios de validação. São José do Rio Preto, o município mais quente e mais distante do perfil de treino, é o único em que o modelo empata com o baseline.
+
+### 7. Clima fora do modelo de previsão
+
+* **Decisão:** as variáveis climáticas (temperatura, chuva e umidade) **não entram** no modelo. Continuam disponíveis no dashboard e na análise exploratória.
+* **Motivo:** na validação *walk-forward*, todas as combinações de clima testadas **pioraram** a previsão nos municípios de treino:
+
+  | Variáveis testadas | H+1 | H+2 | H+3 | H+4 |
+  |---|---|---|---|---|
+  | **Sem clima (adotado)** | **0,87** | **0,79** | **0,75** | **0,72** |
+  | Chuva acumulada de 4 e 8 semanas e temperatura média de 8 semanas | 0,90 | 0,83 | 0,80 | 0,76 |
+  | Chuva de 4 e 12 semanas e temperatura de 8 semanas | 0,91 | 0,82 | 0,78 | 0,73 |
+  | 5 variáveis agregadas de chuva, temperatura e umidade | 0,94 | 0,85 | 0,85 | 0,79 |
+  | 22 variáveis (defasagens semanais de 1 a 8 semanas) | 0,94 | 0,82 | 0,83 | 0,77 |
+
+* **Interpretação:** o clima influencia a dengue, mas com semanas de atraso, e esse efeito já está refletido na tendência recente dos casos e no `Rt`, que o modelo usa. A semana do ano já captura a sazonalidade. Para horizontes curtos (1 a 4 semanas), o clima acrescentou mais ruído do que informação. Além disso, os municípios de treino são vizinhos e têm clima muito parecido (vários caem no mesmo ponto da grade do ERA5), o que limita o que o modelo pode aprender com ele.
+* **Observação:** um primeiro teste com o corte único 80/20 sugeria que o clima ajudava em H+3 e H+4. A validação *walk-forward* não confirmou isso, o que mostra por que avaliar em vários anos é importante.
+
+### 8. Número de municípios de treino
+
+* **Pergunta:** vale a pena incluir mais municípios no treino?
+* **Teste:** treinamos o modelo com 4, 7, 10 e 13 municípios de treino, sorteados, e medimos o resultado nos municípios de validação espacial:
+
+  | Municípios no treino | H+1 | H+2 | H+3 | H+4 |
+  |---|---|---|---|---|
+  | 4 | 1,04 | 0,96 | 0,93 | 0,91 |
+  | 7 | 1,00 | 0,92 | 0,87 | 0,86 |
+  | 10 | 0,97 | 0,89 | 0,85 | 0,83 |
+  | 13 | 0,97 | 0,87 | 0,85 | 0,83 |
+
+* **Conclusão:** mais municípios ajudam, mas o ganho diminui: de 10 para 13 a melhora já é pequena. Incluir mais municípios poderia trazer algum ganho, principalmente se forem de regiões com clima diferente, mas não é prioritário.
+
+### Nota sobre os testes exploratórios
+
+As tabelas das decisões 5, 7 e 8 vêm de testes exploratórios feitos com a mesma validação *walk-forward*, antes de um ajuste no corte das semanas instáveis (decisão 3). Por isso podem diferir na segunda casa decimal dos números de `reports/` e da tabela da decisão 6, que são os resultados finais.
+
+### Nota sobre os municípios de validação
+
+Todas as escolhas acima (tipo de modelo, alvo, variáveis, pandemia, hiperparâmetros) foram feitas com base nos resultados dos **municípios de treino**. Os municípios de validação foram usados para medir a generalização. Nos testes exploratórios, os resultados deles eram exibidos junto com os de treino e sempre apontaram na mesma direção, mas não foram usados como critério de escolha.
