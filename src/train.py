@@ -9,7 +9,11 @@ from src.cidades import CIDADES, cidades_por_papel
 
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
 
-SEMANAS_INSTAVEIS = 8  # semanas finais cujo casos_est (nowcast) ainda é revisado
+# Semanas finais cujo casos_est (nowcast) ainda é revisado pelo InfoDengue.
+# Critério: maior número de semanas finais com intervalo casos_est_min/max aberto
+# entre as cidades de treino (medido em 09/2026: de 7 a 10 semanas; Campinas,
+# Piracicaba e Hortolândia não publicam nowcast, mas também têm a última semana incompleta).
+SEMANAS_INSTAVEIS = 10
 
 FEATURES = [
     'casos_est_lag_1', 'casos_est_lag_2', 'casos_est_lag_3', 'casos_est_lag_4',

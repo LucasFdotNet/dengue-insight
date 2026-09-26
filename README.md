@@ -94,10 +94,11 @@ Registro das decisões que afetam os dados, o modelo ou a avaliação, com o mot
 
 ### 3. Descarte das semanas finais instáveis
 
-* **Decisão:** as últimas `SEMANAS_INSTAVEIS` semanas (hoje, 8) ficam fora do treino e da avaliação, em `src/train.py`.
+* **Decisão:** as últimas `SEMANAS_INSTAVEIS` semanas (hoje, 10) ficam fora do treino e da avaliação, em `src/train.py`.
 * **Motivo:** o `casos_est` das semanas recentes é uma estimativa (*nowcast*) que o InfoDengue ainda revisa conforme chegam notificações atrasadas.
 * **Detalhes:** o corte é aplicado depois do `dropna`, para que alvos que apontam para semanas instáveis também sejam descartados. O corte fica no treino, e não no pré-processamento, porque o dashboard e as previsões precisam das semanas recentes.
-* **Pendente:** o valor 8 é provisório e será medido com os dados das cidades de treino.
+* **Como o valor foi medido (09/2026, só cidades de treino):** para cada cidade, contamos quantas semanas finais ainda têm o intervalo `casos_est_min`–`casos_est_max` aberto, ou seja, ainda em nowcast. O resultado foi de 7 a 10 semanas; usamos o máximo, 10. Campinas, Piracicaba e Hortolândia não publicam nowcast (o intervalo é sempre zero), mas a última semana delas também está visivelmente incompleta (em Campinas, 68 casos contra cerca de 130 nas semanas anteriores).
+* **Limitação:** o critério mede onde o InfoDengue ainda aplica nowcast, não quanto os números mudam depois. Para medir a revisão real, seria preciso guardar as ingestões de semanas diferentes e compará-las.
 
 ### 4. Fonte dos dados climáticos: Open-Meteo (ERA5)
 
