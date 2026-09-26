@@ -87,6 +87,8 @@ O sistema opera em um pipeline desacoplado em 5 etapas modulares:
    streamlit run app.py
    ```
 
+   Opcional: `python -m src.experimento_atraso` roda o experimento de dados atrasados (decisão 10).
+
 ---
 
 ## 🧭 Decisões de Projeto
@@ -147,22 +149,25 @@ Registro das decisões que afetam os dados, o modelo ou a avaliação, com o mot
 * **Variáveis usadas pelo modelo:** casos atuais (em log), variação dos casos em relação a 1, 2, 3 e 4 semanas atrás, `Rt` da semana anterior e semana do ano (sazonalidade). A variável `p_inc100k` (incidência por 100 mil habitantes) foi retirada porque é apenas `casos / população`, redundante com os casos.
 * **Hiperparâmetros:** fixos (300 árvores, taxa de aprendizado 0,05), sem ajuste fino. Testamos 150 e 600 árvores e a diferença foi desprezível.
 
-### 6. Validação *walk-forward* anual e baseline
+### 6. Validação *walk-forward* com retreino mensal e baseline
 
-* **Decisão:** avaliar o modelo ano a ano. Para cada ano de teste, de 2015 em diante, o modelo é treinado **só com as semanas anteriores** a esse ano e testado no ano inteiro. Isso simula o uso real: prever o futuro sabendo apenas o passado.
-* **Por que não o corte único 80/20:** um único corte testava apenas um período (de 2023 em diante), dominado pela epidemia de 2024, e o resultado dependia muito de onde caía o corte. Com janelas anuais, cada ano é testado, e cada teste cobre um ano completo, com todas as estações.
+* **Decisão:** simular o uso real do modelo desde 2015. No início de cada mês, um modelo é treinado **só com o que já era conhecido até ali** e usado para prever as semanas daquele mês; no mês seguinte, é retreinado com os dados novos. São 141 retreinos por horizonte (jan/2015 a set/2026).
+* **Por que retreino mensal:** é como o modelo seria usado na prática, retreinado periodicamente com os dados mais recentes. Uma primeira versão retreinava uma vez por ano, o que deixava a simulação um pouco pessimista: o modelo de dezembro não conhecia nada do próprio ano. Com o retreino mensal, o erro caiu levemente (por exemplo, de 0,98 para 0,94 em H+1 nos municípios de validação).
+* **Cuidado com o futuro:** para prever H semanas à frente, o treino só usa exemplos cujo resultado (H semanas depois) já era conhecido antes do início do mês. Nenhuma informação do período previsto entra no modelo que o previu.
+* **Por que não o corte único 80/20:** um único corte testava apenas um período (de 2023 em diante), dominado pela epidemia de 2024, e o resultado dependia muito de onde caía o corte. Com a validação *walk-forward*, todos os anos desde 2015 são testados.
 * **Baseline de persistência:** a referência de comparação é a previsão mais simples possível, "daqui a H semanas haverá o mesmo número de casos de hoje". Um modelo só é útil se errar menos que isso.
-* **Pandemia (2020–2021):** testamos treinar o modelo sem esses dois anos. O resultado praticamente não mudou (razão de 0,86 a 0,74 sem a pandemia, contra 0,87 a 0,72 com ela), então mantivemos todos os anos. Na avaliação, 2020 foi um ano em que o modelo empatou com o baseline (razão de 1,00 a 1,13).
-* **Anos em que o modelo perde para o baseline:** 2016 a 2018 e 2020. Em 2016–2018 o treino ainda tinha poucos anos de histórico, e 2017 foi um ano de poucos casos após as grandes epidemias de 2015–2016, quando repetir o valor atual é difícil de superar. 2026 também aparece acima de 1, mas é um ano incompleto (só até meados do ano).
-* **Relatórios gerados** em `reports/`: `metricas_gerais.csv` (por grupo e horizonte), `metricas_por_ano.csv` (por ano, com 2024 separado) e `metricas_modelos.csv` (por município, permitindo ver Cosmópolis à parte).
+* **Pandemia (2020–2021):** testamos treinar o modelo sem esses dois anos (teste exploratório, com retreino anual). O resultado praticamente não mudou (razão de 0,86 a 0,74 sem a pandemia, contra 0,87 a 0,72 com ela), então mantivemos todos os anos. Na avaliação, 2020 foi um ano em que o modelo empatou com o baseline (razão de 1,01 a 1,10).
+* **Anos em que o modelo perde para o baseline:** 2016 a 2018, 2020 e 2026. São anos de transmissão baixa ou estável, em que repetir o valor atual é difícil de superar e o modelo às vezes antecipa mudanças que não acontecem (por exemplo, a subida típica do verão). 2017 é o caso mais claro: poucos casos após as grandes epidemias de 2015–2016. Em 2016–2018 o treino também ainda tinha poucos anos de histórico. Nos anos com epidemias ou quedas fortes (2019, 2021 a 2025), o modelo erra de 11% a 44% menos que o baseline nos municípios de treino.
+* **Relatórios gerados** em `reports/`: `metricas_gerais.csv` (por grupo e horizonte), `metricas_por_ano.csv` (por ano da semana prevista, com 2024 separado), `metricas_modelos.csv` (por município, permitindo ver Cosmópolis à parte) e `previsoes_walkforward.csv` (todas as previsões semana a semana, usadas pelo dashboard).
 * **Resultado atual** (razão modelo/baseline; abaixo de 1, o modelo é melhor):
 
   | Grupo | H+1 | H+2 | H+3 | H+4 |
   |---|---|---|---|---|
-  | Municípios de treino (13) | 0,87 | 0,79 | 0,76 | 0,73 |
-  | Municípios de validação espacial (6) | 0,98 | 0,87 | 0,86 | 0,83 |
+  | Municípios de treino (13) | 0,85 | 0,79 | 0,76 | 0,73 |
+  | Municípios de validação espacial (6) | 0,94 | 0,85 | 0,84 | 0,82 |
 
-  O modelo é mais útil nos horizontes mais longos. Para a semana seguinte (H+1), fica próximo do baseline, principalmente nos municípios de validação. São José do Rio Preto, o município mais quente e mais distante do perfil de treino, é o único em que o modelo empata com o baseline.
+  O modelo é mais útil nos horizontes mais longos. Para a semana seguinte (H+1), a vantagem é pequena, principalmente nos municípios de validação. São José do Rio Preto (o município mais quente e mais distante do perfil de treino) e Ribeirão Preto são os únicos em que o modelo praticamente empata com o baseline.
+* **Limitação: dados revisados.** A simulação usa os casos na versão revisada de hoje. Em tempo real, os casos das semanas mais recentes ainda estariam incompletos, porque as notificações chegam com atraso. Por isso a simulação é **otimista** nesse ponto: em uso real, o modelo erraria mais. Não é possível corrigir isso para o passado, porque o InfoDengue não disponibiliza os dados como eram conhecidos em cada data (essa avaliação é chamada de pseudoprospectiva). A decisão 10 mede o tamanho desse efeito com uma simulação de pior caso.
 
 ### 7. Clima fora do modelo de previsão
 
@@ -198,13 +203,34 @@ Registro das decisões que afetam os dados, o modelo ou a avaliação, com o mot
 
 * **Granularidade semanal:** todos os dados, previsões e gráficos são por **semana epidemiológica** (domingo a sábado). É a unidade em que o InfoDengue publica os casos e em que a vigilância epidemiológica trabalha. Agregar por mês esconderia a velocidade de crescimento de um surto, que é justamente o que o modelo usa para prever. Os rótulos dos eixos mostram meses apenas para facilitar a leitura; cada ponto é uma semana.
 * **Previsões passadas no gráfico de projeções:** o gráfico mostra os casos reais, as previsões que o modelo teria feito na época e o baseline, com um seletor de antecedência (1 a 4 semanas) e um seletor de período: últimos 12 meses (padrão), um ano específico de 2015 em diante ou todo o período avaliado. Abaixo, informa o erro médio do modelo e do baseline no período exibido. A previsão das próximas semanas só aparece quando o período inclui a semana atual.
-* **Cuidado metodológico:** as previsões passadas **não** são geradas com o modelo de produção. Ele foi treinado com toda a série e já "viu" essas semanas, então pareceria melhor do que é. Elas vêm da validação *walk-forward* (decisão 6): cada semana foi prevista por um modelo treinado só com dados anteriores ao ano dela. O `train.py` salva essas previsões em `reports/previsoes_walkforward.csv`.
+* **Cuidado metodológico:** as previsões passadas **não** são geradas com o modelo de produção. Ele foi treinado com toda a série e já "viu" essas semanas, então pareceria melhor do que é. Elas vêm da validação *walk-forward* com retreino mensal (decisão 6): cada semana foi prevista por um modelo treinado só com o que era conhecido no início do mês dela. O `train.py` salva essas previsões em `reports/previsoes_walkforward.csv`. Como na decisão 6, elas usam os dados já revisados, e o próprio painel avisa isso.
 * **Semanas sem previsão passada:** as 10 semanas mais recentes (decisão 3) não têm previsão passada, porque os casos delas ainda estão sendo revisados e não servem de referência para medir erro.
 * **Filtro por tipo de município:** o painel permite filtrar os municípios por papel (treino ou validação espacial), e o tipo aparece ao lado do nome de cada um.
 
+### 10. Experimento: previsão com dados atrasados
+
+* **Pergunta:** a decisão 6 usa os dados já revisados. Quanto pior o modelo seria se os dados recentes não estivessem disponíveis, como acontece em tempo real?
+* **Simulação (pior caso):** na semana X, consideramos que as semanas X, X-1, X-2 e X-3 não são confiáveis e não podem ser usadas. O último dado disponível é o da semana X-4. Para prever X+N, o modelo precisa então olhar N+4 semanas à frente a partir de X-4. O baseline, da mesma forma, repete o último valor confiável (X-4). Rodamos também com lacuna de 5 semanas (último dado em X-5). Todo o resto é igual à decisão 6 (retreino mensal, mesmas semanas-alvo em todos os cenários).
+* **Por que é pior caso:** na prática, o InfoDengue fornece uma estimativa (*nowcast*) para as semanas recentes. Ela é incerta, mas não inexistente, então o desempenho real deve ficar entre o cenário sem lacuna e o cenário com lacuna.
+* **Código e resultados:** `src/experimento_atraso.py`, com saída em `reports/experimento_atraso.csv`.
+* **Resultado nos municípios de treino** (erro médio em casos por semana):
+
+  | Antecedência | Modelo sem lacuna | Modelo com lacuna de 4 semanas | Baseline com lacuna de 4 semanas | Razão modelo/baseline com lacuna |
+  |---|---|---|---|---|
+  | 1 semana | 26 | 76 (2,9×) | 106 | 0,72 |
+  | 2 semanas | 39 | 86 (2,2×) | 123 | 0,70 |
+  | 3 semanas | 52 | 96 (1,8×) | 139 | 0,69 |
+  | 4 semanas | 64 | 104 (1,6×) | 153 | 0,68 |
+
+  Nos municípios de validação, o padrão é o mesmo: o erro do modelo cresce de 1,6 a 3,2 vezes, e a razão modelo/baseline fica entre 0,76 e 0,80. Com lacuna de 5 semanas, os erros crescem um pouco mais (de 1,7 a 3,5 vezes), com as mesmas conclusões.
+* **Conclusões:**
+  * **O atraso dos dados custa caro:** sem as 4 semanas mais recentes, o erro do modelo aumenta de 1,6 a 3,2 vezes. O efeito é maior nas antecedências curtas, porque prever "a semana que vem" sem saber o que aconteceu nas últimas 4 semanas é, na prática, prever 5 semanas à frente.
+  * **O modelo continua útil, e sua vantagem aumenta:** com dados atrasados, repetir o último valor conhecido fica muito pior, e o modelo passa a errar de 20% a 32% menos que o baseline (contra 6% a 27% sem lacuna). Quanto mais incerta a situação, mais vale ter um modelo que antecipa a tendência.
+  * **Para o uso real:** as previsões do painel devem ser lidas como estimativas de tendência (subida ou queda), com margem de erro maior nas semanas mais próximas do que a validação da decisão 6 sugere.
+
 ### Nota sobre os testes exploratórios
 
-As tabelas das decisões 5, 7 e 8 vêm de testes exploratórios feitos com a mesma validação *walk-forward*, antes de um ajuste no corte das semanas instáveis (decisão 3). Por isso podem diferir na segunda casa decimal dos números de `reports/` e da tabela da decisão 6, que são os resultados finais.
+As tabelas das decisões 5, 7 e 8 vêm de testes exploratórios feitos com a validação *walk-forward* com retreino **anual**, antes do retreino mensal (decisão 6) e de um ajuste no corte das semanas instáveis (decisão 3). Como todas as alternativas de cada tabela foram avaliadas da mesma forma, as comparações continuam válidas, mas os números podem diferir na segunda casa decimal dos de `reports/` e das tabelas das decisões 6 e 10, que são os resultados finais.
 
 ### Nota sobre os municípios de validação
 

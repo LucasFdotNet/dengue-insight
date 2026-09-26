@@ -263,9 +263,14 @@ else:
     with st.expander("Como as previsões passadas foram geradas?"):
         st.markdown(
             "As previsões passadas mostram o que o modelo **teria previsto na época**, sem conhecer o futuro. "
-            "Elas vêm da validação *walk-forward*: para cada ano, um modelo foi treinado só com os dados "
-            "anteriores a esse ano e usado para prever as semanas dele. Assim, nenhuma semana exibida foi "
-            "vista pelo modelo que a previu.\n\n"
+            "Elas simulam o uso real com retreino mensal: no início de cada mês, um modelo foi treinado só "
+            "com o que já era conhecido até ali e usado para prever as semanas daquele mês. Assim, nenhuma "
+            "semana exibida foi vista pelo modelo que a previu.\n\n"
             "O **baseline** é a previsão mais simples possível: repetir o número de casos de algumas semanas "
-            "antes. O modelo só é útil se errar menos que ele."
+            "antes. O modelo só é útil se errar menos que ele.\n\n"
+            "**Limitação:** a simulação usa os casos já revisados. Em tempo real, os casos das semanas mais "
+            "recentes ainda estariam incompletos, porque as notificações chegam com atraso, e o modelo erraria "
+            "mais. Um experimento em que as 4 semanas mais recentes ficam indisponíveis mostrou que o erro do "
+            "modelo aumenta de 1,6 a 3,2 vezes, mas ele continua errando menos que o baseline nas mesmas "
+            "condições (ver decisão 10 no README do projeto)."
         )
