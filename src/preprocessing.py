@@ -1,4 +1,5 @@
 import os
+import sys
 import numpy as np
 import pandas as pd
 import logging
@@ -30,9 +31,13 @@ def load_and_clean_data(filepath, clima_path):
     
     # 2. Clima semanal (ERA5). Left join: semanas recentes que o ERA5 ainda
     # não cobre ficam sem clima, em vez de receber valor copiado.
-    clima = pd.read_csv(clima_path, parse_dates=['data_iniSE'])
-    _verificar_colunas(clima, ['data_iniSE'] + COLUNAS_CLIMA, clima_path)
-    df = df.merge(clima[['data_iniSE'] + COLUNAS_CLIMA], on='data_iniSE', how='left', validate='one_to_one')
+    if clima_path is None:
+        # Modo --sem-clima: colunas de clima vazias (o modelo atual não usa clima)
+        df[COLUNAS_CLIMA] = np.nan
+    else:
+        clima = pd.read_csv(clima_path, parse_dates=['data_iniSE'])
+        _verificar_colunas(clima, ['data_iniSE'] + COLUNAS_CLIMA, clima_path)
+        df = df.merge(clima[['data_iniSE'] + COLUNAS_CLIMA], on='data_iniSE', how='left', validate='one_to_one')
     
     # Preenchimento de nulos apenas entre valores conhecidos (sem extrapolar nas pontas)
     for col in ['casos_est', 'rt', 'p_inc100k'] + COLUNAS_CLIMA:
@@ -67,14 +72,20 @@ def feature_engineering(df):
         
     return df_feat
 
-def run_preprocessing():
+def run_preprocessing(sem_clima=False):
+    """sem_clima=True (opção --sem-clima) processa sem os dados climáticos, com as colunas
+    de clima vazias. Serve para treinar o modelo, que não usa clima, enquanto a ingestão de
+    clima não termina; o painel e a análise exploratória precisam do processamento completo."""
     os.makedirs('data/processed', exist_ok=True)
+    if sem_clima:
+        logging.warning("Processando SEM dados climáticos (--sem-clima). Rode de novo sem a opção "
+                        "quando a ingestão de clima terminar.")
     
     for cidade in CIDADES:
         filepath = os.path.join('data/raw', f'{cidade}_raw.csv')
-        clima_path = os.path.join('data/raw/clima', f'{cidade}_clima.csv')
+        clima_path = None if sem_clima else os.path.join('data/raw/clima', f'{cidade}_clima.csv')
         for path, script in [(filepath, 'ingestion.py'), (clima_path, 'ingestion_clima.py')]:
-            if not os.path.exists(path):
+            if path is not None and not os.path.exists(path):
                 raise FileNotFoundError(f"{path} não encontrado. Execute {script} antes.")
         logging.info(f"Processando {cidade}...")
         df = load_and_clean_data(filepath, clima_path)
@@ -83,4 +94,4 @@ def run_preprocessing():
         logging.info(f"{cidade} processado com sucesso.")
 
 if __name__ == "__main__":
-    run_preprocessing()
+    run_preprocessing(sem_clima='--sem-clima' in sys.argv)
