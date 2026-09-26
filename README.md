@@ -183,6 +183,19 @@ Registro das decisões que afetam os dados, o modelo ou a avaliação, com o mot
   | 22 variáveis (defasagens semanais de 1 a 8 semanas) | 0,94 | 0,82 | 0,83 | 0,77 |
 
 * **Novo teste sem o Rt:** como o Rt poderia estar "cobrindo" parte do efeito do clima, repetimos o teste depois de retirar o Rt do modelo (decisão 12), já com a validação final (retreino mensal). O clima voltou a piorar a previsão em todas as combinações e horizontes.
+* **Teste com o clima de semanas específicas:** o ciclo de ovo a mosquito adulto leva de 7 a 10 dias e depende do clima, então testamos também o clima semana a semana, sem agregar, nas semanas anteriores à semana atual S (o clima de S ainda não está disponível no momento da previsão). Cada combinação foi testada com todas as variáveis (temperatura mínima, média e máxima, chuva e umidade) e com um conjunto essencial (temperatura média, chuva e umidade). Script: `src/experimento_clima_semanal.py`; saída: `reports/experimento_clima_semanal.csv`. Razão modelo/baseline nos municípios de treino (menor é melhor):
+
+  | Clima usado | H+1 | H+2 | H+3 | H+4 |
+  |---|---|---|---|---|
+  | **Sem clima (adotado)** | **0,865** | **0,787** | **0,754** | **0,739** |
+  | S-1 e S-2 (essencial) | 0,915 | 0,818 | 0,790 | 0,781 |
+  | S-1 e S-3 (essencial) | 0,933 | 0,842 | 0,801 | 0,751 |
+  | S-1, S-2 e S-3 (essencial) | 0,930 | 0,837 | 0,805 | 0,772 |
+  | S-1 e S-2 (completo) | 0,932 | 0,832 | 0,811 | 0,783 |
+  | S-1 e S-3 (completo) | 0,942 | 0,835 | 0,822 | 0,785 |
+  | S-1, S-2 e S-3 (completo) | 0,945 | 0,818 | 0,808 | 0,801 |
+
+  Todas as combinações pioraram a previsão, nos municípios de treino e nos de validação. O acerto de tendência ficou igual ou um pouco pior (com 4 semanas de antecedência: de 65,8% a 67,3%, contra 67,3% sem clima; nos municípios de validação, de 56% a 57%, contra 59%).
 * **Interpretação:** o clima influencia a dengue, mas com semanas de atraso, e esse efeito já está refletido na tendência recente dos casos, que o modelo usa. A semana do ano já captura a sazonalidade. Para horizontes curtos (1 a 4 semanas), o clima acrescentou mais ruído do que informação. Além disso, os municípios de treino são vizinhos e têm clima muito parecido (vários caem no mesmo ponto da grade do ERA5), o que limita o que o modelo pode aprender com ele.
 * **Observação:** um primeiro teste com o corte único 80/20 sugeria que o clima ajudava em H+3 e H+4. A validação *walk-forward* não confirmou isso, o que mostra por que avaliar em vários anos é importante.
 

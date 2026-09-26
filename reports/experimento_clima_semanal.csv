@@ -1,0 +1,57 @@
+Configuracao,Grupo,Horizonte,Razao_MAE,Acerto_tendencia,Subidas_detectadas,Alarmes_subida_corretos,Sentido_oposto
+B. Sem clima (modelo atual),treino,Semana +1,0.865,0.657,0.195,0.486,0.014
+B. Sem clima (modelo atual),validacao,Semana +1,0.946,0.604,0.166,0.496,0.026
+B. Sem clima (modelo atual),treino,Semana +2,0.787,0.65,0.437,0.598,0.032
+B. Sem clima (modelo atual),validacao,Semana +2,0.86,0.556,0.404,0.588,0.04
+B. Sem clima (modelo atual),treino,Semana +3,0.754,0.667,0.511,0.636,0.043
+B. Sem clima (modelo atual),validacao,Semana +3,0.841,0.57,0.468,0.613,0.054
+B. Sem clima (modelo atual),treino,Semana +4,0.739,0.673,0.545,0.658,0.045
+B. Sem clima (modelo atual),validacao,Semana +4,0.828,0.59,0.519,0.651,0.066
+Clima S-1 e S-2 (completo),treino,Semana +1,0.932,0.646,0.195,0.43,0.015
+Clima S-1 e S-2 (completo),validacao,Semana +1,1.025,0.583,0.181,0.413,0.027
+Clima S-1 e S-2 (completo),treino,Semana +2,0.832,0.64,0.426,0.582,0.033
+Clima S-1 e S-2 (completo),validacao,Semana +2,0.947,0.549,0.392,0.567,0.044
+Clima S-1 e S-2 (completo),treino,Semana +3,0.811,0.655,0.501,0.61,0.042
+Clima S-1 e S-2 (completo),validacao,Semana +3,0.887,0.543,0.461,0.59,0.06
+Clima S-1 e S-2 (completo),treino,Semana +4,0.783,0.661,0.539,0.641,0.046
+Clima S-1 e S-2 (completo),validacao,Semana +4,0.871,0.561,0.483,0.627,0.08
+Clima S-1 e S-2 (essencial),treino,Semana +1,0.915,0.645,0.195,0.44,0.016
+Clima S-1 e S-2 (essencial),validacao,Semana +1,1.019,0.581,0.214,0.407,0.029
+Clima S-1 e S-2 (essencial),treino,Semana +2,0.818,0.642,0.437,0.586,0.034
+Clima S-1 e S-2 (essencial),validacao,Semana +2,0.931,0.556,0.416,0.568,0.045
+Clima S-1 e S-2 (essencial),treino,Semana +3,0.79,0.667,0.519,0.624,0.041
+Clima S-1 e S-2 (essencial),validacao,Semana +3,0.91,0.544,0.463,0.585,0.059
+Clima S-1 e S-2 (essencial),treino,Semana +4,0.781,0.673,0.549,0.644,0.046
+Clima S-1 e S-2 (essencial),validacao,Semana +4,0.869,0.562,0.502,0.619,0.071
+Clima S-1 e S-3 (completo),treino,Semana +1,0.942,0.637,0.184,0.407,0.018
+Clima S-1 e S-3 (completo),validacao,Semana +1,0.982,0.585,0.185,0.412,0.023
+Clima S-1 e S-3 (completo),treino,Semana +2,0.835,0.64,0.425,0.582,0.03
+Clima S-1 e S-3 (completo),validacao,Semana +2,0.909,0.539,0.388,0.556,0.043
+Clima S-1 e S-3 (completo),treino,Semana +3,0.822,0.658,0.501,0.613,0.044
+Clima S-1 e S-3 (completo),validacao,Semana +3,0.849,0.543,0.46,0.589,0.06
+Clima S-1 e S-3 (completo),treino,Semana +4,0.785,0.663,0.549,0.636,0.047
+Clima S-1 e S-3 (completo),validacao,Semana +4,0.848,0.563,0.493,0.621,0.076
+Clima S-1 e S-3 (essencial),treino,Semana +1,0.933,0.643,0.189,0.42,0.017
+Clima S-1 e S-3 (essencial),validacao,Semana +1,0.976,0.591,0.2,0.434,0.022
+Clima S-1 e S-3 (essencial),treino,Semana +2,0.842,0.643,0.443,0.578,0.033
+Clima S-1 e S-3 (essencial),validacao,Semana +2,0.908,0.546,0.42,0.561,0.046
+Clima S-1 e S-3 (essencial),treino,Semana +3,0.801,0.661,0.515,0.612,0.042
+Clima S-1 e S-3 (essencial),validacao,Semana +3,0.858,0.545,0.461,0.595,0.057
+Clima S-1 e S-3 (essencial),treino,Semana +4,0.751,0.672,0.554,0.643,0.044
+Clima S-1 e S-3 (essencial),validacao,Semana +4,0.848,0.568,0.497,0.629,0.07
+"Clima S-1, S-2 e S-3 (completo)",treino,Semana +1,0.945,0.645,0.18,0.4,0.018
+"Clima S-1, S-2 e S-3 (completo)",validacao,Semana +1,1.008,0.593,0.202,0.422,0.026
+"Clima S-1, S-2 e S-3 (completo)",treino,Semana +2,0.818,0.635,0.422,0.574,0.031
+"Clima S-1, S-2 e S-3 (completo)",validacao,Semana +2,0.906,0.545,0.387,0.557,0.046
+"Clima S-1, S-2 e S-3 (completo)",treino,Semana +3,0.808,0.656,0.504,0.614,0.041
+"Clima S-1, S-2 e S-3 (completo)",validacao,Semana +3,0.87,0.54,0.47,0.585,0.063
+"Clima S-1, S-2 e S-3 (completo)",treino,Semana +4,0.801,0.658,0.537,0.634,0.047
+"Clima S-1, S-2 e S-3 (completo)",validacao,Semana +4,0.854,0.56,0.496,0.613,0.081
+"Clima S-1, S-2 e S-3 (essencial)",treino,Semana +1,0.93,0.644,0.192,0.421,0.015
+"Clima S-1, S-2 e S-3 (essencial)",validacao,Semana +1,0.991,0.586,0.229,0.421,0.025
+"Clima S-1, S-2 e S-3 (essencial)",treino,Semana +2,0.837,0.647,0.442,0.588,0.033
+"Clima S-1, S-2 e S-3 (essencial)",validacao,Semana +2,0.935,0.554,0.435,0.565,0.045
+"Clima S-1, S-2 e S-3 (essencial)",treino,Semana +3,0.805,0.657,0.508,0.616,0.041
+"Clima S-1, S-2 e S-3 (essencial)",validacao,Semana +3,0.888,0.543,0.466,0.584,0.06
+"Clima S-1, S-2 e S-3 (essencial)",treino,Semana +4,0.772,0.669,0.548,0.638,0.048
+"Clima S-1, S-2 e S-3 (essencial)",validacao,Semana +4,0.859,0.566,0.506,0.617,0.073
