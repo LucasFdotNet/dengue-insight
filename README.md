@@ -194,6 +194,14 @@ Registro das decisões que afetam os dados, o modelo ou a avaliação, com o mot
 
 * **Conclusão:** mais municípios ajudam, mas o ganho diminui: de 10 para 13 a melhora já é pequena. Incluir mais municípios poderia trazer algum ganho, principalmente se forem de regiões com clima diferente, mas não é prioritário.
 
+### 9. Dashboard: granularidade semanal e previsões passadas
+
+* **Granularidade semanal:** todos os dados, previsões e gráficos são por **semana epidemiológica** (domingo a sábado). É a unidade em que o InfoDengue publica os casos e em que a vigilância epidemiológica trabalha. Agregar por mês esconderia a velocidade de crescimento de um surto, que é justamente o que o modelo usa para prever. Os rótulos dos eixos mostram meses apenas para facilitar a leitura; cada ponto é uma semana.
+* **Previsões passadas no gráfico de projeções:** o gráfico mostra os últimos 12 meses com os casos reais, as previsões que o modelo teria feito na época e o baseline, com um seletor de antecedência (1 a 4 semanas). Abaixo, informa o erro médio do modelo e do baseline no período exibido.
+* **Cuidado metodológico:** as previsões passadas **não** são geradas com o modelo de produção. Ele foi treinado com toda a série e já "viu" essas semanas, então pareceria melhor do que é. Elas vêm da validação *walk-forward* (decisão 6): cada semana foi prevista por um modelo treinado só com dados anteriores ao ano dela. O `train.py` salva essas previsões em `reports/previsoes_walkforward.csv`.
+* **Semanas sem previsão passada:** as 10 semanas mais recentes (decisão 3) não têm previsão passada, porque os casos delas ainda estão sendo revisados e não servem de referência para medir erro.
+* **Filtro por tipo de município:** o painel permite filtrar os municípios por papel (treino ou validação espacial), e o tipo aparece ao lado do nome de cada um.
+
 ### Nota sobre os testes exploratórios
 
 As tabelas das decisões 5, 7 e 8 vêm de testes exploratórios feitos com a mesma validação *walk-forward*, antes de um ajuste no corte das semanas instáveis (decisão 3). Por isso podem diferir na segunda casa decimal dos números de `reports/` e da tabela da decisão 6, que são os resultados finais.
