@@ -7,16 +7,25 @@ data_iniSE do InfoDengue) e salva em data/raw/clima/{cidade}_clima.csv.
 
 Só entram semanas com os 7 dias disponíveis: o ERA5 chega com alguns dias de
 atraso, e uma semana parcial teria média e chuva acumulada enviesadas.
+
+Incremental: se o arquivo do município já existe, baixa só as últimas
+SEMANAS_ATUALIZAR semanas (o ERA5 preliminar é substituído pelo definitivo em cerca
+de 2 a 3 meses) e junta ao que já existe. Use --completo para baixar tudo de novo.
+
+A Open-Meteo limita as chamadas por minuto, hora e dia, e uma série de 16 anos conta
+como muitas chamadas. As esperas são automáticas (ver http_utils.py). Se o limite
+diário for atingido, a ingestão para mantendo o que já foi salvo; basta rodar de novo
+no dia seguinte para continuar de onde parou.
 """
 import os
-import time
+import sys
 import logging
 from datetime import date
 
 import pandas as pd
-import requests
 
 from src.cidades import CIDADES
+from src.http_utils import LimiteDiarioAtingido, get_com_retentativas
 
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
 
@@ -29,13 +38,11 @@ VARIAVEIS_DIARIAS = {
     'relative_humidity_2m_mean': 'umidade',
 }
 PASTA_CLIMA = 'data/raw/clima'
-# A Open-Meteo conta uma série longa como várias chamadas no limite por minuto;
-# ao receber 429, espera a janela do limite passar e tenta de novo.
-TENTATIVAS = 5
-ESPERA_429 = 65  # segundos
+INICIO_SERIE = '2010-01-01'
+SEMANAS_ATUALIZAR = 12
 
 
-def fetch_clima_diario(lat, lon, inicio='2010-01-01', fim=None):
+def fetch_clima_diario(lat, lon, inicio=INICIO_SERIE, fim=None):
     params = {
         "latitude": lat,
         "longitude": lon,
@@ -45,13 +52,7 @@ def fetch_clima_diario(lat, lon, inicio='2010-01-01', fim=None):
         "models": "era5",
         "timezone": "America/Sao_Paulo",
     }
-    for tentativa in range(1, TENTATIVAS + 1):
-        response = requests.get(URL, params=params, timeout=120)
-        if response.status_code != 429 or tentativa == TENTATIVAS:
-            break
-        logging.warning(f"Limite de requisições da Open-Meteo; nova tentativa em {ESPERA_429}s ({tentativa}/{TENTATIVAS - 1})...")
-        time.sleep(ESPERA_429)
-    response.raise_for_status()
+    response = get_com_retentativas(URL, params, timeout=120, descricao=f"Open-Meteo ({lat}, {lon})")
     df = pd.DataFrame(response.json()["daily"]).rename(columns=VARIAVEIS_DIARIAS)
     df['time'] = pd.to_datetime(df['time'])
     return df.dropna()
@@ -73,20 +74,47 @@ def agregar_semana_epidemiologica(df_diario):
     return semanal.round(2).reset_index()
 
 
-def run_ingestion_clima():
+def celula_era5(lat, lon):
+    """Ponto da grade ERA5 (0,25°) mais próximo; municípios no mesmo ponto têm o mesmo clima."""
+    return round(lat * 4) / 4, round(lon * 4) / 4
+
+
+def run_ingestion_clima(completo=False):
     os.makedirs(PASTA_CLIMA, exist_ok=True)
+    baixados = {}  # célula ERA5 -> (início pedido, dados diários), para não baixar o mesmo ponto duas vezes
 
     for cidade, info in CIDADES.items():
-        logging.info(f"Buscando clima de {info['nome']} ({info['lat']}, {info['lon']})...")
-        try:
-            df = agregar_semana_epidemiologica(fetch_clima_diario(info['lat'], info['lon']))
-        except Exception as e:
-            logging.error(f"Erro ao buscar clima de {cidade}: {e}")
-            continue
         filepath = f"{PASTA_CLIMA}/{cidade}_clima.csv"
-        df.to_csv(filepath, index=False)
+        existente = None
+        inicio = INICIO_SERIE
+        if not completo and os.path.exists(filepath):
+            existente = pd.read_csv(filepath, parse_dates=['data_iniSE'])
+            # Recomeça num domingo, para as semanas refeitas ficarem completas
+            inicio = (existente['data_iniSE'].max() - pd.Timedelta(weeks=SEMANAS_ATUALIZAR - 1)).date().isoformat()
+
+        celula = celula_era5(info['lat'], info['lon'])
+        if celula in baixados and baixados[celula][0] <= inicio:
+            diario = baixados[celula][1]
+            diario = diario[diario['time'] >= pd.Timestamp(inicio)]
+            logging.info(f"Clima de {info['nome']}: mesmo ponto da grade ERA5 de um município já baixado.")
+        else:
+            logging.info(f"Buscando clima de {info['nome']} ({info['lat']}, {info['lon']}) desde {inicio}...")
+            try:
+                diario = fetch_clima_diario(info['lat'], info['lon'], inicio=inicio)
+            except LimiteDiarioAtingido:
+                logging.error("Limite diário da Open-Meteo atingido. O que já foi baixado está salvo; "
+                              "rode este script novamente amanhã para continuar de onde parou.")
+                sys.exit(1)
+            baixados[celula] = (inicio, diario)
+
+        df = agregar_semana_epidemiologica(diario)
+        if existente is not None:
+            df = pd.concat([existente[existente['data_iniSE'] < df['data_iniSE'].min()], df], ignore_index=True)
+        df.to_csv(filepath, index=False, date_format='%Y-%m-%d')
         logging.info(f"Salvo: {filepath} ({len(df)} semanas, até {df['data_iniSE'].max():%d/%m/%Y})")
+
+    logging.info(f"Ingestão de clima concluída: {len(CIDADES)} municípios.")
 
 
 if __name__ == "__main__":
-    run_ingestion_clima()
+    run_ingestion_clima(completo='--completo' in sys.argv)
