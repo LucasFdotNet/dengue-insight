@@ -13,7 +13,9 @@ def load_and_clean_data(filepath):
         'temp_min': 'tmin',
         'temp_med': 'tmed',
         'temp_max': 'tmax',
-        'inc': 'p_inc100k'
+        'inc': 'p_inc100k',
+        'tempmin': 'tmin',
+        'Rt': 'rt'
     }
     df = df.rename(columns=rename_map)
     
