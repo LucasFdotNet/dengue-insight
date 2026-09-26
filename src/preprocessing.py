@@ -1,38 +1,36 @@
 import os
 import pandas as pd
 import logging
+from src.cidades import CIDADES
 
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
+
+COLUNAS_OBRIGATORIAS = ['data_iniSE', 'casos_est', 'tmin', 'rt', 'p_inc100k']
 
 def load_and_clean_data(filepath):
     df = pd.read_csv(filepath)
     
-    # 1. Normalização de nomes das colunas
+    # 1. Normalização de nomes das colunas (nomes devolvidos pela API do InfoDengue)
     rename_map = {
-        'data_ini': 'data_iniSE',
-        'temp_min': 'tmin',
-        'temp_med': 'tmed',
-        'temp_max': 'tmax',
-        'inc': 'p_inc100k',
         'tempmin': 'tmin',
+        'tempmed': 'tmed',
+        'tempmax': 'tmax',
         'Rt': 'rt'
     }
     df = df.rename(columns=rename_map)
     
-    # Garantir que a coluna tmin exista mesmo se ausente
-    if 'tmin' not in df.columns:
-        df['tmin'] = 22.0  # fallback neutro para temperatura
+    # Falhar cedo: coluna ausente é erro, não recebe valor inventado
+    faltando = [c for c in COLUNAS_OBRIGATORIAS if c not in df.columns]
+    if faltando:
+        raise ValueError(f"{filepath}: colunas ausentes {faltando}")
         
     # Converter data para datetime e ordenar
-    data_col = 'data_iniSE' if 'data_iniSE' in df.columns else df.columns[0]
-    df['data_iniSE'] = pd.to_datetime(df[data_col])
+    df['data_iniSE'] = pd.to_datetime(df['data_iniSE'])
     df = df.sort_values('data_iniSE').reset_index(drop=True)
     
-    # Preenchimento de nulos
-    colunas_numericas = ['casos_est', 'tmin', 'rt', 'p_inc100k']
-    for col in colunas_numericas:
-        if col in df.columns:
-            df[col] = df[col].interpolate().ffill().bfill()
+    # Preenchimento de nulos apenas entre valores conhecidos (sem extrapolar nas pontas)
+    for col in ['casos_est', 'tmin', 'rt', 'p_inc100k']:
+        df[col] = df[col].interpolate(limit_area='inside')
             
     return df
 
@@ -43,10 +41,7 @@ def feature_engineering(df):
     for lag in range(1, 5):
         df_feat[f'casos_est_lag_{lag}'] = df_feat['casos_est'].shift(lag)
         df_feat[f'tmin_lag_{lag}'] = df_feat['tmin'].shift(lag)
-        if 'rt' in df_feat.columns:
-            df_feat[f'rt_lag_{lag}'] = df_feat['rt'].shift(lag)
-        else:
-            df_feat[f'rt_lag_{lag}'] = 1.0
+        df_feat[f'rt_lag_{lag}'] = df_feat['rt'].shift(lag)
         
     # Médias móveis
     df_feat['casos_est_roll_4'] = df_feat['casos_est'].rolling(window=4).mean()
@@ -60,12 +55,13 @@ def feature_engineering(df):
 
 def run_preprocessing():
     os.makedirs('data/processed', exist_ok=True)
-    raw_files = [f for f in os.listdir('data/raw') if f.endswith('_raw.csv')]
     
-    for file in raw_files:
-        cidade = file.removesuffix('_raw.csv')
+    for cidade in CIDADES:
+        filepath = os.path.join('data/raw', f'{cidade}_raw.csv')
+        if not os.path.exists(filepath):
+            raise FileNotFoundError(f"{filepath} não encontrado. Execute a ingestão antes.")
         logging.info(f"Processando {cidade}...")
-        df = load_and_clean_data(os.path.join('data/raw', file))
+        df = load_and_clean_data(filepath)
         df_processed = feature_engineering(df)
         df_processed.to_csv(f"data/processed/{cidade}_processed.csv", index=False)
         logging.info(f"{cidade} processado com sucesso.")
