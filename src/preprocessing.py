@@ -5,31 +5,36 @@ from src.cidades import CIDADES
 
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
 
-COLUNAS_OBRIGATORIAS = ['data_iniSE', 'casos_est', 'tmin', 'rt', 'p_inc100k']
+COLUNAS_OBRIGATORIAS = ['data_iniSE', 'casos_est', 'rt', 'p_inc100k']
+COLUNAS_CLIMA = ['tmin', 'tmed', 'tmax', 'precipitacao', 'umidade']
+# Clima do InfoDengue, substituído pelo ERA5 (ver Decisões de Projeto no README)
+COLUNAS_CLIMA_INFODENGUE = ['tempmin', 'tempmed', 'tempmax', 'umidmin', 'umidmed', 'umidmax']
 
-def load_and_clean_data(filepath):
+def _verificar_colunas(df, obrigatorias, filepath):
+    # Falhar cedo: coluna ausente é erro, não recebe valor inventado
+    faltando = [c for c in obrigatorias if c not in df.columns]
+    if faltando:
+        raise ValueError(f"{filepath}: colunas ausentes {faltando}")
+
+def load_and_clean_data(filepath, clima_path):
     df = pd.read_csv(filepath)
     
     # 1. Normalização de nomes das colunas (nomes devolvidos pela API do InfoDengue)
-    rename_map = {
-        'tempmin': 'tmin',
-        'tempmed': 'tmed',
-        'tempmax': 'tmax',
-        'Rt': 'rt'
-    }
-    df = df.rename(columns=rename_map)
-    
-    # Falhar cedo: coluna ausente é erro, não recebe valor inventado
-    faltando = [c for c in COLUNAS_OBRIGATORIAS if c not in df.columns]
-    if faltando:
-        raise ValueError(f"{filepath}: colunas ausentes {faltando}")
+    df = df.rename(columns={'Rt': 'rt'}).drop(columns=COLUNAS_CLIMA_INFODENGUE, errors='ignore')
+    _verificar_colunas(df, COLUNAS_OBRIGATORIAS, filepath)
         
     # Converter data para datetime e ordenar
     df['data_iniSE'] = pd.to_datetime(df['data_iniSE'])
     df = df.sort_values('data_iniSE').reset_index(drop=True)
     
+    # 2. Clima semanal (ERA5). Left join: semanas recentes que o ERA5 ainda
+    # não cobre ficam sem clima, em vez de receber valor copiado.
+    clima = pd.read_csv(clima_path, parse_dates=['data_iniSE'])
+    _verificar_colunas(clima, ['data_iniSE'] + COLUNAS_CLIMA, clima_path)
+    df = df.merge(clima[['data_iniSE'] + COLUNAS_CLIMA], on='data_iniSE', how='left', validate='one_to_one')
+    
     # Preenchimento de nulos apenas entre valores conhecidos (sem extrapolar nas pontas)
-    for col in ['casos_est', 'tmin', 'rt', 'p_inc100k']:
+    for col in ['casos_est', 'rt', 'p_inc100k'] + COLUNAS_CLIMA:
         df[col] = df[col].interpolate(limit_area='inside')
             
     return df
@@ -58,10 +63,12 @@ def run_preprocessing():
     
     for cidade in CIDADES:
         filepath = os.path.join('data/raw', f'{cidade}_raw.csv')
-        if not os.path.exists(filepath):
-            raise FileNotFoundError(f"{filepath} não encontrado. Execute a ingestão antes.")
+        clima_path = os.path.join('data/raw/clima', f'{cidade}_clima.csv')
+        for path, script in [(filepath, 'ingestion.py'), (clima_path, 'ingestion_clima.py')]:
+            if not os.path.exists(path):
+                raise FileNotFoundError(f"{path} não encontrado. Execute {script} antes.")
         logging.info(f"Processando {cidade}...")
-        df = load_and_clean_data(filepath)
+        df = load_and_clean_data(filepath, clima_path)
         df_processed = feature_engineering(df)
         df_processed.to_csv(f"data/processed/{cidade}_processed.csv", index=False)
         logging.info(f"{cidade} processado com sucesso.")

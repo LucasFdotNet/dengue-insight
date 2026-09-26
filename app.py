@@ -63,7 +63,11 @@ if pd.notnull(ultimo_registro["casos_est_min"]) and pd.notnull(ultimo_registro["
                    f"–{int(ultimo_registro['casos_est_max'])} casos")
 
 col1.metric("Casos estimados", casos_val, help=ajuda_casos)
-col2.metric("Temp. mínima", f"{ultimo_registro['tmin']:.1f} °C")
+# O ERA5 chega com alguns dias de atraso; a semana mais recente pode ainda não ter clima
+if pd.notnull(ultimo_registro["tmin"]):
+    col2.metric("Temp. mínima", f"{ultimo_registro['tmin']:.1f} °C")
+else:
+    col2.metric("Temp. mínima", "sem dado", help="Dado climático (ERA5) ainda não disponível para esta semana")
 col3.metric("Taxa reprodutiva (Rt)", f"{ultimo_registro['rt']:.2f}")
 col4.metric("Nível de alerta", int(ultimo_registro["nivel"]))
 
