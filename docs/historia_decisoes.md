@@ -835,5 +835,22 @@ Os dois são independentes e podem divergir (por exemplo, tendência de subida c
 ### Limitações
 
 * Os dois modelos podem divergir, o que pode confundir quem lê o painel; o aviso explica, mas não resolve a divergência.
-* A semana de partida das previsões é a mais recente, cujos casos ainda são uma estimativa (nowcast). Em municípios sem nowcast publicado, como Campinas, a última semana está incompleta e pode fazer o classificador prever subida quando os casos estão apenas voltando ao nível normal.
+* A semana de partida das previsões é a mais recente, cujos casos ainda são uma estimativa (nowcast).
+
+### Correção: ponto de partida nos municípios sem nowcast
+
+Logo depois da implantação, o painel mostrou "subida" nas 4 semanas para Campinas, com o número de casos previsto praticamente igual ao atual. A investigação mostrou que **39 dos 115 municípios** (entre eles Campinas, Belo Horizonte, Rio de Janeiro, Salvador e Goiânia) não têm nowcast publicado nas semanas recentes: essas semanas têm só os casos já notificados e estão incompletas. Comparando cada uma das últimas semanas com o nível das semanas anteriores (mediana dos municípios com pelo menos 20 casos):
+
+| Semana | Sem nowcast (21 municípios) | Com nowcast (48 municípios) |
+|---|---|---|
+| Última | 23% | 84% |
+| Penúltima | 63% | 82% |
+| Antepenúltima | 76% | 87% |
+| 4ª mais recente | 88% | 98% |
+
+Nos municípios com nowcast, a queda é real (baixa temporada). Nos sem nowcast, as 3 últimas semanas estão incompletas, e o classificador interpretava a volta ao nível normal como subida.
+
+* **Decisão:** não descartar esses municípios (o treino usa só semanas antigas, já completas, e eles incluem capitais importantes). Nas previsões do painel, os municípios sem nowcast partem da **última semana completa** (a 4ª mais recente; `SEMANAS_INCOMPLETAS_SEM_NOWCAST = 3` em `src/predict.py`), e o painel avisa isso e mostra as semanas incompletas em cinza.
+* **Resultado:** em Campinas, as previsões passaram de "subida" com cerca de 70 casos para "estável" com cerca de 150 casos, a partir de 23/08/2026.
+* **Limitação:** nesses municípios, algumas semanas previstas já passaram quando a previsão é exibida. A avaliação *walk-forward* não captura esse problema, porque usa os dados já revisados (avaliação pseudoprospectiva, seção 5).
 

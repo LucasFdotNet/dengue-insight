@@ -33,7 +33,7 @@ def mostrar(cidade, df):
     if info["papel"] == "validacao":
         st.info(f"{info['nome']} é um município de validação: seus dados nunca foram usados no treino do modelo.")
 
-    previsoes, base = get_predictions(df)
+    previsoes, base, descartadas = get_predictions(df)
     if previsoes.empty:
         st.error("Não há modelos treinados. Execute `python -m src.train` e recarregue o painel.")
         return
@@ -44,6 +44,11 @@ def mostrar(cidade, df):
     valor_base = df.loc[df["data_iniSE"] == base, "casos_est"].iloc[0]
     st.caption(f"Em relação à semana de {base:%d/%m/%Y} ({int(valor_base)} casos estimados). Subida ou queda: "
                "variação de mais de 20% e de 5 casos.")
+    ultima = df.dropna(subset=["casos_est"])["data_iniSE"].max()
+    if descartadas:
+        st.info(f"O InfoDengue não publica a estimativa de casos atrasados (*nowcast*) para {info['nome']}, então as "
+                f"{descartadas} semanas mais recentes ainda estão incompletas. As previsões partem da última semana "
+                f"considerada completa ({base:%d/%m/%Y}); por isso algumas semanas previstas já passaram.")
 
     # ------------------------------------------------------------ Gráfico
     ultimos_12 = "Últimos 12 meses"
@@ -54,9 +59,9 @@ def mostrar(cidade, df):
     h = col_h.radio("Previsões passadas feitas com antecedência de:", list(previsoes["h"]),
                     format_func=lambda x: f"{x} semana" + ("s" if x > 1 else ""), horizontal=True)
     if periodo == ultimos_12:
-        inicio, fim = base - pd.Timedelta(weeks=SEMANAS_ULTIMOS_12_MESES - 1), base
+        inicio, fim = ultima - pd.Timedelta(weeks=SEMANAS_ULTIMOS_12_MESES - 1), ultima
     elif periodo == todo:
-        inicio, fim = pd.Timestamp(f"{PRIMEIRO_ANO_TESTE}-01-01"), base
+        inicio, fim = pd.Timestamp(f"{PRIMEIRO_ANO_TESTE}-01-01"), ultima
     else:
         inicio, fim = pd.Timestamp(f"{periodo}-01-01"), pd.Timestamp(f"{periodo}-12-31")
 
@@ -66,6 +71,11 @@ def mostrar(cidade, df):
     fig.add_trace(go.Scatter(x=janela["data_iniSE"], y=janela["casos_est"], mode=modo,
                              name="Casos estimados (real)", line=dict(color="#0275d8"),
                              hovertemplate=FORMATO_DATA_HOVER + "<extra>Real</extra>"))
+    incompletas = df[(df["data_iniSE"] >= base) & (df["data_iniSE"] <= fim) & (df["data_iniSE"] >= inicio)]
+    if descartadas and len(incompletas) > 1:
+        fig.add_trace(go.Scatter(x=incompletas["data_iniSE"], y=incompletas["casos_est"], mode="lines+markers",
+                                 name="Semanas ainda incompletas", line=dict(color="#95a5a6", dash="dot"),
+                                 hovertemplate=FORMATO_DATA_HOVER + "<extra>Incompleta</extra>"))
 
     passadas = carregar_previsoes_passadas()
     if passadas is not None:
