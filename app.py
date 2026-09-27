@@ -1,39 +1,47 @@
+"""Painel do Dengue Insight (Streamlit): aviso de entrada, seleção do município e seções."""
 import os
 
-import numpy as np
-import pandas as pd
-import plotly.graph_objects as go
 import streamlit as st
 
+from painel import detalhes, indicadores
+from painel.dados import ROTULO_PAPEL, carregar_municipio
 from src.cidades import CIDADES
-from src.predict import get_predictions
-from src.train import (ARQUIVO_PREVISOES_PASSADAS, LIMIAR_TENDENCIA, MIN_CASOS_TENDENCIA, PRIMEIRO_ANO_TESTE,
-                       SEMANAS_INSTAVEIS, TENDENCIAS, classificar_tendencia)
 
 # Colunas que o CSV processado precisa ter. Se faltar alguma, o app para com erro
 # explícito em vez de exibir valores inventados.
 COLUNAS_OBRIGATORIAS = ["data_iniSE", "casos_est", "casos_est_min", "casos_est_max", "tmin", "rt", "nivel"]
-DIAS_DADOS_DESATUALIZADOS = 21
-SEMANAS_HISTORICO_PROJECAO = 52  # 12 meses de histórico no período padrão do gráfico de projeções
-MAX_SEMANAS_COM_MARCADORES = 104  # acima disso, só linhas, para o gráfico não ficar poluído
-ROTULO_PAPEL = {"treino": "treino", "validacao": "validação"}
-FORMATO_DATA_HOVER = "%{x|%d/%m/%Y}: %{y:,.0f} casos"
+AVISO = ("Este painel é resultado de um trabalho acadêmico (Projeto Integrador IV, UNIVESP). As previsões são "
+         "experimentais e **não devem ser usadas como base para decisões oficiais de vigilância ou de saúde pública**.")
+PALAVRA_ACEITE = "entendo"
 
 st.set_page_config(page_title="Dengue Insight | UNIVESP PI-IV", layout="wide")
 
-st.title("🦟 Dengue Insight")
-st.markdown("**Monitoramento e previsão de surtos de dengue (PI-IV UNIVESP)**")
+# ---------------------------------------------------------------- Aviso de entrada
+# Validação só no navegador (sessão do Streamlit), sem registro no servidor
+if not st.session_state.get("aviso_aceito"):
+    st.title("🦟 Dengue Insight")
+    st.warning(AVISO)
+    with st.form("aceite"):
+        texto = st.text_input(f"Para continuar, digite \"{PALAVRA_ACEITE}\":")
+        if st.form_submit_button("Continuar"):
+            if texto.strip().lower() == PALAVRA_ACEITE:
+                st.session_state["aviso_aceito"] = True
+                st.rerun()
+            st.error(f"Digite \"{PALAVRA_ACEITE}\" para continuar.")
+    st.stop()
 
-# ---------------------------------------------------------------- Seleção do município
+# ---------------------------------------------------------------- Menu e seleção do município
+st.sidebar.title("🦟 Dengue Insight")
+secao = st.sidebar.radio("Seção:", ["Indicadores", "Detalhes do Modelo"])
+st.sidebar.markdown("---")
+
 disponiveis = [k for k in CIDADES if os.path.exists(f"data/processed/{k}_processed.csv")]
-
 if not disponiveis:
     st.error("Nenhum dado processado encontrado. Execute ingestion.py, preprocessing.py e train.py e recarregue o painel.")
     st.stop()
 
 tipo = st.sidebar.radio(
-    "Tipo de município:",
-    ["Todos", "Treino", "Validação espacial"],
+    "Tipo de município:", ["Todos", "Treino", "Validação espacial"],
     help="Treino: municípios usados para treinar o modelo. Validação espacial: municípios que o modelo "
          "nunca viu no treino, usados para testar se ele funciona em outras regiões.",
 )
@@ -42,290 +50,20 @@ opcoes = [k for k in disponiveis if papel_filtro is None or CIDADES[k]["papel"] 
 if not opcoes:
     st.sidebar.warning("Nenhum município processado desse tipo.")
     st.stop()
-
 cidade = st.sidebar.selectbox(
-    "Selecione o município:",
-    opcoes,
+    "Município:", opcoes,
     format_func=lambda k: f"{CIDADES[k]['nome']} - {CIDADES[k]['uf']} ({ROTULO_PAPEL[CIDADES[k]['papel']]})",
 )
-nome = CIDADES[cidade]["nome"]
+st.sidebar.caption("Trabalho acadêmico (PI-IV, UNIVESP). Previsões experimentais.")
 
-
-@st.cache_data
-def load_cidade_data(cidade):
-    df = pd.read_csv(f"data/processed/{cidade}_processed.csv")
-    df["data_iniSE"] = pd.to_datetime(df["data_iniSE"])
-    return df
-
-
-@st.cache_data
-def load_previsoes_passadas():
-    if not os.path.exists(ARQUIVO_PREVISOES_PASSADAS):
-        return None
-    return pd.read_csv(ARQUIVO_PREVISOES_PASSADAS, parse_dates=["data_alvo"])
-
-
-df_cidade = load_cidade_data(cidade)
-
-faltando = [c for c in COLUNAS_OBRIGATORIAS if c not in df_cidade.columns]
+df = carregar_municipio(cidade)
+faltando = [c for c in COLUNAS_OBRIGATORIAS if c not in df.columns]
 if faltando:
-    st.error(f"O arquivo processado de {nome} não tem as colunas: {', '.join(faltando)}. "
-             "Verifique o rename_map em preprocessing.py e processe os dados novamente.")
+    st.error(f"O arquivo processado de {CIDADES[cidade]['nome']} não tem as colunas: {', '.join(faltando)}. "
+             "Processe os dados novamente.")
     st.stop()
 
-df_valid = df_cidade.dropna(subset=["casos_est"])
-ultimo_registro = df_valid.iloc[-1]
-ultima = ultimo_registro["data_iniSE"]
-
-# ---------------------------------------------------------------- Indicadores da última semana
-st.markdown("---")
-col1, col2, col3, col4 = st.columns(4)
-
-casos_val = int(ultimo_registro["casos_est"])
-
-ajuda_casos = None
-if pd.notnull(ultimo_registro["casos_est_min"]) and pd.notnull(ultimo_registro["casos_est_max"]):
-    ajuda_casos = (f"Intervalo do nowcast: {int(ultimo_registro['casos_est_min'])}"
-                   f"–{int(ultimo_registro['casos_est_max'])} casos")
-
-col1.metric("Casos estimados", casos_val, help=ajuda_casos)
-# O ERA5 chega com alguns dias de atraso; a semana mais recente pode ainda não ter clima
-if pd.notnull(ultimo_registro["tmin"]):
-    col2.metric("Temp. mínima", f"{ultimo_registro['tmin']:.1f} °C")
+if secao == "Indicadores":
+    indicadores.mostrar(cidade, df)
 else:
-    col2.metric("Temp. mínima", "sem dado", help="Dado climático (ERA5) ainda não disponível para esta semana")
-col3.metric("Taxa reprodutiva (Rt)", f"{ultimo_registro['rt']:.2f}")
-col4.metric("Nível de alerta", int(ultimo_registro["nivel"]))
-
-st.caption(f"Última semana epidemiológica: {ultima:%d/%m/%Y}")
-if (pd.Timestamp.today() - ultima).days > DIAS_DADOS_DESATUALIZADOS:
-    st.warning("Os dados estão desatualizados. Execute a ingestão novamente para ver as semanas mais recentes.")
-
-# ---------------------------------------------------------------- Histórico
-st.markdown("### Histórico epidemiológico")
-
-fig_hist = go.Figure()
-# Faixa de incerteza do nowcast (visível apenas nas semanas recentes, ainda sujeitas a revisão)
-fig_hist.add_trace(go.Scatter(
-    x=df_valid["data_iniSE"], y=df_valid["casos_est_max"],
-    mode="lines", line=dict(width=0), showlegend=False, hoverinfo="skip",
-))
-fig_hist.add_trace(go.Scatter(
-    x=df_valid["data_iniSE"], y=df_valid["casos_est_min"],
-    mode="lines", line=dict(width=0), fill="tonexty",
-    fillcolor="rgba(217, 83, 79, 0.2)", name="Intervalo do nowcast", hoverinfo="skip",
-))
-fig_hist.add_trace(go.Scatter(
-    x=df_valid["data_iniSE"], y=df_valid["casos_est"],
-    mode="lines", line=dict(color="#d9534f", width=2), name="Casos estimados",
-    hovertemplate=FORMATO_DATA_HOVER + "<extra></extra>",
-))
-fig_hist.update_layout(
-    title=f"Evolução temporal de casos – {nome}",
-    xaxis_title="Semana epidemiológica (data de início)", yaxis_title="Casos estimados",
-    xaxis_tickformat="%m/%Y",
-)
-st.plotly_chart(fig_hist, width="stretch")
-
-with st.expander("O que são \"casos estimados\" e \"intervalo do nowcast\"?"):
-    st.markdown(
-        "- **Casos notificados** são os casos já registrados no sistema para uma semana. Nas semanas "
-        "recentes esse número está incompleto, porque as notificações chegam com atraso: um caso desta "
-        "semana pode entrar no sistema duas ou três semanas depois.\n"
-        "- **Casos estimados** são a estimativa do InfoDengue de quantos casos aquela semana terá quando "
-        "todas as notificações chegarem. Essa correção do presente pelo atraso das notificações se chama "
-        "*nowcast*. Nas semanas antigas, já completas, o valor estimado é igual ao notificado.\n"
-        "- **Intervalo do nowcast** é a margem de incerteza dessa estimativa: o número final deve ficar "
-        "dentro da faixa. Por isso ela só aparece nas últimas semanas, e não aparece nos municípios em que "
-        "o InfoDengue não calcula o nowcast.\n\n"
-        "Cada ponto da série é uma **semana epidemiológica** (de domingo a sábado), a unidade em que o "
-        "InfoDengue publica os dados. Os rótulos do eixo mostram meses apenas para facilitar a leitura."
-    )
-
-# ---------------------------------------------------------------- Projeções
-st.markdown("---")
-st.markdown("### 🔮 Projeções de machine learning (próximas 4 semanas)")
-
-predicoes, data_base = get_predictions(cidade, df_cidade)
-
-if not predicoes:
-    st.error("Não há modelo treinado. Execute train.py e recarregue o painel.")
-else:
-    base = pd.to_datetime(data_base, dayfirst=True)
-    valor_base = df_cidade.loc[df_cidade["data_iniSE"] == base, "casos_est"].iloc[0]
-    st.caption(f"Previsões geradas a partir da semana de {base:%d/%m/%Y}.")
-    if CIDADES[cidade]["papel"] == "validacao":
-        st.info(f"{nome} é um município de validação espacial: seus dados não foram usados no treino do modelo.")
-
-    # predict.py devolve chaves no formato "Semana +H (dd/mm/aaaa)"; extrai H de cada uma
-    por_horizonte = {int(chave.split("+")[1].split(" ")[0]): valor for chave, valor in predicoes.items()}
-    horizontes = sorted(por_horizonte)
-    datas_futuras = [base + pd.Timedelta(weeks=h) for h in horizontes]
-    valores_futuros = [por_horizonte[h] for h in horizontes]
-
-    cols_pred = st.columns(len(horizontes))
-    for col, h, data, valor in zip(cols_pred, horizontes, datas_futuras, valores_futuros):
-        tendencia = classificar_tendencia([valor], [valor_base])[0]
-        variacao = f"{(valor - valor_base) / valor_base:+.0%}" if valor_base > 0 else f"{valor - valor_base:+.0f} casos"
-        # O Streamlit decide a seta pelo sinal no início do texto; subida em vermelho, queda em verde
-        col.metric(
-            label=f"Semana +{h} ({data:%d/%m/%Y})",
-            value=f"{valor} casos",
-            delta=f"{variacao} · {'subida' if tendencia == 'sobe' else 'queda' if tendencia == 'cai' else 'estável'}",
-            delta_color="off" if tendencia == "estável" else "inverse",
-        )
-    st.caption(f"Tendência em relação à semana de {base:%d/%m/%Y} ({int(valor_base)} casos): subida ou queda quando "
-               f"a variação passa de {LIMIAR_TENDENCIA:.0%} e de {MIN_CASOS_TENDENCIA} casos; senão, estável.")
-
-    # Previsões passadas: vêm da validação walk-forward, em que cada semana foi prevista por um
-    # modelo treinado só com dados anteriores ao ano dela. Usar o modelo de produção aqui seria
-    # enganoso, porque ele já viu essas semanas no treino.
-    previsoes_passadas = load_previsoes_passadas()
-
-    # ------------------------------------------------------------ Período exibido
-    ULTIMOS_12 = "Últimos 12 meses"
-    TODO = f"Todo o período (desde {PRIMEIRO_ANO_TESTE})"
-    anos = list(range(base.year, PRIMEIRO_ANO_TESTE - 1, -1))
-    col_periodo, col_h = st.columns([1, 2])
-    periodo = col_periodo.selectbox("Período:", [ULTIMOS_12, TODO] + [str(a) for a in anos])
-    if periodo == ULTIMOS_12:
-        inicio_janela, fim_janela = base - pd.Timedelta(weeks=SEMANAS_HISTORICO_PROJECAO - 1), base
-    elif periodo == TODO:
-        inicio_janela, fim_janela = pd.Timestamp(f"{PRIMEIRO_ANO_TESTE}-01-01"), base
-    else:
-        inicio_janela, fim_janela = pd.Timestamp(f"{periodo}-01-01"), pd.Timestamp(f"{periodo}-12-31")
-    # A previsão das próximas semanas só aparece se o período inclui a semana atual
-    inclui_futuro = fim_janela >= base
-
-    janela = df_cidade[(df_cidade["data_iniSE"] >= inicio_janela) & (df_cidade["data_iniSE"] <= min(fim_janela, base))]
-    modo = "lines+markers" if len(janela) <= MAX_SEMANAS_COM_MARCADORES else "lines"
-
-    fig_proj = go.Figure()
-    fig_proj.add_trace(go.Scatter(
-        x=janela["data_iniSE"], y=janela["casos_est"],
-        mode=modo, name="Casos estimados (real)", line=dict(color="#0275d8"),
-        hovertemplate=FORMATO_DATA_HOVER + "<extra>Real</extra>",
-    ))
-
-    resumo_passado = None
-    tendencia_passada = None
-    if previsoes_passadas is not None:
-        h_passado = col_h.radio(
-            "Previsões passadas feitas com antecedência de:",
-            horizontes,
-            format_func=lambda h: f"{h} semana" + ("s" if h > 1 else ""),
-            horizontal=True,
-        )
-        passadas = previsoes_passadas[
-            (previsoes_passadas["cidade"] == cidade)
-            & (previsoes_passadas["h"] == h_passado)
-            & (previsoes_passadas["data_alvo"] >= inicio_janela)
-            & (previsoes_passadas["data_alvo"] <= fim_janela)
-        ]
-        if not passadas.empty:
-            # Baseline de persistência: repete, para a semana alvo, os casos de H semanas antes
-            casos_por_semana = df_cidade.set_index("data_iniSE")["casos_est"]
-            baseline = casos_por_semana.reindex(passadas["data_alvo"] - pd.Timedelta(weeks=h_passado)).values
-            fig_proj.add_trace(go.Scatter(
-                x=passadas["data_alvo"], y=baseline,
-                mode="lines", name=f"Baseline (repete o valor de {h_passado} sem. antes)",
-                line=dict(color="#999999", width=1, dash="dot"),
-                hovertemplate=FORMATO_DATA_HOVER + "<extra>Baseline</extra>",
-            ))
-            fig_proj.add_trace(go.Scatter(
-                x=passadas["data_alvo"], y=passadas["previsto"],
-                mode=modo, name=f"Previsão passada ({h_passado} sem. antes)",
-                line=dict(color="#d9534f", dash="dot"), marker=dict(size=4),
-                hovertemplate=FORMATO_DATA_HOVER + "<extra>Previsão passada</extra>",
-            ))
-            erro_modelo = (passadas["real"] - passadas["previsto"]).abs().mean()
-            erro_baseline = (passadas["real"] - baseline).abs().mean()
-            resumo_passado = (
-                f"Nas {len(passadas)} semanas com previsão passada exibidas, o modelo errou em média "
-                f"**{erro_modelo:,.0f} casos por semana**; o baseline (repetir o valor de {h_passado} "
-                f"semana(s) antes) errou **{erro_baseline:,.0f}**."
-            )
-            validas = ~np.isnan(baseline)
-            tendencia_passada = (
-                classificar_tendencia(passadas["real"].values[validas], baseline[validas]),
-                classificar_tendencia(passadas["previsto"].values[validas], baseline[validas]),
-            )
-            if inclui_futuro:
-                resumo_passado += (
-                    f" As últimas semanas não têm previsão passada porque os casos delas ainda estão sendo "
-                    f"revisados ({SEMANAS_INSTAVEIS} semanas instáveis)."
-                )
-
-    if inclui_futuro:
-        # A série prevista começa na última semana observada, para as duas linhas se conectarem
-        fig_proj.add_trace(go.Scatter(
-            x=[base] + datas_futuras, y=[valor_base] + valores_futuros,
-            mode="lines+markers", name="Previsão (próximas semanas)",
-            line=dict(color="#d9534f", dash="dash", width=3),
-            hovertemplate=FORMATO_DATA_HOVER + "<extra>Previsão</extra>",
-        ))
-    fig_proj.update_layout(
-        xaxis_title="Semana epidemiológica (data de início)", yaxis_title="Casos estimados",
-        xaxis_tickformat="%m/%Y", margin=dict(t=30),
-        legend=dict(orientation="h", yanchor="top", y=-0.2),
-    )
-    st.plotly_chart(fig_proj, width="stretch")
-    if resumo_passado:
-        st.caption(resumo_passado)
-
-    # ------------------------------------------------------------ Acerto de tendência
-    if tendencia_passada is not None:
-        real_t, modelo_t = tendencia_passada
-        st.markdown(f"#### Acerto de tendência (previsões feitas {h_passado} semana(s) antes)")
-        acerto = (real_t == modelo_t).mean()
-        acerto_estavel = (real_t == "estável").mean()
-        subiu, previu_subida = real_t == "sobe", modelo_t == "sobe"
-
-        c1, c2, c3 = st.columns(3)
-        c1.metric(
-            "Tendência acertada", f"{acerto:.0%}",
-            delta=f"{(acerto - acerto_estavel) * 100:+.0f} p.p. vs. \"sempre estável\"",
-            help=f"Em quantas semanas o modelo acertou se os casos iriam subir, ficar estáveis ou cair. "
-                 f"Dizer sempre \"estável\" teria acertado {acerto_estavel:.0%}.",
-        )
-        c2.metric(
-            "Subidas detectadas", f"{(modelo_t[subiu] == 'sobe').mean():.0%}" if subiu.any() else "—",
-            help=f"Das {subiu.sum()} semanas em que os casos realmente subiram, em quantas o modelo previu subida.",
-        )
-        c3.metric(
-            "Alarmes de subida corretos", f"{(real_t[previu_subida] == 'sobe').mean():.0%}" if previu_subida.any() else "—",
-            help=f"Das {previu_subida.sum()} vezes em que o modelo previu subida, em quantas os casos realmente subiram.",
-        )
-
-        # Linhas: o que aconteceu; colunas: o que o modelo previu (contagem e % da linha)
-        contagem = pd.crosstab(pd.Categorical(real_t, TENDENCIAS), pd.Categorical(modelo_t, TENDENCIAS), dropna=False)
-        percentual = contagem.div(contagem.sum(axis=1).replace(0, np.nan), axis=0)
-        tabela = contagem.astype(str) + percentual.map(lambda v: f" ({v:.0%})" if pd.notnull(v) else "")
-        tabela.index = [f"Aconteceu: {t}" for t in TENDENCIAS]
-        tabela.columns = [f"Modelo previu: {t}" for t in TENDENCIAS]
-        st.table(tabela)
-        oposto = ((real_t == "sobe") & (modelo_t == "cai")) | ((real_t == "cai") & (modelo_t == "sobe"))
-        st.caption(
-            f"Semanas no período: {len(real_t)}. O modelo apontou o sentido oposto (subida quando caiu, ou queda "
-            f"quando subiu) em {oposto.mean():.0%} delas; os demais erros são de intensidade (prever estável "
-            f"quando houve movimento, ou o contrário)."
-        )
-
-    with st.expander("Como as previsões passadas foram geradas?"):
-        st.markdown(
-            "As previsões passadas mostram o que o modelo **teria previsto na época**, sem conhecer o futuro. "
-            "Elas simulam o uso real com retreino mensal: no início de cada mês, um modelo foi treinado só "
-            "com o que já era conhecido até ali e usado para prever as semanas daquele mês. Assim, nenhuma "
-            "semana exibida foi vista pelo modelo que a previu.\n\n"
-            "O **baseline** é a previsão mais simples possível: repetir o número de casos de algumas semanas "
-            "antes. O modelo só é útil se errar menos que ele.\n\n"
-            "**Tendência:** cada semana é classificada como subida ou queda quando a variação em relação à "
-            f"semana de partida passa de {LIMIAR_TENDENCIA:.0%} e de {MIN_CASOS_TENDENCIA} casos; senão, estável. "
-            "O acerto de tendência compara a classificação prevista com a que aconteceu. \"Sempre estável\" é "
-            "a referência equivalente ao baseline: dizer sempre que nada vai mudar.\n\n"
-            "**Limitação:** a simulação usa os casos já revisados. Em tempo real, os casos das semanas mais "
-            "recentes ainda estariam incompletos, porque as notificações chegam com atraso, e o modelo erraria "
-            "mais. Um experimento em que as 4 semanas mais recentes ficam indisponíveis mostrou que o erro do "
-            "modelo aumenta de 1,6 a 2,8 vezes, mas ele continua errando menos que o baseline nas mesmas "
-            "condições (ver a decisão 12, Previsão com dados atrasados, no README do projeto)."
-        )
+    detalhes.mostrar(cidade, df)

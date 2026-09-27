@@ -1,24 +1,44 @@
+"""
+Previsões das próximas 4 semanas para um município, com os modelos de produção de train.py:
+  - tendência (sobe, estável, cai): classificador com clima;
+  - número de casos com intervalo de 80%: modelo por quantis.
+Os dois modelos são independentes e podem divergir (por exemplo, tendência de subida com
+aumento previsto de só 10% nos casos); o painel mostra os dois como são.
+"""
 import os
+
 import joblib
 import pandas as pd
-from src.train import FEATURES, HORIZONTES, caminho_modelo, reconstruir_casos
 
-def get_predictions(cidade, df_processed):
-    # O modelo é único para todos os municípios; 'cidade' fica na assinatura por compatibilidade com o app
+from src.train import FEATURES, HORIZONTES, caminho_modelo
+
+
+def modelos_disponiveis():
+    return all(os.path.exists(caminho_modelo(tipo, h)) for tipo in ('classificador', 'quantis') for h in HORIZONTES)
+
+
+def get_predictions(df_processed):
+    """DataFrame com h, data, previsto, inferior, superior e tendencia, e a data da semana de partida.
+
+    A semana de partida é a mais recente com as informações do modelo completas. Devolve um
+    DataFrame vazio se os modelos não tiverem sido treinados.
+    """
     df_valid = df_processed.dropna(subset=FEATURES)
-    if df_valid.empty:
-        return {}, ""
+    if df_valid.empty or not modelos_disponiveis():
+        return pd.DataFrame(), None
 
-    last_row = df_valid.iloc[[-1]]
-    ultima_data = pd.to_datetime(last_row['data_iniSE'].values[0])
-    predictions = {}
-
-    for horizon in HORIZONTES:
-        model_path = caminho_modelo(horizon)
-        if os.path.exists(model_path):
-            model = joblib.load(model_path)
-            pred = reconstruir_casos(last_row, model.predict(last_row[FEATURES])).iloc[0]
-            data_futura = ultima_data + pd.Timedelta(weeks=horizon)
-            predictions[f'Semana +{horizon} ({data_futura.strftime("%d/%m/%Y")})'] = int(round(pred))
-
-    return predictions, ultima_data.strftime("%d/%m/%Y")
+    ultima = df_valid.iloc[[-1]]
+    base = pd.Timestamp(ultima['data_iniSE'].values[0])
+    linhas = []
+    for h in HORIZONTES:
+        casos = joblib.load(caminho_modelo('quantis', h)).prever(ultima, h).iloc[0]
+        tendencia = joblib.load(caminho_modelo('classificador', h)).prever(ultima, h).iloc[0]
+        linhas.append({
+            'h': h,
+            'data': base + pd.Timedelta(weeks=h),
+            'previsto': int(round(casos['previsto'])),
+            'inferior': int(round(casos['inferior'])),
+            'superior': int(round(casos['superior'])),
+            'tendencia': tendencia['tendencia'],
+        })
+    return pd.DataFrame(linhas), base

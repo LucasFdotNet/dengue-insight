@@ -9,6 +9,8 @@ logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(
 
 COLUNAS_OBRIGATORIAS = ['data_iniSE', 'casos_est', 'rt', 'p_inc100k']
 COLUNAS_CLIMA = ['tmin', 'tmed', 'tmax', 'precipitacao', 'umidade']
+VARIAVEIS_CLIMA_MODELO = ['tmed', 'precipitacao', 'umidade']
+SEMANAS_CLIMA_MODELO = 4
 # Clima do InfoDengue, substituído pelo ERA5 (ver Decisões de Projeto no README)
 COLUNAS_CLIMA_INFODENGUE = ['tempmin', 'tempmed', 'tempmax', 'umidmin', 'umidmed', 'umidmax']
 
@@ -65,6 +67,12 @@ def feature_engineering(df):
         # variação em relação a 'lag' semanas atrás: > 0 se os casos cresceram
         df_feat[f'var_log_{lag}'] = df_feat['log_casos'] - np.log1p(df_feat[f'casos_est_lag_{lag}'])
     df_feat['semana_ano'] = df_feat['data_iniSE'].dt.isocalendar().week.astype(int)
+    
+    # Clima das semanas S-1 a S-4 ('<variável>_s<k>'), usado pelo classificador de tendência.
+    # O clima da própria semana S não entra: o ERA5 chega com ~6 dias de atraso.
+    for variavel in VARIAVEIS_CLIMA_MODELO:
+        for k in range(1, SEMANAS_CLIMA_MODELO + 1):
+            df_feat[f'{variavel}_s{k}'] = df_feat[variavel].shift(k)
     
     # Targets futuros (1 a 4 semanas à frente)
     for horizon in range(1, 5):

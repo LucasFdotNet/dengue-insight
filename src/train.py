@@ -1,21 +1,25 @@
 """
-Treino e avaliação do modelo único de previsão de casos (H+1 a H+4 semanas).
+Treino, avaliação e modelos de produção do Dengue Insight (previsões de 1 a 4 semanas).
 
-Um único LightGBM por horizonte, treinado com todos os municípios de treino juntos.
-O alvo é relativo: log1p(casos daqui a H semanas) - log1p(casos atuais), ou seja,
-o modelo prevê quanto os casos vão crescer ou cair, e não o número absoluto.
-Isso deixa municípios de tamanhos diferentes na mesma escala e permite prever
-valores acima dos já vistos no treino. Motivação e testes: "Decisões de Projeto"
-no README.
+Modelos de produção (escolhidos na comparação de modelos; ver README, decisões 9 e 11):
+  - tendência (sobe, estável, cai): LightGBM classificador com o clima das semanas
+    S-1 a S-4 (src/modelos/lightgbm_classificador_clima.py);
+  - número de casos, com intervalo de 80%: LightGBM por quantis, com alvo relativo
+    (src/modelos/lightgbm_quantis.py).
+Os dois são modelos únicos, treinados com todos os municípios de treino juntos, um por
+antecedência. Não usam o Rt.
 
-Etapas:
-  1. Avaliação walk-forward com retreino mensal: no início de cada mês, treina um
-     modelo só com o que já era conhecido até ali e prevê as semanas daquele mês,
-     nos municípios de treino e nos de validação espacial (que nunca entram em
-     nenhum treino). Simula o uso real do modelo, retreinado todo mês. Sempre
-     comparado ao baseline de persistência (casos daqui a H semanas = casos atuais).
-  2. Modelo de produção: treinado com toda a série dos municípios de treino e
-     salvo para o predict.py e o app.
+Etapas de run_training():
+  1. Avaliação walk-forward com retreino mensal, de 2015 em diante: no início de cada mês,
+     os dois modelos são treinados só com o que já era conhecido e preveem as semanas
+     daquele mês, nos municípios de treino e nos de validação (que nunca entram no treino).
+     As previsões ficam em reports/previsoes_walkforward.csv (usadas pelo painel) e geram
+     as métricas em reports/metricas_*.csv. Leva cerca de 25 minutos.
+  2. Modelos de produção: treinados com toda a série dos municípios de treino e salvos
+     para o predict.py e o painel.
+
+Este arquivo também guarda as definições comuns (variáveis, tendência, semanas instáveis) e
+a avaliação walk-forward do LightGBM de regressão usada pelos experimentos.
 """
 import os
 import joblib
@@ -52,8 +56,9 @@ PASTA_MODELOS = 'models/trained_models'
 ARQUIVO_PREVISOES_PASSADAS = 'reports/previsoes_walkforward.csv'
 
 
-def caminho_modelo(horizonte):
-    return f"{PASTA_MODELOS}/modelo_unico_h{horizonte}.joblib"
+def caminho_modelo(tipo, horizonte):
+    """tipo: 'classificador' (tendência) ou 'quantis' (número de casos com intervalo)."""
+    return f"{PASTA_MODELOS}/{tipo}_h{horizonte}.joblib"
 
 
 def novo_modelo():
@@ -193,36 +198,93 @@ def resumir_tendencia(erros):
     return resumo.astype({'Semanas': int})
 
 
+def _modelos_producao():
+    # Import local: src.modelos importa definições deste arquivo
+    from src.modelos.lightgbm_classificador_clima import ClassificadorClimaS1S4
+    from src.modelos.lightgbm_quantis import LightGBMQuantis
+    return {'classificador': ClassificadorClimaS1S4, 'quantis': LightGBMQuantis}
+
+
+def avaliar_producao(treino, validacao):
+    """Previsões walk-forward (retreino mensal) dos dois modelos de produção, semana a semana."""
+    from src.avaliacao import walk_forward
+    modelos = _modelos_producao()
+    teste = pd.concat([treino, validacao], ignore_index=True)
+    inicio = f'{PRIMEIRO_ANO_TESTE}-01'
+    fim = treino['data_iniSE'].max().to_period('M').strftime('%Y-%m')
+    logging.info("Walk-forward do modelo de quantis (número de casos)...")
+    casos = walk_forward(modelos['quantis'], treino, teste, inicio, fim, 1)
+    logging.info("Walk-forward do classificador (tendência)...")
+    tendencia = walk_forward(modelos['classificador'], treino, teste, inicio, fim, 1)
+    chave = ['cidade', 'h', 'data_iniSE']
+    prev = casos.drop(columns='tend_prev').merge(tendencia[chave + ['tend_prev']], on=chave, validate='one_to_one')
+    prev['data_alvo'] = prev['data_iniSE'] + pd.to_timedelta(prev['h'] * 7, unit='D')
+    prev['Grupo'] = prev['cidade'].map(lambda k: CIDADES[k]['papel'])
+    return prev
+
+
+def resumir_tendencia_producao(prev):
+    """Métricas de tendência do classificador por grupo e antecedência."""
+    def metricas(g):
+        real, modelo = g['tend_real'], g['tend_prev']
+        acertos = {t: (modelo[real == t] == t).mean() for t in TENDENCIAS if (real == t).any()}
+        oposto = ((real == 'sobe') & (modelo == 'cai')) | ((real == 'cai') & (modelo == 'sobe'))
+        return pd.Series({
+            'Semanas': len(g),
+            'Acerto': round((real == modelo).mean(), 3),
+            'Acerto_balanceado': round(np.mean(list(acertos.values())), 3),
+            'Acerto_sempre_estavel': round((real == 'estável').mean(), 3),
+            'Subidas_detectadas': round(acertos.get('sobe', np.nan), 3),
+            'Alarmes_subida_corretos': round((real[modelo == 'sobe'] == 'sobe').mean(), 3),
+            'Quedas_detectadas': round(acertos.get('cai', np.nan), 3),
+            'Sentido_oposto': round(oposto.mean(), 3),
+        })
+    df = prev.assign(Horizonte='Semana +' + prev['h'].astype(str))
+    resumo = df.groupby(['Grupo', 'Horizonte']).apply(metricas, include_groups=False).reset_index()
+    return resumo.astype({'Semanas': int})
+
+
 def treinar_producao(treino):
     os.makedirs(PASTA_MODELOS, exist_ok=True)
-    for horizonte in HORIZONTES:
-        tr = linhas_validas(treino, horizonte)
-        modelo = novo_modelo().fit(tr[FEATURES], alvo_relativo(tr, horizonte))
-        joblib.dump(modelo, caminho_modelo(horizonte))
-        logging.info(f"Modelo de produção H+{horizonte} salvo ({len(tr)} semanas, até {tr['data_iniSE'].max():%d/%m/%Y}).")
+    for tipo, classe in _modelos_producao().items():
+        for horizonte in HORIZONTES:
+            tr = linhas_validas(treino, horizonte)
+            joblib.dump(classe().treinar(tr, horizonte), caminho_modelo(tipo, horizonte))
+            logging.info(f"Modelo de produção '{tipo}' H+{horizonte} salvo "
+                         f"({len(tr)} semanas, até {tr['data_iniSE'].max():%d/%m/%Y}).")
 
 
 def run_training():
     os.makedirs('reports', exist_ok=True)
     treino, validacao = carregar('treino'), carregar('validacao')
 
-    erros = avaliar_walk_forward(treino, validacao)
+    prev = avaliar_producao(treino, validacao)
+
+    # Erro em número de casos (modelo de quantis) contra o baseline de persistência
+    erros = prev.assign(
+        Cidade=prev['cidade'].map(lambda k: CIDADES[k]['nome']),
+        Ano=prev['data_alvo'].dt.year,
+        Horizonte='Semana +' + prev['h'].astype(str),
+        erro_lgbm=prev['real'] - prev['previsto'],
+        erro_baseline=prev['real'] - prev['atual'],
+    )
     resumir(erros, ['Grupo', 'Cidade', 'Horizonte']).to_csv('reports/metricas_modelos.csv', index=False)
     resumir(erros, ['Grupo', 'Ano', 'Horizonte']).to_csv('reports/metricas_por_ano.csv', index=False)
     geral = resumir(erros, ['Grupo', 'Horizonte'])
     geral.to_csv('reports/metricas_gerais.csv', index=False)
-    for _, linha in geral.iterrows():
-        logging.info(f"[{linha['Grupo']} | {linha['Horizonte']}] Baseline MAE: {linha['Baseline_MAE']:.2f} "
-                     f"vs LGBM MAE: {linha['LGBM_MAE']:.2f} (razão {linha['Razao_MAE']:.2f})")
-    resumir_tendencia(erros).to_csv('reports/metricas_tendencia.csv', index=False)
+    tendencia = resumir_tendencia_producao(prev)
+    tendencia.to_csv('reports/metricas_tendencia.csv', index=False)
+    for (_, linha), (_, tend) in zip(geral.iterrows(), tendencia.iterrows()):
+        logging.info(f"[{linha['Grupo']} | {linha['Horizonte']}] razão de erro (quantis) {linha['Razao_MAE']:.2f}; "
+                     f"acerto balanceado (classificador) {tend['Acerto_balanceado']:.3f}")
     logging.info("Métricas salvas em reports/metricas_modelos.csv, metricas_por_ano.csv, metricas_gerais.csv "
                  "e metricas_tendencia.csv.")
 
-    # Previsões fora da amostra (cada semana prevista por um modelo que não a viu no treino),
-    # usadas pelo app para mostrar como o modelo teria se saído no passado
-    previsoes = erros[['cidade', 'h', 'data_alvo', 'real', 'previsto']].copy()
-    previsoes['previsto'] = previsoes['previsto'].round(1)
-    previsoes.sort_values(['cidade', 'h', 'data_alvo']).to_csv(ARQUIVO_PREVISOES_PASSADAS, index=False)
+    # Previsões fora da amostra (cada semana prevista por modelos que não a viram no treino),
+    # usadas pelo painel para mostrar como os modelos teriam se saído no passado
+    colunas = ['cidade', 'h', 'data_alvo', 'atual', 'real', 'previsto', 'inferior', 'superior', 'tend_real', 'tend_prev']
+    saida = prev[colunas].round({'previsto': 1, 'inferior': 1, 'superior': 1})
+    saida.sort_values(['cidade', 'h', 'data_alvo']).to_csv(ARQUIVO_PREVISOES_PASSADAS, index=False)
     logging.info(f"Previsões do walk-forward salvas em {ARQUIVO_PREVISOES_PASSADAS}.")
 
     treinar_producao(treino)
