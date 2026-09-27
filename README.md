@@ -382,6 +382,14 @@ Registro das decisões que afetam os dados, o modelo ou a avaliação, com o mot
   * **Conclusão:** com 100 municípios, a quantidade de dados deixou de ser o principal limite. Ganhos maiores dependeriam de outras mudanças no modelo (novas informações ou outra forma de modelar), e não de mais municípios.
   * **Ressalva:** a curva foi ajustada com 5 pontos e 3 sorteios por ponto; o limite estimado é uma extrapolação e deve ser lido como ordem de grandeza.
 
+### 14. Comparação de modelos para a tendência
+
+* **Pergunta:** o LightGBM é o melhor modelo para prever a tendência (sobe, estável ou cai) em municípios não vistos?
+* **Teste:** 8 modelos, um arquivo cada em `src/modelos/` (baseline, regressão linear, binomial negativa, LightGBM atual, LightGBM ajustado, LightGBM por quantis, LightGBM classificador e ensemble), comparados por `src/experimento_modelos.py` na validação cruzada por município (decisão 13), de 2019 em diante. Métrica principal: **acerto balanceado da tendência** (média do acerto em cada classe; "sempre estável" tira 33%). Resultados em `reports/comparacao_modelos.csv` e `reports/comparacao_modelos_por_municipio.csv`.
+* **Resultado (acerto balanceado, 1 a 4 semanas):** LightGBM classificador 0,42 a 0,62, o único significativamente melhor que o LightGBM atual (0,39 a 0,59); regressão linear, binomial negativa e ensemble ficaram abaixo; ajustar hiperparâmetros não trouxe ganho. O LightGBM por quantis teve o menor erro em número de casos e um intervalo de 80% bem calibrado (78% a 82% de cobertura).
+* **Troca:** o classificador detecta mais subidas (55% contra 42% em 4 semanas), mas com mais alarmes falsos (57% dos alarmes corretos, contra 65%).
+* **Decisão:** em aberto. Detalhes, tabelas completas e limitações na seção 16 de [`docs/historia_decisoes.md`](docs/historia_decisoes.md).
+
 ### Nota sobre os testes exploratórios
 
 As tabelas das decisões 5, 7 e 8 vêm de testes exploratórios (ainda com o `Rt` no modelo) feitos com a validação *walk-forward* com retreino **anual**, antes do retreino mensal (decisão 6) e de um ajuste no corte das semanas instáveis (decisão 3). Como todas as alternativas de cada tabela foram avaliadas da mesma forma, as comparações continuam válidas, mas os números podem diferir na segunda casa decimal dos de `reports/` e das tabelas das decisões 6 e 10, que são os resultados finais.
