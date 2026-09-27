@@ -2,7 +2,7 @@
 Experimento: clima das semanas anteriores à semana atual (S), com a base nacional.
 
 Motivação: o ciclo de ovo a mosquito adulto leva de 7 a 10 dias, e a atividade do
-mosquito depende das condições climáticas. Com 63 municípios de treino em várias
+mosquito depende das condições climáticas. Com os municípios de treino de várias
 regiões do país (climas e sazonalidades diferentes), o modelo tem mais variação de
 clima para aprender do que com os 13 municípios de SP.
 
@@ -11,7 +11,8 @@ então S ainda não está completa no momento da previsão.
 
 Configurações (todas sem Rt, mesma validação walk-forward com retreino mensal do train.py):
   - sem clima, treinado só com os 13 municípios de treino de SP (base anterior);
-  - sem clima, treinado com os 63 municípios de treino (modelo atual);
+  - sem clima, treinado com todos os municípios de treino (modelo atual; eram 63 quando o
+    experimento foi criado, e o resultado salvo é dessa base);
   - clima semana a semana de S-1 a S-2, de S-1 a S-4 e de S-1 a S-5;
   - média do clima de S-1 a S-8 (chuva: total das 8 semanas).
 Variáveis climáticas: temperatura média, chuva total e umidade média da semana (o
@@ -63,7 +64,7 @@ def adicionar_clima(df):
 
 
 def configuracoes():
-    config = {'Sem clima (modelo atual, 63 municípios)': FEATURES}
+    config = {'Sem clima (modelo atual, treino nacional)': FEATURES}
     for nome, semanas in SEMANAS.items():
         config[f'Clima {nome}'] = FEATURES + [f'{v}_s{k}' for k in semanas for v in VARIAVEIS]
     config[f'Clima: média de S-1 a S-{JANELA_MEDIA}'] = FEATURES + [f'{v}_media_s1_s{JANELA_MEDIA}' for v in VARIAVEIS]

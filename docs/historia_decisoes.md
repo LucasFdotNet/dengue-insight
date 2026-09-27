@@ -270,6 +270,8 @@ Nos municípios de validação, o erro do modelo cresce de 1,6 a 3,1 vezes com l
 
 ---
 
+**Atualização com a base de 115 municípios (27/09/2026).** O experimento foi rodado de novo com os 100 municípios de treino e os 15 de validação (`reports/experimento_atraso.csv`). As conclusões se mantêm. Nos municípios de treino, sem as 4 semanas mais recentes, o erro do modelo aumenta de 1,6 a 2,8 vezes (razão de erro com lacuna de 0,67 a 0,70, contra 0,71 a 0,84 sem lacuna). Nos de validação, aumenta de 1,6 a 2,9 vezes, com razão de 0,63 a 0,64.
+
 <a id="s8"></a>
 ## 8. Mudança de foco: acertar a tendência
 

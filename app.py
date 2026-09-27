@@ -326,6 +326,6 @@ else:
             "**Limitação:** a simulação usa os casos já revisados. Em tempo real, os casos das semanas mais "
             "recentes ainda estariam incompletos, porque as notificações chegam com atraso, e o modelo erraria "
             "mais. Um experimento em que as 4 semanas mais recentes ficam indisponíveis mostrou que o erro do "
-            "modelo aumenta de 1,6 a 3,1 vezes, mas ele continua errando menos que o baseline nas mesmas "
-            "condições (ver decisão 10 no README do projeto)."
+            "modelo aumenta de 1,6 a 2,8 vezes, mas ele continua errando menos que o baseline nas mesmas "
+            "condições (ver a decisão 12, Previsão com dados atrasados, no README do projeto)."
         )
