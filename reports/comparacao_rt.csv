@@ -1,0 +1,193 @@
+modelo,descricao,conjunto,h,metrica,valor,ic95_inf,ic95_sup,dif_vs_referencia,dif_ic95_inf,dif_ic95_sup,municipios
+lightgbm_classificador,LightGBM classificador (prevê a tendência diretamente),validacao_cruzada,1,acerto,0.6607,0.642,0.6802,0.0,0.0,0.0,100
+lightgbm_classificador,LightGBM classificador (prevê a tendência diretamente),validacao_cruzada,1,acerto_balanceado,0.4194,0.4131,0.4259,0.0,0.0,0.0,100
+lightgbm_classificador,LightGBM classificador (prevê a tendência diretamente),validacao_cruzada,1,subidas_detectadas,0.1737,0.1638,0.1841,0.0,0.0,0.0,100
+lightgbm_classificador,LightGBM classificador (prevê a tendência diretamente),validacao_cruzada,1,alarmes_subida_corretos,0.5,0.4796,0.5206,0.0,0.0,0.0,100
+lightgbm_classificador,LightGBM classificador (prevê a tendência diretamente),validacao_cruzada,1,quedas_detectadas,0.1631,0.1484,0.1779,0.0,0.0,0.0,100
+lightgbm_classificador,LightGBM classificador (prevê a tendência diretamente),validacao_cruzada,1,sentido_oposto,0.013,0.0113,0.0147,0.0,0.0,0.0,100
+lightgbm_classificador,LightGBM classificador (prevê a tendência diretamente),validacao_cruzada,2,acerto,0.6228,0.6023,0.6436,0.0,0.0,0.0,100
+lightgbm_classificador,LightGBM classificador (prevê a tendência diretamente),validacao_cruzada,2,acerto_balanceado,0.5536,0.5402,0.5663,0.0,0.0,0.0,100
+lightgbm_classificador,LightGBM classificador (prevê a tendência diretamente),validacao_cruzada,2,subidas_detectadas,0.4097,0.3909,0.4285,0.0,0.0,0.0,100
+lightgbm_classificador,LightGBM classificador (prevê a tendência diretamente),validacao_cruzada,2,alarmes_subida_corretos,0.5501,0.5308,0.5697,0.0,0.0,0.0,100
+lightgbm_classificador,LightGBM classificador (prevê a tendência diretamente),validacao_cruzada,2,quedas_detectadas,0.485,0.4602,0.5106,0.0,0.0,0.0,100
+lightgbm_classificador,LightGBM classificador (prevê a tendência diretamente),validacao_cruzada,2,sentido_oposto,0.0424,0.0385,0.0464,0.0,0.0,0.0,100
+lightgbm_classificador,LightGBM classificador (prevê a tendência diretamente),validacao_cruzada,3,acerto,0.6213,0.6,0.6427,0.0,0.0,0.0,100
+lightgbm_classificador,LightGBM classificador (prevê a tendência diretamente),validacao_cruzada,3,acerto_balanceado,0.605,0.589,0.6199,0.0,0.0,0.0,100
+lightgbm_classificador,LightGBM classificador (prevê a tendência diretamente),validacao_cruzada,3,subidas_detectadas,0.508,0.4873,0.5278,0.0,0.0,0.0,100
+lightgbm_classificador,LightGBM classificador (prevê a tendência diretamente),validacao_cruzada,3,alarmes_subida_corretos,0.5607,0.5397,0.5818,0.0,0.0,0.0,100
+lightgbm_classificador,LightGBM classificador (prevê a tendência diretamente),validacao_cruzada,3,quedas_detectadas,0.631,0.6083,0.652,0.0,0.0,0.0,100
+lightgbm_classificador,LightGBM classificador (prevê a tendência diretamente),validacao_cruzada,3,sentido_oposto,0.0702,0.0636,0.0773,0.0,0.0,0.0,100
+lightgbm_classificador,LightGBM classificador (prevê a tendência diretamente),validacao_cruzada,4,acerto,0.626,0.6049,0.6469,0.0,0.0,0.0,100
+lightgbm_classificador,LightGBM classificador (prevê a tendência diretamente),validacao_cruzada,4,acerto_balanceado,0.623,0.6068,0.6374,0.0,0.0,0.0,100
+lightgbm_classificador,LightGBM classificador (prevê a tendência diretamente),validacao_cruzada,4,subidas_detectadas,0.5476,0.5227,0.5698,0.0,0.0,0.0,100
+lightgbm_classificador,LightGBM classificador (prevê a tendência diretamente),validacao_cruzada,4,alarmes_subida_corretos,0.5691,0.5488,0.5893,0.0,0.0,0.0,100
+lightgbm_classificador,LightGBM classificador (prevê a tendência diretamente),validacao_cruzada,4,quedas_detectadas,0.6816,0.6606,0.7016,0.0,0.0,0.0,100
+lightgbm_classificador,LightGBM classificador (prevê a tendência diretamente),validacao_cruzada,4,sentido_oposto,0.089,0.0806,0.0976,0.0,0.0,0.0,100
+lightgbm_classificador,LightGBM classificador (prevê a tendência diretamente),validacao_final,1,acerto,0.6344,0.5951,0.6793,0.0,0.0,0.0,15
+lightgbm_classificador,LightGBM classificador (prevê a tendência diretamente),validacao_final,1,acerto_balanceado,0.4156,0.398,0.4329,0.0,0.0,0.0,15
+lightgbm_classificador,LightGBM classificador (prevê a tendência diretamente),validacao_final,1,subidas_detectadas,0.1733,0.1489,0.1966,0.0,0.0,0.0,15
+lightgbm_classificador,LightGBM classificador (prevê a tendência diretamente),validacao_final,1,alarmes_subida_corretos,0.542,0.4761,0.6093,0.0,0.0,0.0,15
+lightgbm_classificador,LightGBM classificador (prevê a tendência diretamente),validacao_final,1,quedas_detectadas,0.162,0.1297,0.1955,0.0,0.0,0.0,15
+lightgbm_classificador,LightGBM classificador (prevê a tendência diretamente),validacao_final,1,sentido_oposto,0.0124,0.0084,0.0176,0.0,0.0,0.0,15
+lightgbm_classificador,LightGBM classificador (prevê a tendência diretamente),validacao_final,2,acerto,0.5844,0.5424,0.6291,0.0,0.0,0.0,15
+lightgbm_classificador,LightGBM classificador (prevê a tendência diretamente),validacao_final,2,acerto_balanceado,0.5503,0.5166,0.5803,0.0,0.0,0.0,15
+lightgbm_classificador,LightGBM classificador (prevê a tendência diretamente),validacao_final,2,subidas_detectadas,0.4128,0.3756,0.444,0.0,0.0,0.0,15
+lightgbm_classificador,LightGBM classificador (prevê a tendência diretamente),validacao_final,2,alarmes_subida_corretos,0.5735,0.512,0.6325,0.0,0.0,0.0,15
+lightgbm_classificador,LightGBM classificador (prevê a tendência diretamente),validacao_final,2,quedas_detectadas,0.5442,0.4918,0.5954,0.0,0.0,0.0,15
+lightgbm_classificador,LightGBM classificador (prevê a tendência diretamente),validacao_final,2,sentido_oposto,0.0431,0.0333,0.0538,0.0,0.0,0.0,15
+lightgbm_classificador,LightGBM classificador (prevê a tendência diretamente),validacao_final,3,acerto,0.5966,0.5597,0.6365,0.0,0.0,0.0,15
+lightgbm_classificador,LightGBM classificador (prevê a tendência diretamente),validacao_final,3,acerto_balanceado,0.6029,0.568,0.6352,0.0,0.0,0.0,15
+lightgbm_classificador,LightGBM classificador (prevê a tendência diretamente),validacao_final,3,subidas_detectadas,0.5662,0.521,0.6029,0.0,0.0,0.0,15
+lightgbm_classificador,LightGBM classificador (prevê a tendência diretamente),validacao_final,3,alarmes_subida_corretos,0.5939,0.5397,0.6438,0.0,0.0,0.0,15
+lightgbm_classificador,LightGBM classificador (prevê a tendência diretamente),validacao_final,3,quedas_detectadas,0.6836,0.6315,0.7345,0.0,0.0,0.0,15
+lightgbm_classificador,LightGBM classificador (prevê a tendência diretamente),validacao_final,3,sentido_oposto,0.0643,0.0516,0.0761,0.0,0.0,0.0,15
+lightgbm_classificador,LightGBM classificador (prevê a tendência diretamente),validacao_final,4,acerto,0.6027,0.5655,0.6431,0.0,0.0,0.0,15
+lightgbm_classificador,LightGBM classificador (prevê a tendência diretamente),validacao_final,4,acerto_balanceado,0.6112,0.5716,0.6497,0.0,0.0,0.0,15
+lightgbm_classificador,LightGBM classificador (prevê a tendência diretamente),validacao_final,4,subidas_detectadas,0.6303,0.5799,0.6722,0.0,0.0,0.0,15
+lightgbm_classificador,LightGBM classificador (prevê a tendência diretamente),validacao_final,4,alarmes_subida_corretos,0.5943,0.5447,0.635,0.0,0.0,0.0,15
+lightgbm_classificador,LightGBM classificador (prevê a tendência diretamente),validacao_final,4,quedas_detectadas,0.7321,0.6808,0.7767,0.0,0.0,0.0,15
+lightgbm_classificador,LightGBM classificador (prevê a tendência diretamente),validacao_final,4,sentido_oposto,0.0959,0.0814,0.1103,0.0,0.0,0.0,15
+sinal_rt,"Regra do Rt do InfoDengue (> 1,1 sobe; < 0,9 cai)",validacao_cruzada,1,acerto,0.2718,0.2545,0.2877,-0.3888,-0.423,-0.3573,100
+sinal_rt,"Regra do Rt do InfoDengue (> 1,1 sobe; < 0,9 cai)",validacao_cruzada,1,acerto_balanceado,0.3471,0.3313,0.3617,-0.0723,-0.0883,-0.0584,100
+sinal_rt,"Regra do Rt do InfoDengue (> 1,1 sobe; < 0,9 cai)",validacao_cruzada,1,subidas_detectadas,0.4303,0.4111,0.4484,0.2566,0.2377,0.275,100
+sinal_rt,"Regra do Rt do InfoDengue (> 1,1 sobe; < 0,9 cai)",validacao_cruzada,1,alarmes_subida_corretos,0.2073,0.193,0.2207,-0.2927,-0.315,-0.2711,100
+sinal_rt,"Regra do Rt do InfoDengue (> 1,1 sobe; < 0,9 cai)",validacao_cruzada,1,quedas_detectadas,0.4209,0.3954,0.4442,0.2577,0.2341,0.2784,100
+sinal_rt,"Regra do Rt do InfoDengue (> 1,1 sobe; < 0,9 cai)",validacao_cruzada,1,sentido_oposto,0.1342,0.1246,0.1438,0.1212,0.1124,0.13,100
+sinal_rt,"Regra do Rt do InfoDengue (> 1,1 sobe; < 0,9 cai)",validacao_cruzada,2,acerto,0.3155,0.2967,0.334,-0.3073,-0.3434,-0.2723,100
+sinal_rt,"Regra do Rt do InfoDengue (> 1,1 sobe; < 0,9 cai)",validacao_cruzada,2,acerto_balanceado,0.3765,0.3629,0.3913,-0.177,-0.1916,-0.1608,100
+sinal_rt,"Regra do Rt do InfoDengue (> 1,1 sobe; < 0,9 cai)",validacao_cruzada,2,subidas_detectadas,0.4818,0.4648,0.4998,0.0722,0.0541,0.0916,100
+sinal_rt,"Regra do Rt do InfoDengue (> 1,1 sobe; < 0,9 cai)",validacao_cruzada,2,alarmes_subida_corretos,0.2902,0.2701,0.3096,-0.2599,-0.2764,-0.2427,100
+sinal_rt,"Regra do Rt do InfoDengue (> 1,1 sobe; < 0,9 cai)",validacao_cruzada,2,quedas_detectadas,0.4578,0.4379,0.4791,-0.0272,-0.0433,-0.0093,100
+sinal_rt,"Regra do Rt do InfoDengue (> 1,1 sobe; < 0,9 cai)",validacao_cruzada,2,sentido_oposto,0.1534,0.144,0.1625,0.1111,0.1034,0.1182,100
+sinal_rt,"Regra do Rt do InfoDengue (> 1,1 sobe; < 0,9 cai)",validacao_cruzada,3,acerto,0.3396,0.3197,0.359,-0.2817,-0.3181,-0.2468,100
+sinal_rt,"Regra do Rt do InfoDengue (> 1,1 sobe; < 0,9 cai)",validacao_cruzada,3,acerto_balanceado,0.3857,0.373,0.3991,-0.2193,-0.2352,-0.2016,100
+sinal_rt,"Regra do Rt do InfoDengue (> 1,1 sobe; < 0,9 cai)",validacao_cruzada,3,subidas_detectadas,0.4974,0.4804,0.5144,-0.0106,-0.0311,0.0103,100
+sinal_rt,"Regra do Rt do InfoDengue (> 1,1 sobe; < 0,9 cai)",validacao_cruzada,3,alarmes_subida_corretos,0.3358,0.314,0.3579,-0.2249,-0.2433,-0.2068,100
+sinal_rt,"Regra do Rt do InfoDengue (> 1,1 sobe; < 0,9 cai)",validacao_cruzada,3,quedas_detectadas,0.4736,0.4559,0.492,-0.1573,-0.1714,-0.141,100
+sinal_rt,"Regra do Rt do InfoDengue (> 1,1 sobe; < 0,9 cai)",validacao_cruzada,3,sentido_oposto,0.1655,0.1558,0.1752,0.0953,0.0878,0.103,100
+sinal_rt,"Regra do Rt do InfoDengue (> 1,1 sobe; < 0,9 cai)",validacao_cruzada,4,acerto,0.3487,0.3288,0.3691,-0.2773,-0.313,-0.2432,100
+sinal_rt,"Regra do Rt do InfoDengue (> 1,1 sobe; < 0,9 cai)",validacao_cruzada,4,acerto_balanceado,0.3821,0.3703,0.3949,-0.2408,-0.2586,-0.2208,100
+sinal_rt,"Regra do Rt do InfoDengue (> 1,1 sobe; < 0,9 cai)",validacao_cruzada,4,subidas_detectadas,0.4993,0.4846,0.5135,-0.0482,-0.0704,-0.0229,100
+sinal_rt,"Regra do Rt do InfoDengue (> 1,1 sobe; < 0,9 cai)",validacao_cruzada,4,alarmes_subida_corretos,0.3629,0.3402,0.387,-0.2062,-0.2244,-0.1877,100
+sinal_rt,"Regra do Rt do InfoDengue (> 1,1 sobe; < 0,9 cai)",validacao_cruzada,4,quedas_detectadas,0.4692,0.4522,0.4866,-0.2124,-0.2264,-0.1977,100
+sinal_rt,"Regra do Rt do InfoDengue (> 1,1 sobe; < 0,9 cai)",validacao_cruzada,4,sentido_oposto,0.1775,0.1684,0.1866,0.0884,0.0798,0.097,100
+sinal_rt,"Regra do Rt do InfoDengue (> 1,1 sobe; < 0,9 cai)",validacao_final,1,acerto,0.3195,0.2777,0.3567,-0.3149,-0.3877,-0.2621,15
+sinal_rt,"Regra do Rt do InfoDengue (> 1,1 sobe; < 0,9 cai)",validacao_final,1,acerto_balanceado,0.3729,0.3314,0.4134,-0.0427,-0.0806,-0.0056,15
+sinal_rt,"Regra do Rt do InfoDengue (> 1,1 sobe; < 0,9 cai)",validacao_final,1,subidas_detectadas,0.4099,0.3763,0.4436,0.2366,0.2002,0.2747,15
+sinal_rt,"Regra do Rt do InfoDengue (> 1,1 sobe; < 0,9 cai)",validacao_final,1,alarmes_subida_corretos,0.2219,0.1937,0.2481,-0.3201,-0.3879,-0.2568,15
+sinal_rt,"Regra do Rt do InfoDengue (> 1,1 sobe; < 0,9 cai)",validacao_final,1,quedas_detectadas,0.4559,0.3898,0.5211,0.2939,0.2395,0.3477,15
+sinal_rt,"Regra do Rt do InfoDengue (> 1,1 sobe; < 0,9 cai)",validacao_final,1,sentido_oposto,0.1359,0.1124,0.1608,0.1234,0.1026,0.1451,15
+sinal_rt,"Regra do Rt do InfoDengue (> 1,1 sobe; < 0,9 cai)",validacao_final,2,acerto,0.3677,0.3214,0.4118,-0.2168,-0.2925,-0.1576,15
+sinal_rt,"Regra do Rt do InfoDengue (> 1,1 sobe; < 0,9 cai)",validacao_final,2,acerto_balanceado,0.4033,0.3628,0.4449,-0.147,-0.1823,-0.1146,15
+sinal_rt,"Regra do Rt do InfoDengue (> 1,1 sobe; < 0,9 cai)",validacao_final,2,subidas_detectadas,0.476,0.4333,0.5159,0.0632,0.0337,0.0955,15
+sinal_rt,"Regra do Rt do InfoDengue (> 1,1 sobe; < 0,9 cai)",validacao_final,2,alarmes_subida_corretos,0.336,0.29,0.3801,-0.2375,-0.2722,-0.2017,15
+sinal_rt,"Regra do Rt do InfoDengue (> 1,1 sobe; < 0,9 cai)",validacao_final,2,quedas_detectadas,0.4784,0.4214,0.5338,-0.0658,-0.087,-0.0483,15
+sinal_rt,"Regra do Rt do InfoDengue (> 1,1 sobe; < 0,9 cai)",validacao_final,2,sentido_oposto,0.1564,0.1313,0.1824,0.1133,0.0952,0.1316,15
+sinal_rt,"Regra do Rt do InfoDengue (> 1,1 sobe; < 0,9 cai)",validacao_final,3,acerto,0.3842,0.3326,0.4319,-0.2123,-0.2872,-0.1573,15
+sinal_rt,"Regra do Rt do InfoDengue (> 1,1 sobe; < 0,9 cai)",validacao_final,3,acerto_balanceado,0.408,0.366,0.4471,-0.1949,-0.2376,-0.1541,15
+sinal_rt,"Regra do Rt do InfoDengue (> 1,1 sobe; < 0,9 cai)",validacao_final,3,subidas_detectadas,0.4797,0.4344,0.5221,-0.0865,-0.126,-0.0481,15
+sinal_rt,"Regra do Rt do InfoDengue (> 1,1 sobe; < 0,9 cai)",validacao_final,3,alarmes_subida_corretos,0.3728,0.3138,0.4296,-0.2211,-0.2505,-0.1947,15
+sinal_rt,"Regra do Rt do InfoDengue (> 1,1 sobe; < 0,9 cai)",validacao_final,3,quedas_detectadas,0.4991,0.4453,0.547,-0.1845,-0.2011,-0.1683,15
+sinal_rt,"Regra do Rt do InfoDengue (> 1,1 sobe; < 0,9 cai)",validacao_final,3,sentido_oposto,0.1616,0.1371,0.1866,0.0973,0.0814,0.1138,15
+sinal_rt,"Regra do Rt do InfoDengue (> 1,1 sobe; < 0,9 cai)",validacao_final,4,acerto,0.3919,0.3366,0.4405,-0.2108,-0.2842,-0.1562,15
+sinal_rt,"Regra do Rt do InfoDengue (> 1,1 sobe; < 0,9 cai)",validacao_final,4,acerto_balanceado,0.4026,0.3627,0.4416,-0.2087,-0.2596,-0.1558,15
+sinal_rt,"Regra do Rt do InfoDengue (> 1,1 sobe; < 0,9 cai)",validacao_final,4,subidas_detectadas,0.4854,0.4455,0.5224,-0.1449,-0.172,-0.1155,15
+sinal_rt,"Regra do Rt do InfoDengue (> 1,1 sobe; < 0,9 cai)",validacao_final,4,alarmes_subida_corretos,0.4066,0.3462,0.4634,-0.1877,-0.216,-0.1611,15
+sinal_rt,"Regra do Rt do InfoDengue (> 1,1 sobe; < 0,9 cai)",validacao_final,4,quedas_detectadas,0.4832,0.4351,0.5259,-0.2489,-0.2684,-0.2259,15
+sinal_rt,"Regra do Rt do InfoDengue (> 1,1 sobe; < 0,9 cai)",validacao_final,4,sentido_oposto,0.1768,0.1531,0.2005,0.0809,0.0622,0.1,15
+sinal_p_rt1,"Regra do p_rt1 do InfoDengue (> 0,9 sobe; < 0,1 cai)",validacao_cruzada,1,acerto,0.454,0.4415,0.4661,-0.2066,-0.2249,-0.1885,100
+sinal_p_rt1,"Regra do p_rt1 do InfoDengue (> 0,9 sobe; < 0,1 cai)",validacao_cruzada,1,acerto_balanceado,0.3881,0.3744,0.4008,-0.0314,-0.0435,-0.0211,100
+sinal_p_rt1,"Regra do p_rt1 do InfoDengue (> 0,9 sobe; < 0,1 cai)",validacao_cruzada,1,subidas_detectadas,0.3099,0.2871,0.3305,0.1362,0.1125,0.1586,100
+sinal_p_rt1,"Regra do p_rt1 do InfoDengue (> 0,9 sobe; < 0,1 cai)",validacao_cruzada,1,alarmes_subida_corretos,0.2588,0.2463,0.2716,-0.2412,-0.2632,-0.2204,100
+sinal_p_rt1,"Regra do p_rt1 do InfoDengue (> 0,9 sobe; < 0,1 cai)",validacao_cruzada,1,quedas_detectadas,0.3284,0.2991,0.3554,0.1653,0.1396,0.1887,100
+sinal_p_rt1,"Regra do p_rt1 do InfoDengue (> 0,9 sobe; < 0,1 cai)",validacao_cruzada,1,sentido_oposto,0.079,0.0736,0.0845,0.066,0.0615,0.0706,100
+sinal_p_rt1,"Regra do p_rt1 do InfoDengue (> 0,9 sobe; < 0,1 cai)",validacao_cruzada,2,acerto,0.4698,0.4586,0.4808,-0.153,-0.1744,-0.1338,100
+sinal_p_rt1,"Regra do p_rt1 do InfoDengue (> 0,9 sobe; < 0,1 cai)",validacao_cruzada,2,acerto_balanceado,0.4279,0.4146,0.4416,-0.1256,-0.1389,-0.113,100
+sinal_p_rt1,"Regra do p_rt1 do InfoDengue (> 0,9 sobe; < 0,1 cai)",validacao_cruzada,2,subidas_detectadas,0.3551,0.3326,0.3779,-0.0546,-0.0759,-0.0326,100
+sinal_p_rt1,"Regra do p_rt1 do InfoDengue (> 0,9 sobe; < 0,1 cai)",validacao_cruzada,2,alarmes_subida_corretos,0.3707,0.3527,0.3875,-0.1794,-0.1936,-0.167,100
+sinal_p_rt1,"Regra do p_rt1 do InfoDengue (> 0,9 sobe; < 0,1 cai)",validacao_cruzada,2,quedas_detectadas,0.3727,0.3465,0.3999,-0.1124,-0.1304,-0.0924,100
+sinal_p_rt1,"Regra do p_rt1 do InfoDengue (> 0,9 sobe; < 0,1 cai)",validacao_cruzada,2,sentido_oposto,0.0915,0.0856,0.0971,0.0492,0.0445,0.0537,100
+sinal_p_rt1,"Regra do p_rt1 do InfoDengue (> 0,9 sobe; < 0,1 cai)",validacao_cruzada,3,acerto,0.4708,0.4598,0.4817,-0.1505,-0.172,-0.1312,100
+sinal_p_rt1,"Regra do p_rt1 do InfoDengue (> 0,9 sobe; < 0,1 cai)",validacao_cruzada,3,acerto_balanceado,0.4401,0.427,0.4535,-0.1649,-0.1804,-0.1491,100
+sinal_p_rt1,"Regra do p_rt1 do InfoDengue (> 0,9 sobe; < 0,1 cai)",validacao_cruzada,3,subidas_detectadas,0.3608,0.34,0.3826,-0.1472,-0.1673,-0.1262,100
+sinal_p_rt1,"Regra do p_rt1 do InfoDengue (> 0,9 sobe; < 0,1 cai)",validacao_cruzada,3,alarmes_subida_corretos,0.4221,0.403,0.4406,-0.1386,-0.1532,-0.1243,100
+sinal_p_rt1,"Regra do p_rt1 do InfoDengue (> 0,9 sobe; < 0,1 cai)",validacao_cruzada,3,quedas_detectadas,0.3863,0.3618,0.4129,-0.2446,-0.2601,-0.2291,100
+sinal_p_rt1,"Regra do p_rt1 do InfoDengue (> 0,9 sobe; < 0,1 cai)",validacao_cruzada,3,sentido_oposto,0.0999,0.0936,0.106,0.0297,0.0242,0.035,100
+sinal_p_rt1,"Regra do p_rt1 do InfoDengue (> 0,9 sobe; < 0,1 cai)",validacao_cruzada,4,acerto,0.4637,0.4536,0.4741,-0.1622,-0.1829,-0.1422,100
+sinal_p_rt1,"Regra do p_rt1 do InfoDengue (> 0,9 sobe; < 0,1 cai)",validacao_cruzada,4,acerto_balanceado,0.4409,0.4281,0.454,-0.182,-0.2004,-0.1629,100
+sinal_p_rt1,"Regra do p_rt1 do InfoDengue (> 0,9 sobe; < 0,1 cai)",validacao_cruzada,4,subidas_detectadas,0.3551,0.3357,0.3747,-0.1925,-0.2127,-0.1715,100
+sinal_p_rt1,"Regra do p_rt1 do InfoDengue (> 0,9 sobe; < 0,1 cai)",validacao_cruzada,4,alarmes_subida_corretos,0.4469,0.4278,0.4655,-0.1222,-0.1369,-0.1076,100
+sinal_p_rt1,"Regra do p_rt1 do InfoDengue (> 0,9 sobe; < 0,1 cai)",validacao_cruzada,4,quedas_detectadas,0.3877,0.3636,0.4114,-0.294,-0.3083,-0.2796,100
+sinal_p_rt1,"Regra do p_rt1 do InfoDengue (> 0,9 sobe; < 0,1 cai)",validacao_cruzada,4,sentido_oposto,0.1065,0.1,0.113,0.0175,0.0111,0.0236,100
+sinal_p_rt1,"Regra do p_rt1 do InfoDengue (> 0,9 sobe; < 0,1 cai)",validacao_final,1,acerto,0.4247,0.3993,0.4549,-0.2097,-0.261,-0.1659,15
+sinal_p_rt1,"Regra do p_rt1 do InfoDengue (> 0,9 sobe; < 0,1 cai)",validacao_final,1,acerto_balanceado,0.3884,0.351,0.4262,-0.0272,-0.0575,0.0011,15
+sinal_p_rt1,"Regra do p_rt1 do InfoDengue (> 0,9 sobe; < 0,1 cai)",validacao_final,1,subidas_detectadas,0.3198,0.2612,0.3774,0.1464,0.0858,0.2077,15
+sinal_p_rt1,"Regra do p_rt1 do InfoDengue (> 0,9 sobe; < 0,1 cai)",validacao_final,1,alarmes_subida_corretos,0.2557,0.2267,0.2832,-0.2863,-0.3507,-0.2246,15
+sinal_p_rt1,"Regra do p_rt1 do InfoDengue (> 0,9 sobe; < 0,1 cai)",validacao_final,1,quedas_detectadas,0.3734,0.2871,0.4605,0.2114,0.1397,0.2852,15
+sinal_p_rt1,"Regra do p_rt1 do InfoDengue (> 0,9 sobe; < 0,1 cai)",validacao_final,1,sentido_oposto,0.08,0.0673,0.0934,0.0675,0.0575,0.0783,15
+sinal_p_rt1,"Regra do p_rt1 do InfoDengue (> 0,9 sobe; < 0,1 cai)",validacao_final,2,acerto,0.4542,0.422,0.4903,-0.1303,-0.1831,-0.0913,15
+sinal_p_rt1,"Regra do p_rt1 do InfoDengue (> 0,9 sobe; < 0,1 cai)",validacao_final,2,acerto_balanceado,0.4361,0.3931,0.479,-0.1142,-0.1466,-0.0855,15
+sinal_p_rt1,"Regra do p_rt1 do InfoDengue (> 0,9 sobe; < 0,1 cai)",validacao_final,2,subidas_detectadas,0.3815,0.3146,0.4419,-0.0313,-0.0756,0.0177,15
+sinal_p_rt1,"Regra do p_rt1 do InfoDengue (> 0,9 sobe; < 0,1 cai)",validacao_final,2,alarmes_subida_corretos,0.3979,0.3529,0.4359,-0.1756,-0.2123,-0.1364,15
+sinal_p_rt1,"Regra do p_rt1 do InfoDengue (> 0,9 sobe; < 0,1 cai)",validacao_final,2,quedas_detectadas,0.4154,0.3299,0.4989,-0.1289,-0.1675,-0.0934,15
+sinal_p_rt1,"Regra do p_rt1 do InfoDengue (> 0,9 sobe; < 0,1 cai)",validacao_final,2,sentido_oposto,0.0974,0.0863,0.1089,0.0544,0.0439,0.0641,15
+sinal_p_rt1,"Regra do p_rt1 do InfoDengue (> 0,9 sobe; < 0,1 cai)",validacao_final,3,acerto,0.4586,0.4255,0.4951,-0.138,-0.1865,-0.1021,15
+sinal_p_rt1,"Regra do p_rt1 do InfoDengue (> 0,9 sobe; < 0,1 cai)",validacao_final,3,acerto_balanceado,0.4467,0.4034,0.4899,-0.1561,-0.1985,-0.12,15
+sinal_p_rt1,"Regra do p_rt1 do InfoDengue (> 0,9 sobe; < 0,1 cai)",validacao_final,3,subidas_detectadas,0.3817,0.317,0.4426,-0.1845,-0.237,-0.1351,15
+sinal_p_rt1,"Regra do p_rt1 do InfoDengue (> 0,9 sobe; < 0,1 cai)",validacao_final,3,alarmes_subida_corretos,0.4382,0.384,0.4844,-0.1557,-0.1847,-0.1284,15
+sinal_p_rt1,"Regra do p_rt1 do InfoDengue (> 0,9 sobe; < 0,1 cai)",validacao_final,3,quedas_detectadas,0.4308,0.3483,0.5138,-0.2528,-0.2919,-0.2129,15
+sinal_p_rt1,"Regra do p_rt1 do InfoDengue (> 0,9 sobe; < 0,1 cai)",validacao_final,3,sentido_oposto,0.1054,0.0934,0.1186,0.0411,0.032,0.0494,15
+sinal_p_rt1,"Regra do p_rt1 do InfoDengue (> 0,9 sobe; < 0,1 cai)",validacao_final,4,acerto,0.4553,0.4194,0.4895,-0.1474,-0.1991,-0.1117,15
+sinal_p_rt1,"Regra do p_rt1 do InfoDengue (> 0,9 sobe; < 0,1 cai)",validacao_final,4,acerto_balanceado,0.4491,0.405,0.4875,-0.1621,-0.2167,-0.1175,15
+sinal_p_rt1,"Regra do p_rt1 do InfoDengue (> 0,9 sobe; < 0,1 cai)",validacao_final,4,subidas_detectadas,0.3837,0.3224,0.4407,-0.2466,-0.2837,-0.206,15
+sinal_p_rt1,"Regra do p_rt1 do InfoDengue (> 0,9 sobe; < 0,1 cai)",validacao_final,4,alarmes_subida_corretos,0.4743,0.4216,0.5163,-0.12,-0.1464,-0.0937,15
+sinal_p_rt1,"Regra do p_rt1 do InfoDengue (> 0,9 sobe; < 0,1 cai)",validacao_final,4,quedas_detectadas,0.4226,0.342,0.495,-0.3095,-0.3423,-0.2762,15
+sinal_p_rt1,"Regra do p_rt1 do InfoDengue (> 0,9 sobe; < 0,1 cai)",validacao_final,4,sentido_oposto,0.116,0.1033,0.1282,0.0201,0.0034,0.0333,15
+classificador_rt,"LightGBM classificador só com Rt, p_rt1 e casos atuais",validacao_cruzada,1,acerto,0.65,0.6304,0.6703,-0.0107,-0.0137,-0.0077,100
+classificador_rt,"LightGBM classificador só com Rt, p_rt1 e casos atuais",validacao_cruzada,1,acerto_balanceado,0.3624,0.3578,0.3671,-0.057,-0.0616,-0.0524,100
+classificador_rt,"LightGBM classificador só com Rt, p_rt1 e casos atuais",validacao_cruzada,1,subidas_detectadas,0.0506,0.0436,0.0579,-0.1231,-0.1325,-0.1136,100
+classificador_rt,"LightGBM classificador só com Rt, p_rt1 e casos atuais",validacao_cruzada,1,alarmes_subida_corretos,0.4219,0.381,0.4599,-0.0781,-0.1147,-0.043,100
+classificador_rt,"LightGBM classificador só com Rt, p_rt1 e casos atuais",validacao_cruzada,1,quedas_detectadas,0.0749,0.0641,0.0862,-0.0882,-0.0979,-0.0787,100
+classificador_rt,"LightGBM classificador só com Rt, p_rt1 e casos atuais",validacao_cruzada,1,sentido_oposto,0.0086,0.0075,0.0098,-0.0044,-0.006,-0.0028,100
+classificador_rt,"LightGBM classificador só com Rt, p_rt1 e casos atuais",validacao_cruzada,2,acerto,0.5831,0.5618,0.6056,-0.0396,-0.0466,-0.033,100
+classificador_rt,"LightGBM classificador só com Rt, p_rt1 e casos atuais",validacao_cruzada,2,acerto_balanceado,0.464,0.4532,0.4748,-0.0896,-0.0975,-0.0814,100
+classificador_rt,"LightGBM classificador só com Rt, p_rt1 e casos atuais",validacao_cruzada,2,subidas_detectadas,0.2039,0.1908,0.2167,-0.2057,-0.2191,-0.1913,100
+classificador_rt,"LightGBM classificador só com Rt, p_rt1 e casos atuais",validacao_cruzada,2,alarmes_subida_corretos,0.4819,0.4586,0.5051,-0.0682,-0.0844,-0.0529,100
+classificador_rt,"LightGBM classificador só com Rt, p_rt1 e casos atuais",validacao_cruzada,2,quedas_detectadas,0.3581,0.3326,0.3852,-0.127,-0.1442,-0.1085,100
+classificador_rt,"LightGBM classificador só com Rt, p_rt1 e casos atuais",validacao_cruzada,2,sentido_oposto,0.0493,0.0455,0.0527,0.0069,0.0036,0.01,100
+classificador_rt,"LightGBM classificador só com Rt, p_rt1 e casos atuais",validacao_cruzada,3,acerto,0.5567,0.5323,0.5815,-0.0646,-0.0741,-0.0546,100
+classificador_rt,"LightGBM classificador só com Rt, p_rt1 e casos atuais",validacao_cruzada,3,acerto_balanceado,0.517,0.5036,0.5294,-0.088,-0.0959,-0.0791,100
+classificador_rt,"LightGBM classificador só com Rt, p_rt1 e casos atuais",validacao_cruzada,3,subidas_detectadas,0.3016,0.2846,0.3188,-0.2064,-0.2191,-0.1926,100
+classificador_rt,"LightGBM classificador só com Rt, p_rt1 e casos atuais",validacao_cruzada,3,alarmes_subida_corretos,0.4658,0.4444,0.4872,-0.0949,-0.1092,-0.0793,100
+classificador_rt,"LightGBM classificador só com Rt, p_rt1 e casos atuais",validacao_cruzada,3,quedas_detectadas,0.5598,0.532,0.5873,-0.0711,-0.0905,-0.0521,100
+classificador_rt,"LightGBM classificador só com Rt, p_rt1 e casos atuais",validacao_cruzada,3,sentido_oposto,0.1057,0.097,0.1144,0.0355,0.0288,0.0419,100
+classificador_rt,"LightGBM classificador só com Rt, p_rt1 e casos atuais",validacao_cruzada,4,acerto,0.5555,0.5321,0.579,-0.0704,-0.0803,-0.0605,100
+classificador_rt,"LightGBM classificador só com Rt, p_rt1 e casos atuais",validacao_cruzada,4,acerto_balanceado,0.5391,0.5237,0.5522,-0.0839,-0.0921,-0.0757,100
+classificador_rt,"LightGBM classificador só com Rt, p_rt1 e casos atuais",validacao_cruzada,4,subidas_detectadas,0.3454,0.3279,0.3622,-0.2022,-0.2149,-0.1883,100
+classificador_rt,"LightGBM classificador só com Rt, p_rt1 e casos atuais",validacao_cruzada,4,alarmes_subida_corretos,0.4698,0.4486,0.4909,-0.0993,-0.1148,-0.0846,100
+classificador_rt,"LightGBM classificador só com Rt, p_rt1 e casos atuais",validacao_cruzada,4,quedas_detectadas,0.6358,0.6059,0.6646,-0.0458,-0.0689,-0.0237,100
+classificador_rt,"LightGBM classificador só com Rt, p_rt1 e casos atuais",validacao_cruzada,4,sentido_oposto,0.1423,0.1304,0.1546,0.0533,0.045,0.0617,100
+classificador_rt,"LightGBM classificador só com Rt, p_rt1 e casos atuais",validacao_final,1,acerto,0.6242,0.5867,0.6675,-0.0102,-0.0188,-0.0003,15
+classificador_rt,"LightGBM classificador só com Rt, p_rt1 e casos atuais",validacao_final,1,acerto_balanceado,0.3636,0.3525,0.3743,-0.0519,-0.0603,-0.0423,15
+classificador_rt,"LightGBM classificador só com Rt, p_rt1 e casos atuais",validacao_final,1,subidas_detectadas,0.0433,0.0288,0.0588,-0.13,-0.1437,-0.115,15
+classificador_rt,"LightGBM classificador só com Rt, p_rt1 e casos atuais",validacao_final,1,alarmes_subida_corretos,0.4065,0.304,0.496,-0.1355,-0.2318,-0.048,15
+classificador_rt,"LightGBM classificador só com Rt, p_rt1 e casos atuais",validacao_final,1,quedas_detectadas,0.0921,0.0687,0.1149,-0.0698,-0.087,-0.0543,15
+classificador_rt,"LightGBM classificador só com Rt, p_rt1 e casos atuais",validacao_final,1,sentido_oposto,0.0053,0.0032,0.008,-0.0072,-0.0101,-0.0044,15
+classificador_rt,"LightGBM classificador só com Rt, p_rt1 e casos atuais",validacao_final,2,acerto,0.5287,0.4865,0.5798,-0.0557,-0.0733,-0.0383,15
+classificador_rt,"LightGBM classificador só com Rt, p_rt1 e casos atuais",validacao_final,2,acerto_balanceado,0.454,0.425,0.483,-0.0964,-0.1082,-0.0835,15
+classificador_rt,"LightGBM classificador só com Rt, p_rt1 e casos atuais",validacao_final,2,subidas_detectadas,0.2017,0.1695,0.2326,-0.2111,-0.2307,-0.1895,15
+classificador_rt,"LightGBM classificador só com Rt, p_rt1 e casos atuais",validacao_final,2,alarmes_subida_corretos,0.511,0.4392,0.5824,-0.0626,-0.098,-0.0305,15
+classificador_rt,"LightGBM classificador só com Rt, p_rt1 e casos atuais",validacao_final,2,quedas_detectadas,0.3927,0.3201,0.4632,-0.1515,-0.1825,-0.1234,15
+classificador_rt,"LightGBM classificador só com Rt, p_rt1 e casos atuais",validacao_final,2,sentido_oposto,0.0503,0.0414,0.0591,0.0072,-0.0022,0.0157,15
+classificador_rt,"LightGBM classificador só com Rt, p_rt1 e casos atuais",validacao_final,3,acerto,0.4912,0.448,0.5455,-0.1054,-0.1265,-0.0824,15
+classificador_rt,"LightGBM classificador só com Rt, p_rt1 e casos atuais",validacao_final,3,acerto_balanceado,0.4889,0.4495,0.5275,-0.1139,-0.1301,-0.1,15
+classificador_rt,"LightGBM classificador só com Rt, p_rt1 e casos atuais",validacao_final,3,subidas_detectadas,0.323,0.2786,0.3608,-0.2432,-0.274,-0.216,15
+classificador_rt,"LightGBM classificador só com Rt, p_rt1 e casos atuais",validacao_final,3,alarmes_subida_corretos,0.4627,0.4014,0.5206,-0.1312,-0.1623,-0.0986,15
+classificador_rt,"LightGBM classificador só com Rt, p_rt1 e casos atuais",validacao_final,3,quedas_detectadas,0.6423,0.5642,0.7213,-0.0413,-0.0788,-0.0053,15
+classificador_rt,"LightGBM classificador só com Rt, p_rt1 e casos atuais",validacao_final,3,sentido_oposto,0.1277,0.1071,0.146,0.0634,0.0459,0.0793,15
+classificador_rt,"LightGBM classificador só com Rt, p_rt1 e casos atuais",validacao_final,4,acerto,0.4907,0.4483,0.543,-0.112,-0.1345,-0.0861,15
+classificador_rt,"LightGBM classificador só com Rt, p_rt1 e casos atuais",validacao_final,4,acerto_balanceado,0.4951,0.4474,0.5398,-0.1161,-0.1363,-0.0971,15
+classificador_rt,"LightGBM classificador só com Rt, p_rt1 e casos atuais",validacao_final,4,subidas_detectadas,0.364,0.3139,0.411,-0.2663,-0.2912,-0.2394,15
+classificador_rt,"LightGBM classificador só com Rt, p_rt1 e casos atuais",validacao_final,4,alarmes_subida_corretos,0.4659,0.4004,0.524,-0.1284,-0.1563,-0.095,15
+classificador_rt,"LightGBM classificador só com Rt, p_rt1 e casos atuais",validacao_final,4,quedas_detectadas,0.7267,0.6528,0.792,-0.0054,-0.0407,0.0267,15
+classificador_rt,"LightGBM classificador só com Rt, p_rt1 e casos atuais",validacao_final,4,sentido_oposto,0.183,0.1564,0.2053,0.0871,0.0663,0.1045,15

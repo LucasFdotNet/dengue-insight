@@ -4,7 +4,13 @@ Este documento reconstrói, em ordem cronológica, as decisões técnicas tomada
 
 **Fontes.** Todos os números vêm do `README.md`, dos arquivos em `reports/`, das mensagens e do conteúdo dos commits (`git log`) e das notas de trabalho em `temp/` (`HANDOFF_dengue_insight.md`, que descreve o diagnóstico do código herdado, e `CONTINUAR.md`, que registra resultados intermediários da base de 74 municípios). Quando um número só existe em uma versão anterior de um arquivo, o commit correspondente é indicado.
 
-**Como ler as métricas.** A métrica mais usada ao longo do texto é a **razão modelo/baseline**: o erro absoluto médio do modelo (MAE, a média, em casos por semana, da diferença entre o previsto e o que aconteceu) dividido pelo erro absoluto médio do baseline de persistência (explicado na [seção 5](#s5)). Valores abaixo de 1 indicam que o modelo erra menos que o baseline; 0,75, por exemplo, significa um erro 25% menor. "H+1" a "H+4" indicam a antecedência da previsão, de 1 a 4 semanas.
+**Como ler as métricas.** O texto usa três tipos de número, e cada tabela diz qual está usando:
+
+* **Razão de erro (modelo/baseline)**: o erro absoluto médio do modelo (MAE, a média, em casos por semana, da diferença entre o previsto e o que aconteceu) dividido pelo erro absoluto médio do baseline de persistência (explicado na [seção 5](#s5)). **Quanto menor, melhor; abaixo de 1, o modelo erra menos que o baseline.** 0,75, por exemplo, significa um erro 25% menor.
+* **Acerto de tendência (%)**: a fração das semanas em que o modelo acertou se os casos iriam subir, ficar estáveis ou cair ([seção 8](#s8)). **Quanto maior, melhor.** Deve ser comparado com o "sempre estável", que já acerta muito porque a maioria das semanas é estável.
+* **Acerto balanceado (de 0 a 1)**: a média do acerto em cada uma das três situações (subiu, ficou estável, caiu), calculada separadamente. **Quanto maior, melhor; o baseline tira 0,333.** Não é uma razão em relação ao baseline. Exemplo de cálculo na [seção 16](#s16).
+
+"H+1" a "H+4" indicam a antecedência da previsão, de 1 a 4 semanas.
 
 ---
 
@@ -29,6 +35,7 @@ Este documento reconstrói, em ordem cronológica, as decisões técnicas tomada
 | 14 | Generalização para municípios não vistos | 26/09/2026 (`4965f7a`) | Validação cruzada por município com bootstrap e curva de aprendizado; clima ajuda só em 4 semanas; mais municípios quase não ajudam | [14](#s14) |
 | 15 | Como as conclusões mudaram | | Síntese das decisões revistas | [15](#s15) |
 | 16 | Comparação de modelos | 27/09/2026 | 8 modelos comparados na tendência; o classificador é o melhor no acerto balanceado e o modelo por quantis no número de casos; escolha final em aberto | [16](#s16) |
+| 17 | Modelo contra o Rt | 27/09/2026 | O classificador supera a regra do Rt, a do `p_rt1` e um classificador treinado só com o Rt; o Rt segue fora dos modelos | [17](#s17) |
 
 Observação sobre as datas: o código herdado é de 21/09/2026 e quase todo o trabalho de revisão foi registrado em commits de 26/09/2026 (o último, que fixa versões do `scipy` e do `statsmodels`, é de 27/09/2026). A coluna de commits permite reconstruir a ordem exata com `git log --reverse`.
 
@@ -617,6 +624,18 @@ Oito modelos, cada um em um arquivo de `src/modelos/`, todos com as mesmas infor
 
 ### Resultados
 
+**Como ler a tabela a seguir:** os valores são o próprio acerto balanceado de cada modelo, de 0 a 1. **Quanto maior, melhor**, e o baseline de persistência tira 0,333. Não são uma divisão pelo baseline.
+
+**Exemplo de cálculo** (LightGBM atual, 4 semanas, somando as semanas dos 100 municípios):
+
+| O que aconteceu | Semanas | O modelo acertou | Acerto nessa situação |
+|---|---|---|---|
+| Subiu | 10.738 | 4.471 | 41,6% |
+| Ficou estável | 17.161 | 12.915 | 75,3% |
+| Caiu | 10.899 | 6.613 | 60,7% |
+
+Acerto balanceado = (41,6% + 75,3% + 60,7%) / 3 = 0,592. O baseline sempre diz "estável" e acerta 0%, 100% e 0% nessas três situações; a média é 0,333. No acerto simples, o baseline pareceria melhor do que é (17.161 / 38.798 = 44%), porque a maioria das semanas é estável.
+
 **Acerto balanceado da tendência** (validação cruzada, 100 municípios; entre parênteses, a diferença em relação ao LightGBM atual, com o intervalo de confiança de 95%):
 
 | Modelo | 1 semana | 2 semanas | 3 semanas | 4 semanas |
@@ -632,7 +651,7 @@ Oito modelos, cada um em um arquivo de `src/modelos/`, todos com as mesmas infor
 
 Todos os modelos que não são LightGBM ficaram abaixo do LightGBM atual, com intervalos de confiança que excluem zero em todos os horizontes.
 
-**Perfil de cada modelo com 4 semanas de antecedência** (validação cruzada):
+**Perfil de cada modelo com 4 semanas de antecedência** (validação cruzada; porcentagens: maior é melhor, exceto "sentido oposto", em que menor é melhor; razão de erro em casos: menor é melhor, abaixo de 1 o modelo supera o baseline):
 
 | Modelo | Acerto | Subidas detectadas | Alarmes de subida corretos | Sentido oposto | Razão de erro em casos |
 |---|---|---|---|---|---|
@@ -679,4 +698,64 @@ A escolha do modelo usado no painel está em aberto. Pelo critério definido ant
 python -m src.experimento_modelos                  # tudo (cerca de 45 minutos)
 python -m src.experimento_modelos --reajustar      # refaz a busca de hiperparâmetros
 python -m src.experimento_modelos --modelos lightgbm_classificador,lightgbm_quantis
+```
+
+
+<a id="s17"></a>
+## 17. O melhor modelo contra a sinalização do Rt do InfoDengue
+
+### Contexto e pergunta
+
+O Rt foi retirado do modelo na [seção 9](#s9) e, por decisão do grupo, **não é usado em nenhum modelo do projeto**; aparece apenas como referência de comparação. A comparação da seção 9 foi feita com a base de SP e com o modelo de regressão. Depois da comparação de modelos ([seção 16](#s16)), a pergunta foi refeita com o melhor modelo de tendência e a base atual: **para dizer se os casos vão subir, ficar estáveis ou cair nas próximas 1 a 4 semanas, o nosso modelo é mais útil do que a sinalização que o InfoDengue já publica?**
+
+A comparação faz sentido porque o Rt responde a uma pergunta próxima: Rt acima de 1 indica que a epidemia está crescendo. O InfoDengue também publica o `p_rt1`, a probabilidade de o Rt ser maior que 1. Os dois são estimativas da transmissão na semana de partida, disponíveis no mesmo momento que os casos usados pelo modelo.
+
+### O que foi testado
+
+Três formas de transformar o Rt em tendência (`src/modelos/sinal_rt.py`), contra o LightGBM classificador:
+
+| Referência | Regra |
+|---|---|
+| Regra do Rt | Rt acima de 1,1: sobe; abaixo de 0,9: cai; entre os dois: estável |
+| Regra do `p_rt1` | `p_rt1` acima de 0,9: sobe; abaixo de 0,1: cai; entre os dois: estável |
+| Classificador só com o Rt | LightGBM classificador treinado só com Rt, `p_rt1` e casos atuais |
+
+As regras usam limiares escolhidos por nós, e o Rt não foi criado para a nossa definição de tendência (20% e 5 casos). Por isso incluímos o classificador treinado só com o Rt: ele aprende, a partir dos dados, a melhor forma de usar o Rt com a mesma técnica do nosso modelo. Ele não é candidato a modelo do projeto, serve só para que a comparação não dependa de limiares arbitrários.
+
+Avaliação idêntica à da seção 16 (validação cruzada por município, 2019 em diante, validação final nos 15 municípios, intervalos de confiança por bootstrap sobre municípios). Script `src/experimento_rt.py`; resultados em `reports/comparacao_rt.csv` e `reports/comparacao_rt_por_municipio.csv`.
+
+### Resultados
+
+**Acerto balanceado da tendência** (de 0 a 1; maior é melhor; o baseline "sempre estável" tira 0,333). Validação cruzada, 100 municípios; entre parênteses, a diferença em relação ao nosso modelo, com o intervalo de confiança de 95%:
+
+| Modelo | 1 semana | 2 semanas | 3 semanas | 4 semanas |
+|---|---|---|---|---|
+| **LightGBM classificador (nosso modelo)** | **0,419** | **0,554** | **0,605** | **0,623** |
+| Classificador só com o Rt | 0,362 (−0,057; −0,062 a −0,052) | 0,464 (−0,090; −0,098 a −0,081) | 0,517 (−0,088; −0,096 a −0,079) | 0,539 (−0,084; −0,092 a −0,076) |
+| Regra do `p_rt1` | 0,388 (−0,031; −0,044 a −0,021) | 0,428 (−0,126; −0,139 a −0,113) | 0,440 (−0,165; −0,180 a −0,149) | 0,441 (−0,182; −0,200 a −0,163) |
+| Regra do Rt | 0,347 (−0,072; −0,088 a −0,058) | 0,376 (−0,177; −0,192 a −0,161) | 0,386 (−0,219; −0,235 a −0,202) | 0,382 (−0,241; −0,259 a −0,221) |
+
+**Perfil com 4 semanas de antecedência** (validação cruzada; porcentagens: maior é melhor, exceto "sentido oposto", em que menor é melhor):
+
+| Modelo | Acerto | Subidas detectadas | Alarmes de subida corretos | Sentido oposto |
+|---|---|---|---|---|
+| **LightGBM classificador** | **62,6%** | **54,8%** | **56,9%** | **8,9%** |
+| Classificador só com o Rt | 55,6% | 34,5% | 47,0% | 14,2% |
+| Regra do `p_rt1` | 46,4% | 35,5% | 44,7% | 10,6% |
+| Regra do Rt | 34,9% | 49,9% | 36,3% | 17,8% |
+
+**Validação final (15 municípios):** o resultado se repete. Com 4 semanas, o acerto balanceado é de 0,611 para o nosso modelo, 0,495 para o classificador só com o Rt, 0,449 para a regra do `p_rt1` e 0,403 para a regra do Rt.
+
+### Leitura dos resultados
+
+* **O nosso modelo é melhor que qualquer uso do Rt**, em todos os horizontes, com intervalos de confiança que excluem zero. A vantagem cresce com a antecedência: de 3 a 7 pontos em 1 semana e de 8 a 24 pontos em 4 semanas.
+* **Mesmo o melhor uso possível do Rt fica atrás.** O classificador treinado só com o Rt perde de 6 a 9 pontos para o nosso modelo. Isso mostra que a diferença não vem de limiares mal escolhidos nas regras: os casos recentes (nível e variação) contêm mais informação sobre a tendência das próximas semanas do que o Rt.
+* **As regras diretas pouco superam o "sempre estável".** A regra do Rt tem acerto balanceado de 0,35 a 0,39, pouco acima de 0,333, e o acerto simples dela (27% a 35%) fica abaixo de dizer sempre "estável". Ela detecta metade das subidas, mas só 21% a 36% dos seus alarmes se confirmam, e aponta o sentido errado em 13% a 18% das semanas. O Rt oscila bastante de uma semana para outra, e cada oscilação vira um alarme.
+* **Ressalva:** o Rt mede a transmissão atual e não foi criado para prever a variação dos casos daqui a 1 a 4 semanas com o nosso critério. A conclusão é que, para essa pergunta específica, o nosso modelo é mais útil do que uma leitura direta do Rt, e não que o Rt seja um indicador ruim para o que se propõe.
+
+### Como reproduzir
+
+```bash
+python -m src.experimento_modelos     # precisa rodar antes (gera os resultados do classificador)
+python -m src.experimento_rt          # cerca de 15 minutos
 ```

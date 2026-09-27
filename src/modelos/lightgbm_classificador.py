@@ -17,11 +17,12 @@ from src.train import FEATURES
 class LightGBMClassificador(Modelo):
     nome = 'lightgbm_classificador'
     descricao = 'LightGBM classificador (prevê a tendência diretamente)'
+    features = FEATURES
 
     def treinar(self, df, horizonte):
         self.modelo = LGBMClassifier(n_estimators=300, learning_rate=0.05, random_state=42, verbose=-1)
-        self.modelo.fit(df[FEATURES], tendencia_real(df, horizonte))
+        self.modelo.fit(df[self.features], tendencia_real(df, horizonte))
         return self
 
     def prever(self, df, horizonte):
-        return pd.DataFrame({'previsto': np.nan, 'tendencia': self.modelo.predict(df[FEATURES])}, index=df.index)
+        return pd.DataFrame({'previsto': np.nan, 'tendencia': self.modelo.predict(df[self.features])}, index=df.index)
