@@ -43,7 +43,7 @@ O sistema opera em um pipeline desacoplado em 5 etapas modulares:
    * **Casos (`src/ingestion.py`):** Conecta à API pública do InfoDengue (Fiocruz/FGV) via requisições HTTP REST e extrai as séries temporais consolidadas das semanas epidemiológicas.
    * **Clima (`src/ingestion_clima.py`):** Obtém temperatura, precipitação e umidade diárias da reanálise ERA5 pela Open-Meteo e agrega por semana epidemiológica.
 2. **Pré-processamento (`src/preprocessing.py`):** Une casos e clima por semana, realiza limpeza, tratamento de valores faltantes por interpolação e gera defasagens temporais (*lag features* de 1 a 4 semanas) e médias móveis.
-3. **Treinamento e Validação (`src/train.py`):** Treina um modelo único de Gradient Boosting (**LightGBM**) com todos os municípios de treino, um por horizonte (H+1 a H+4 semanas). Avalia com validação *walk-forward* anual por MAE, RMSE e R², sempre comparando com um baseline de persistência, e salva o modelo de produção usado pelo dashboard.
+3. **Treinamento e Validação (`src/train.py`):** Treina um modelo único de Gradient Boosting (**LightGBM**) com todos os municípios de treino, um por horizonte (H+1 a H+4 semanas). Avalia com validação *walk-forward* com retreino mensal, pelo acerto da tendência e por MAE, RMSE e R², sempre comparando com um baseline de persistência, e salva o modelo de produção usado pelo dashboard.
 4. **Análise Exploratória (`src/eda.py`):** Processa dados e gera matrizes de correlação de Pearson e gráficos comparativos de casos versus variáveis climáticas/ambientais.
 5. **Dashboard Interativo (`app.py`):** Interface web moderna para visualização em tempo real dos indicadores atuais, curvas históricas e projeções com intervalos das próximas 4 semanas.
 
@@ -377,8 +377,8 @@ Registro das decisões que afetam os dados, o modelo ou a avaliação, com o mot
   | *Limite estimado (infinitos municípios)* | *0,828* | *0,756* | *0,725* | *0,702* |
   | *Previsto com 200 municípios* | *0,835* | *0,766* | *0,734* | *0,717* |
 
-  * De 10 para 40 municípios, o erro cai bastante (7% a 10%). De 40 para 80, cai só 2% a 3%.
-  * Pela curva ajustada, dobrar a base de 100 para 200 municípios reduziria o erro em cerca de 1%, e nem com infinitos municípios o ganho passaria de 2% a 4%.
+  * De 10 para 40 municípios, o erro cai de 5% a 8%. De 40 para 80, cai só de 2% a 3%.
+  * Pela curva ajustada, dobrar a base de 100 para 200 municípios reduziria o erro em cerca de 1%, e nem com infinitos municípios o ganho passaria de 1% a 4% em relação aos 100 atuais.
   * **Conclusão:** com 100 municípios, a quantidade de dados deixou de ser o principal limite. Ganhos maiores dependeriam de outras mudanças no modelo (novas informações ou outra forma de modelar), e não de mais municípios.
   * **Ressalva:** a curva foi ajustada com 5 pontos e 3 sorteios por ponto; o limite estimado é uma extrapolação e deve ser lido como ordem de grandeza.
 
