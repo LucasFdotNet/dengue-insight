@@ -37,6 +37,7 @@ Este documento reconstrói, em ordem cronológica, as decisões técnicas tomada
 | 16 | Comparação de modelos | 27/09/2026 | 8 modelos comparados na tendência; o classificador é o melhor no acerto balanceado e o modelo por quantis no número de casos; escolha final em aberto | [16](#s16) |
 | 17 | Modelo contra o Rt | 27/09/2026 | O classificador supera a regra do Rt, a do `p_rt1` e um classificador treinado só com o Rt; o Rt segue fora dos modelos | [17](#s17) |
 | 18 | Clima no classificador | 27/09/2026 | Com o classificador, o clima de S-1 a S-4 melhora todos os horizontes (+0,006 a +0,010); entra no modelo de 4 semanas | [18](#s18) |
+| 19 | Modelos em produção e painel | 27/09/2026 | Classificador com clima para a tendência e quantis para os casos; painel com aviso, Indicadores e Detalhes do Modelo | [19](#s19) |
 
 Observação sobre as datas: o código herdado é de 21/09/2026 e quase todo o trabalho de revisão foi registrado em commits de 26/09/2026 (o último, que fixa versões do `scipy` e do `statsmodels`, é de 27/09/2026). A coluna de commits permite reconstruir a ordem exata com `git log --reverse`.
 
@@ -802,4 +803,37 @@ O clima de S-1 a S-4 entra no modelo de 4 semanas (decisão do grupo). Se o clas
 
 * Só o classificador foi testado com clima nesta etapa; o modelo por quantis (candidato para o número de casos) não foi testado.
 * O ganho é pequeno e, nos 15 municípios de validação, não é significativo em 3 e 4 semanas.
+
+<a id="s19"></a>
+## 19. Modelos em produção e novo painel
+
+### Decisão
+
+Com base nas seções 16 a 18, o grupo decidiu usar **dois modelos** no painel, cada um no que faz melhor:
+
+| | Tendência | Número de casos |
+|---|---|---|
+| Modelo | LightGBM classificador com clima das semanas S-1 a S-4 | LightGBM por quantis |
+| Motivo | Melhor acerto balanceado; detecta mais subidas, que é o mais importante para alertar e planejar ações | Menor erro em casos; faixa de 80% bem calibrada |
+
+Os dois são independentes e podem divergir (por exemplo, tendência de subida com aumento previsto de só 10% nos casos). O painel mostra os dois como são e avisa isso. A tabela usada para a decisão comparou, com 4 semanas de antecedência, o classificador (acerto balanceado de 0,633; 57% das subidas detectadas; 58% dos alarmes corretos), o modelo por quantis (0,586; 41%; 65%), o LightGBM de regressão anterior (0,592; 42%; 65%), o classificador só com o Rt (0,539; 35%; 47%) e o baseline (0,333; 0%).
+
+### Implementação
+
+* `src/train.py` passou a treinar os dois modelos, com avaliação *walk-forward* com retreino mensal desde 2015 (cerca de 20 minutos). As previsões passadas (`reports/previsoes_walkforward.csv`) têm os casos previstos, a faixa de 80% e a tendência prevista de cada semana.
+* O clima das semanas S-1 a S-4 passou a ser calculado no pré-processamento.
+* As funções de avaliação comuns foram para `src/avaliacao.py`.
+
+**Resultado com retreino mensal** (`reports/metricas_tendencia.csv` e `reports/metricas_gerais.csv`; municípios de treino, 1 a 4 semanas): acerto balanceado do classificador de 0,43 a 0,64 (validação: 0,43 a 0,62); razão de erro do modelo de quantis de 0,83 a 0,71 (validação: 0,79 a 0,67). Os valores são um pouco melhores que os da seção 16, que usou retreino trimestral.
+
+### Painel
+
+* **Aviso de entrada:** o painel é resultado de trabalho acadêmico, e as previsões não devem ser usadas como base para decisões oficiais de vigilância ou de saúde pública; para continuar, é preciso digitar "entendo" (verificação só no navegador).
+* **Indicadores:** cards com a tendência em destaque e os casos previstos com a faixa; gráfico com os casos reais, a previsão passada e, nos últimos 12 meses, a previsão das próximas semanas.
+* **Detalhes do Modelo:** explicação dos modelos e de suas métricas, importância das variáveis, comparação com os 11 modelos alternativos (gráficos e matrizes de confusão para uso no relatório), mapa e distribuição dos municípios, e dados do município selecionado.
+
+### Limitações
+
+* Os dois modelos podem divergir, o que pode confundir quem lê o painel; o aviso explica, mas não resolve a divergência.
+* A semana de partida das previsões é a mais recente, cujos casos ainda são uma estimativa (nowcast). Em municípios sem nowcast publicado, como Campinas, a última semana está incompleta e pode fazer o classificador prever subida quando os casos estão apenas voltando ao nível normal.
 

@@ -43,9 +43,9 @@ São 115 municípios, listados em [`data/config/cidades.csv`](data/config/cidade
    * **Casos (`src/ingestion.py`):** baixa da API do InfoDengue (Fiocruz/FGV) a série semanal de cada município, desde 2010.
    * **Clima (`src/ingestion_clima.py`):** baixa temperatura, chuva e umidade diárias da reanálise ERA5 (Open-Meteo) e agrega por semana epidemiológica.
 2. **Pré-processamento (`src/preprocessing.py`):** une casos e clima por semana, interpola valores faltantes apenas entre valores conhecidos e calcula as variáveis do modelo.
-3. **Treinamento e avaliação (`src/train.py`):** treina um modelo LightGBM único para todos os municípios de treino, um por antecedência (1 a 4 semanas), avalia com validação *walk-forward* contra o baseline de persistência e salva o modelo usado pelo painel.
+3. **Treinamento e avaliação (`src/train.py`):** treina os dois modelos de produção, cada um único para todos os municípios de treino e com uma versão por antecedência (1 a 4 semanas): o **LightGBM classificador com clima**, para a tendência, e o **LightGBM por quantis**, para o número de casos com intervalo de 80%. Avalia os dois com validação *walk-forward* com retreino mensal contra o baseline de persistência e salva os modelos usados pelo painel (cerca de 20 minutos).
 4. **Análise exploratória (`src/eda.py`):** gera matrizes de correlação e gráficos de casos contra clima.
-5. **Painel (`app.py`):** mostra os indicadores atuais, o histórico, as previsões das próximas 4 semanas com a tendência, as previsões que o modelo teria feito no passado e o acerto de tendência.
+5. **Painel (`app.py` e `painel/`):** aviso de uso acadêmico na entrada; seção **Indicadores**, com a tendência e os casos previstos para as próximas 4 semanas e o gráfico de projeções; seção **Detalhes do Modelo**, com a explicação dos modelos, a comparação com as alternativas, o mapa dos municípios e os dados de cada município.
 
 **Experimentos** (cada um grava seus resultados em `reports/`; detalhes na seção "Decisões de Projeto"):
 
@@ -192,22 +192,22 @@ Estado atual das decisões, com os números da base atual (115 municípios). Qua
   | **Modelo único, alvo relativo** | **0,87** | **0,79** | **0,75** | **0,72** |
 
 * **Variáveis do modelo:** casos atuais (em log), variação dos casos em relação a 1, 2, 3 e 4 semanas atrás e semana do ano. **Não usa o Rt** (decisão 8) **nem o clima** (decisão 9). A incidência por 100 mil habitantes foi retirada por ser redundante com os casos.
-* **Modelo em produção:** LightGBM de regressão com hiperparâmetros fixos (300 árvores, taxa de aprendizado 0,05). A comparação de modelos (decisão 11) indicou alternativas melhores para a tendência; a troca está em aberto.
+* **Modelos em produção** (decisão 11): LightGBM **classificador** com clima das semanas S-1 a S-4, para a tendência, e LightGBM **por quantis**, para o número de casos com intervalo de 80%. Os dois usam hiperparâmetros fixos (300 árvores, taxa de aprendizado 0,05).
 
 ### 6. Avaliação: walk-forward, validação cruzada por município e baseline
 
 * **Walk-forward com retreino mensal:** para cada mês desde 2015, um modelo é treinado **só com o que já era conhecido** no início do mês e prevê as semanas daquele mês. Simula o uso real e garante que nenhuma informação do período previsto entre no modelo que o previu.
 * **Validação espacial:** os 15 municípios de validação nunca entram no treino. Para os experimentos de generalização e de modelos, os 100 municípios de treino também são avaliados como desconhecidos, por **validação cruzada por município** (5 grupos de 20; cada grupo é previsto por modelos treinados com os outros 80).
 * **Intervalos de confiança de 95%** por *bootstrap* sobre municípios: sorteamos municípios com reposição 2.000 vezes. A unidade de sorteio é o município, e não a semana, porque as semanas de um mesmo município são muito parecidas entre si.
-* **Resultado atual do modelo em produção** (`reports/metricas_gerais.csv`; razão de erro, **menor é melhor**, abaixo de 1 o modelo supera o baseline):
+* **Resultado atual do modelo de quantis (número de casos)** (`reports/metricas_gerais.csv`; razão de erro, **menor é melhor**, abaixo de 1 o modelo supera o baseline):
 
   | Grupo | 1 sem. | 2 sem. | 3 sem. | 4 sem. |
   |---|---|---|---|---|
-  | Municípios de treino (100) | 0,84 | 0,77 | 0,73 | 0,71 |
-  | Municípios de validação (15) | 0,79 | 0,71 | 0,69 | 0,66 |
+  | Municípios de treino (100) | 0,83 | 0,77 | 0,73 | 0,71 |
+  | Municípios de validação (15) | 0,79 | 0,71 | 0,68 | 0,67 |
 
-* **Por ano** (`reports/metricas_por_ano.csv`): nos municípios de treino, a razão fica abaixo de 1 em todos os anos de 2015 a 2026. Os anos mais difíceis são os de transmissão baixa ou estável (2017, 2018 e o parcial de 2026, de 0,90 a 0,98), e os melhores, os de epidemia (2024, de 0,64 a 0,76). Nos municípios de validação, só 2017 fica acima de 1 (até 1,11 em 4 semanas).
-* **Por município de validação** (`reports/metricas_modelos.csv`): o modelo supera o baseline com folga em Blumenau, Vitória da Conquista, Sorocaba e Bauru (0,55 a 0,61 em 4 semanas), mas empata em Parauapebas e Manacapuru (Norte), Caruaru e Sinop (0,94 a 1,06). A generalização é mais fraca nas regiões com menos municípios parecidos no treino.
+* **Por ano** (`reports/metricas_por_ano.csv`): nos municípios de treino, a razão fica abaixo de 1 em todos os anos de 2015 a 2026. Os anos mais difíceis são os de transmissão baixa ou estável (2017, 2018 e o parcial de 2026, de 0,88 a 0,97), e os melhores, os de epidemia (2024, de 0,64 a 0,76). Nos municípios de validação, só 2017 fica acima de 1 (até 1,11 em 4 semanas).
+* **Por município de validação** (`reports/metricas_modelos.csv`): o modelo supera o baseline com folga em Blumenau, Sorocaba, Vitória da Conquista e Bauru (0,56 a 0,64 em 4 semanas), mas empata em Parauapebas e Manacapuru (Norte), Caruaru e Sinop (0,94 a 1,03). A generalização é mais fraca nas regiões com menos municípios parecidos no treino.
 * **Pandemia (2020–2021):** num teste com a base de SP, treinar sem esses anos não mudou o resultado; todos os anos foram mantidos.
 * **Limitação: dados revisados.** A simulação usa os casos na versão revisada de hoje; em tempo real, as semanas recentes estariam incompletas. Por isso ela é otimista nesse ponto. O InfoDengue não guarda os dados como eram conhecidos em cada data, então isso não pode ser corrigido para o passado (avaliação pseudoprospectiva). A decisão 12 mede o tamanho desse efeito.
 
@@ -216,17 +216,16 @@ Estado atual das decisões, com os números da base atual (115 municípios). Qua
 * **Decisão:** o objetivo principal do modelo é acertar a **tendência** das próximas 1 a 4 semanas, e não o número exato de casos. Para a vigilância, saber que os casos vão subir é mais útil que o número exato.
 * **Definição:** comparando os casos daqui a H semanas com os de hoje, a semana é de **subida** ou **queda** quando a variação passa de **20% e de 5 casos**; senão, **estável**. O mínimo de 5 casos evita que oscilações pequenas em municípios com poucos casos (de 2 para 3, por exemplo) contem como subida. Valores em `LIMIAR_TENDENCIA` e `MIN_CASOS_TENDENCIA` (`src/train.py`).
 * **Métrica principal:** acerto balanceado (ver "Como Ler as Métricas").
-* **Resultado do modelo em produção** (`reports/metricas_tendencia.csv`, municípios de treino; porcentagens, **maior é melhor**, exceto sentido oposto):
+* **Resultado do classificador em produção** (`reports/metricas_tendencia.csv`, retreino mensal desde 2015; municípios de treino; acerto balanceado de 0 a 1 e porcentagens, **maior é melhor**, exceto sentido oposto):
 
-  | Antecedência | Acerto do modelo | Acerto do "sempre estável" | Subidas detectadas | Alarmes de subida corretos | Sentido oposto |
-  |---|---|---|---|---|---|
-  | 1 semana | 68% | 67% | 7% | 55% | 1% |
-  | 2 semanas | 64% | 57% | 24% | 61% | 2% |
-  | 3 semanas | 63% | 52% | 34% | 62% | 4% |
-  | 4 semanas | 63% | 48% | 41% | 62% | 5% |
+  | Antecedência | Acerto balanceado | Acerto | Acerto do "sempre estável" | Subidas detectadas | Alarmes de subida corretos | Sentido oposto |
+  |---|---|---|---|---|---|---|
+  | 1 semana | 0,43 | 68% | 67% | 17% | 50% | 1% |
+  | 2 semanas | 0,56 | 64% | 57% | 40% | 53% | 4% |
+  | 3 semanas | 0,62 | 65% | 52% | 51% | 55% | 6% |
+  | 4 semanas | 0,64 | 65% | 48% | 56% | 56% | 8% |
 
-  Em 1 semana o modelo praticamente não acrescenta, porque os casos raramente mudam mais de 20% em uma semana. De 2 a 4 semanas, ele acerta de 6 a 16 pontos a mais que "sempre estável" e quase nunca erra o sentido. Nos municípios de validação o padrão é o mesmo (60% contra 41% em 4 semanas).
-* **Limitação:** o modelo em produção é conservador e detecta menos da metade das subidas. O classificador da decisão 11 detecta mais.
+  Em 1 semana, os casos raramente mudam mais de 20%, e o ganho sobre o "sempre estável" é pequeno. De 2 a 4 semanas, o classificador acerta de 7 a 18 pontos a mais e detecta de 40% a 56% das subidas. Nos municípios de validação, o resultado é parecido (acerto balanceado de 0,43 a 0,62).
 
 ### 8. Rt fora dos modelos, usado só para comparação
 
@@ -245,7 +244,7 @@ Estado atual das decisões, com os números da base atual (115 municípios). Qua
 
 ### 9. Clima no modelo
 
-* **Decisão do grupo:** o clima entra no modelo de 4 semanas. Com o LightGBM classificador (melhor modelo de tendência), o clima das semanas S-1 a S-4 também melhora as previsões de 1 a 3 semanas; a extensão aos outros horizontes depende da escolha do modelo (decisão 11).
+* **Decisão:** o clima das semanas S-1 a S-4 entra no **classificador de tendência**, nos quatro horizontes: o grupo decidiu incluí-lo em 4 semanas, e o teste com o classificador mostrou ganho também em 1 a 3 semanas. O modelo de quantis (número de casos) continua sem clima.
 * **Clima usado:** temperatura média, chuva total e umidade média de cada uma das 4 semanas anteriores à semana atual S (o clima de S ainda não está disponível no momento da previsão, por causa do atraso do ERA5).
 * **Evidências:**
   * **Base de SP (13 municípios vizinhos, clima parecido):** todas as combinações de clima testadas pioraram a previsão.
@@ -288,7 +287,7 @@ Estado atual das decisões, com os números da base atual (115 municípios). Qua
   * As relações não lineares fazem diferença: regressão linear e binomial negativa (o modelo clássico da epidemiologia para contagens) ficaram bem abaixo. Combinar modelos e ajustar hiperparâmetros não trouxe ganho.
   * O **classificador**, que prevê a tendência diretamente, é o único significativamente melhor que o LightGBM em produção (3 a 4 pontos a mais). Ele detecta mais subidas (55% contra 42% em 4 semanas), mas com mais alarmes falsos (57% dos alarmes corretos, contra 65%) e não produz número de casos.
   * O **LightGBM por quantis** tem o menor erro em número de casos e um intervalo de previsão de 80% bem calibrado (o valor real caiu dentro dele em 78% a 82% das semanas).
-* **Decisão:** em aberto. Uma opção em discussão é usar o classificador para a tendência e o modelo por quantis para o número de casos com intervalo. Tabelas completas e limitações na seção 16 de [`docs/historia_decisoes.md`](docs/historia_decisoes.md).
+* **Decisão:** usar os dois modelos, cada um no que faz melhor. O **classificador com clima** (decisão 9) dá a tendência: no contexto do projeto, o mais importante é alertar uma subida, e ele detecta mais subidas que as alternativas. O **LightGBM por quantis** dá o número de casos, com uma faixa de 80% ("entre X e Y casos"). Os dois são independentes e podem divergir; o painel mostra os dois como são e avisa isso. Tabelas completas e limitações nas seções 16 a 19 de [`docs/historia_decisoes.md`](docs/historia_decisoes.md).
 
 ### 12. Previsão com dados atrasados
 
@@ -308,10 +307,12 @@ Estado atual das decisões, com os números da base atual (115 municípios). Qua
 
 ### 13. Painel
 
-* **Granularidade semanal:** todos os dados e previsões são por **semana epidemiológica**, a unidade em que o InfoDengue publica os casos e em que a vigilância trabalha. Os eixos mostram meses só para facilitar a leitura.
-* **Previsões passadas:** o gráfico de projeções mostra os casos reais, o que o modelo teria previsto na época e o baseline, com seletores de antecedência e de período (últimos 12 meses, um ano específico ou todo o período desde 2015). As previsões passadas **não** vêm do modelo em produção, que já viu essas semanas no treino: vêm da validação *walk-forward* (decisão 6), em que cada semana foi prevista por um modelo que não a conhecia. As 10 semanas mais recentes não têm previsão passada (decisão 3).
-* **Tendência:** as previsões das próximas semanas mostram a variação e a tendência (subida, estável ou queda), e um bloco mostra o acerto de tendência no município, no período e na antecedência escolhidos.
-* **Filtros:** por tipo de município (treino ou validação) e por município, com a UF ao lado do nome.
+* **Aviso de entrada:** antes de usar o painel, a pessoa lê que ele é resultado de um trabalho acadêmico e que as previsões não devem ser usadas como base para decisões oficiais de vigilância ou de saúde pública, e precisa digitar "entendo". A verificação é feita só no navegador, na sessão.
+* **Indicadores** (seção padrão): para o município escolhido, quatro cards com a semana, a **tendência em destaque** (seta e "subida", "estável" ou "queda", do classificador) e os **casos previstos** com a faixa de 80% (do modelo de quantis); abaixo, o gráfico com os casos reais, a previsão passada (com seletores de antecedência e de período) e, nos últimos 12 meses, a previsão das próximas semanas com a faixa.
+* **Detalhes do Modelo**, em quatro abas: o modelo atual (o que é, o que usa, desempenho, importância das variáveis e limitações); a comparação com os 11 modelos alternativos (acerto balanceado com intervalos de confiança, evolução por antecedência, tabela completa e matrizes de confusão, com gráficos e tabelas para baixar); os municípios (mapa, contagem por região e por UF, lista com critérios); e os dados do município selecionado (indicadores da última semana, histórico completo desde 2010 e acerto de tendência).
+* **Granularidade semanal:** todos os dados e previsões são por **semana epidemiológica**, a unidade em que o InfoDengue publica os casos e em que a vigilância trabalha.
+* **Previsões passadas:** vêm da validação *walk-forward* (decisão 6), em que cada semana foi prevista por modelos retreinados a cada mês só com os dados disponíveis até então; nunca do modelo em produção, que já viu essas semanas. As 10 semanas mais recentes não têm previsão passada (decisão 3).
+* **Código:** `app.py` (aviso de entrada e menu) e `painel/` (`indicadores.py`, `detalhes.py`, `dados.py`).
 
 ### 14. Robustez da ingestão e reprodutibilidade
 
