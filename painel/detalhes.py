@@ -8,7 +8,8 @@ import plotly.express as px
 import plotly.graph_objects as go
 import streamlit as st
 
-from painel.dados import (FORMATO_DATA_HOVER, REGIAO_UF, ROTULO_PAPEL, carregar_csv, carregar_previsoes_passadas)
+from painel.dados import (FORMATO_DATA_HOVER, REGIAO_UF, ROTULO_PAPEL, carregar_csv, carregar_previsoes_passadas,
+                          seletor_municipio)
 from src.cidades import CIDADES
 from src.train import HORIZONTES, TENDENCIAS, caminho_modelo
 
@@ -259,7 +260,10 @@ def _municipios():
 
 # ---------------------------------------------------------------- 4. Município selecionado
 
-def _municipio(cidade, df):
+def _municipio():
+    cidade, df = seletor_municipio("municipio_detalhes")
+    if cidade is None:
+        return
     info = CIDADES[cidade]
     st.markdown(f"#### {info['nome']} - {info['uf']} ({ROTULO_PAPEL[info['papel']]})")
     ultimo = df.dropna(subset=["casos_est"]).iloc[-1]
@@ -326,9 +330,19 @@ def _municipio(cidade, df):
                "disponíveis até então.")
 
 
-def mostrar(cidade, df):
+def _glossario():
+    caminho = "docs/glossario.md"
+    if not os.path.exists(caminho):
+        st.warning(f"{caminho} não encontrado.")
+        return
+    with open(caminho, encoding="utf-8") as f:
+        st.markdown(f.read())
+
+
+def pagina():
     st.title("Detalhes do Modelo")
-    abas = st.tabs(["Modelo atual", "Comparação com outros modelos", "Municípios", "Dados do município selecionado"])
+    abas = st.tabs(["Modelo atual", "Comparação com outros modelos", "Municípios", "Dados do município",
+                    "Glossário e dicionário de dados"])
     with abas[0]:
         _modelo_atual()
     with abas[1]:
@@ -336,4 +350,6 @@ def mostrar(cidade, df):
     with abas[2]:
         _municipios()
     with abas[3]:
-        _municipio(cidade, df)
+        _municipio()
+    with abas[4]:
+        _glossario()

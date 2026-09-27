@@ -3,7 +3,7 @@ import pandas as pd
 import plotly.graph_objects as go
 import streamlit as st
 
-from painel.dados import FORMATO_DATA_HOVER, SETA, carregar_previsoes_passadas
+from painel.dados import FORMATO_DATA_HOVER, SETA, carregar_previsoes_passadas, seletor_municipio
 from src.cidades import CIDADES
 from src.predict import get_predictions
 from src.train import PRIMEIRO_ANO_TESTE
@@ -14,19 +14,27 @@ MAX_SEMANAS_COM_MARCADORES = 104
 
 def _card(coluna, linha):
     seta, rotulo, cor = SETA[linha["tendencia"]]
-    with coluna.container(border=True):
-        st.caption(f"Semana de {linha['data']:%d/%m/%Y}")
-        st.markdown(f"<div style='font-size:1.9rem;font-weight:700;color:{cor};line-height:1.2'>"
-                    f"{seta} {rotulo}</div>", unsafe_allow_html=True)
-        st.markdown(f"<div style='font-size:0.95rem;color:#555'>≈ {linha['previsto']} casos "
-                    f"<span style='color:#888'>(entre {linha['inferior']} e {linha['superior']})</span></div>",
-                    unsafe_allow_html=True)
+    # Fontes proporcionais à largura da tela (clamp), sem quebra de linha na tendência
+    coluna.markdown(f"""
+<div style="border:1px solid rgba(49,51,63,0.2);border-radius:0.6rem;padding:1.1rem 1rem;min-height:9.5rem;
+            display:flex;flex-direction:column;justify-content:space-between;margin-bottom:0.5rem">
+  <div style="font-size:clamp(0.75rem,0.9vw,0.9rem);color:#6b6b6b">Semana de {linha['data']:%d/%m/%Y}</div>
+  <div style="font-size:clamp(1.15rem,2vw,1.9rem);font-weight:700;color:{cor};white-space:nowrap;margin:0.6rem 0">
+    {seta} {rotulo}</div>
+  <div style="font-size:clamp(0.8rem,1vw,0.95rem);color:#444">≈ {linha['previsto']} casos
+    <span style="color:#888;white-space:nowrap">(entre {linha['inferior']} e {linha['superior']})</span></div>
+</div>""", unsafe_allow_html=True)
+
+
+def pagina():
+    st.title("Projeções de Casos de Dengue por Município")
+    cidade, df = seletor_municipio("municipio_indicadores")
+    if cidade is not None:
+        mostrar(cidade, df)
 
 
 def mostrar(cidade, df):
     info = CIDADES[cidade]
-    st.title("Projeções de Casos de Dengue por Município")
-    st.subheader(f"{info['nome']} - {info['uf']}")
     st.caption("As previsões abaixo são geradas por modelos analíticos e estão sujeitas a erro. A tendência e o "
                "número de casos vêm de modelos diferentes e podem divergir; o número é uma estimativa, com uma "
                "faixa que contém o valor real em cerca de 80% das semanas.")
@@ -45,10 +53,6 @@ def mostrar(cidade, df):
     st.caption(f"Em relação à semana de {base:%d/%m/%Y} ({int(valor_base)} casos estimados). Subida ou queda: "
                "variação de mais de 20% e de 5 casos.")
     ultima = df.dropna(subset=["casos_est"])["data_iniSE"].max()
-    if descartadas:
-        st.info(f"O InfoDengue não publica a estimativa de casos atrasados (*nowcast*) para {info['nome']}, então as "
-                f"{descartadas} semanas mais recentes ainda estão incompletas. As previsões partem da última semana "
-                f"considerada completa ({base:%d/%m/%Y}); por isso algumas semanas previstas já passaram.")
 
     # ------------------------------------------------------------ Gráfico
     ultimos_12 = "Últimos 12 meses"
@@ -104,3 +108,8 @@ def mostrar(cidade, df):
     st.caption("Previsão passada: o que o modelo teria previsto na época, sem conhecer o futuro (retreinado a cada "
                "mês só com os dados disponíveis até então). As últimas semanas não têm previsão passada porque "
                "os casos delas ainda estão sendo revisados. Detalhes e acerto por município em \"Detalhes do Modelo\".")
+    if descartadas:
+        st.info(f"O InfoDengue não publica a estimativa de casos atrasados (*nowcast*, ver o glossário em \"Detalhes do "
+                f"Modelo\") para {info['nome']}, então as {descartadas} semanas mais recentes ainda estão incompletas "
+                f"(em cinza no gráfico). As previsões partem da última semana considerada completa "
+                f"({base:%d/%m/%Y}); por isso algumas semanas previstas já passaram.")
