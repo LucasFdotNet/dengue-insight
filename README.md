@@ -183,8 +183,10 @@ Registro das decisões que afetam os dados, o modelo ou a avaliação, com o mot
 
   | Grupo | H+1 | H+2 | H+3 | H+4 |
   |---|---|---|---|---|
-  | Municípios de treino (13) | 0,86 | 0,79 | 0,75 | 0,74 |
-  | Municípios de validação espacial (6) | 0,95 | 0,86 | 0,84 | 0,83 |
+  | Municípios de treino (100) | 0,84 | 0,77 | 0,73 | 0,71 |
+  | Municípios de validação espacial (15) | 0,79 | 0,71 | 0,69 | 0,66 |
+
+  Com a base de 115 municípios (decisão 1). Na primeira versão, só com SP (13 de treino e 6 de validação), os valores eram 0,86 a 0,74 no treino e 0,95 a 0,83 na validação. Os números detalhados abaixo, por ano e por município, são dessa primeira versão.
 
   O modelo é mais útil nos horizontes mais longos. Para a semana seguinte (H+1), a vantagem é pequena, principalmente nos municípios de validação. São José do Rio Preto (o município mais quente e mais distante do perfil de treino) e Ribeirão Preto são os únicos em que o modelo praticamente empata com o baseline.
 * **Limitação: dados revisados.** A simulação usa os casos na versão revisada de hoje. Em tempo real, os casos das semanas mais recentes ainda estariam incompletos, porque as notificações chegam com atraso. Por isso a simulação é **otimista** nesse ponto: em uso real, o modelo erraria mais. Não é possível corrigir isso para o passado, porque o InfoDengue não disponibiliza os dados como eram conhecidos em cada data (essa avaliação é chamada de pseudoprospectiva). A decisão 10 mede o tamanho desse efeito com uma simulação de pior caso.
@@ -219,7 +221,9 @@ Registro das decisões que afetam os dados, o modelo ou a avaliação, com o mot
 * **Interpretação:** o clima influencia a dengue, mas com semanas de atraso, e esse efeito já está refletido na tendência recente dos casos, que o modelo usa. A semana do ano já captura a sazonalidade. Para horizontes curtos (1 a 4 semanas), o clima acrescentou mais ruído do que informação. Além disso, os municípios de treino são vizinhos e têm clima muito parecido (vários caem no mesmo ponto da grade do ERA5), o que limita o que o modelo pode aprender com ele.
 * **Observação:** um primeiro teste com o corte único 80/20 sugeria que o clima ajudava em H+3 e H+4. A validação *walk-forward* não confirmou isso, o que mostra por que avaliar em vários anos é importante.
 
-### 8. Número de municípios de treino
+### 8. Número de municípios de treino (primeira versão, só SP)
+
+* **Atualização:** esta análise foi refeita com a base nacional, de forma mais rigorosa (decisão 13).
 
 * **Pergunta:** vale a pena incluir mais municípios no treino?
 * **Teste:** treinamos o modelo com 4, 7, 10 e 13 municípios de treino, sorteados, e medimos o resultado nos municípios de validação espacial:
@@ -326,6 +330,57 @@ Registro das decisões que afetam os dados, o modelo ou a avaliação, com o mot
   * **O modelo acrescenta valor em relação à sinalização do InfoDengue:** acerta de 15 a 18 pontos percentuais a mais que a regra `p_rt1`, seus alarmes de subida são mais confiáveis e ele erra o sentido da tendência com metade ou menos da frequência.
   * **As regras baseadas no Rt dão muitos alarmes falsos:** a regra `Rt` detecta mais subidas (de 50% a 55%), mas só 22% a 39% dos seus alarmes se confirmam. O Rt mede a transmissão atual, que oscila bastante de uma semana para outra.
   * **Ressalva:** o Rt não foi criado para prever o número de casos daqui a 1 a 4 semanas com o nosso critério de 20%. A comparação mostra que, para essa pergunta específica, o modelo é mais útil que uma leitura direta do Rt, e não que o Rt seja um indicador ruim para o que ele se propõe.
+
+### 13. Generalização para municípios não vistos (base nacional)
+
+* **Pergunta:** o objetivo principal passou a ser mostrar que o modelo **generaliza** para municípios que não viu no treino. Com a base de 100 municípios de treino, testamos (a) qual configuração de clima generaliza melhor e (b) se incluir ainda mais municípios melhoraria o modelo.
+* **Método:** `src/experimento_generalizacao.py`, com saída em `reports/generalizacao_configuracoes.csv` e `reports/generalizacao_curva.csv`. Os 15 municípios de validação não foram usados.
+  * **Validação cruzada por município:** os 100 municípios de treino foram divididos em 5 grupos de 20. Cada grupo foi previsto por modelos treinados só com os outros 80, com a mesma validação *walk-forward* (retreino a cada 3 meses, para o experimento caber em tempo razoável). Assim, todos os 100 municípios são avaliados como se fossem desconhecidos, e não só os 15 de validação.
+  * **Intervalos de confiança de 95%** por *bootstrap* sobre municípios: sorteamos municípios com reposição 2.000 vezes e recalculamos a métrica. A unidade de sorteio é o município, e não a semana, porque as semanas de um mesmo município são muito parecidas entre si; tratá-las como independentes daria uma falsa precisão. Nas comparações entre configurações, o sorteio é pareado (os mesmos municípios para as duas).
+  * **Curva de aprendizado:** o mesmo esquema, mas treinando com apenas 10, 20, 40, 60 ou 80 municípios sorteados (3 sorteios por tamanho, retreino a cada 6 meses). Ajustamos a curva `erro(n) = a + b·n^(-c)`, comum em aprendizado de máquina, em que `a` é o erro que se alcançaria com infinitos municípios.
+
+* **Resultado 1: o modelo generaliza.** Nos 100 municípios avaliados como desconhecidos, sem clima (razão modelo/baseline; abaixo de 1, o modelo é melhor):
+
+  | Antecedência | Razão | IC 95% |
+  |---|---|---|
+  | 1 semana | 0,84 | 0,81 a 0,87 |
+  | 2 semanas | 0,77 | 0,74 a 0,81 |
+  | 3 semanas | 0,74 | 0,71 a 0,78 |
+  | 4 semanas | 0,73 | 0,70 a 0,76 |
+
+  Em todos os horizontes, o intervalo de confiança fica inteiramente abaixo de 1: o modelo erra de 16% a 27% menos que o baseline em municípios que não viu, e isso não é efeito do acaso na escolha dos municípios.
+
+* **Resultado 2: o efeito do clima é pequeno e depende do horizonte.** Diferença na razão em relação ao modelo sem clima (negativo = clima melhora), com IC 95%:
+
+  | Clima usado | 1 semana | 2 semanas | 3 semanas | 4 semanas |
+  |---|---|---|---|---|
+  | S-1 a S-2 | +0,017 (+0,004 a +0,031) | +0,007 (−0,003 a +0,018) | −0,001 (−0,013 a +0,016) | −0,007 (−0,018 a +0,005) |
+  | S-1 a S-4 | +0,019 (+0,007 a +0,032) | +0,005 (−0,005 a +0,014) | −0,005 (−0,017 a +0,010) | **−0,014 (−0,023 a −0,004)** |
+  | S-1 a S-5 | +0,018 (+0,006 a +0,031) | +0,008 (−0,004 a +0,023) | −0,004 (−0,017 a +0,012) | **−0,014 (−0,027 a −0,002)** |
+  | Média de S-1 a S-8 | +0,011 (+0,001 a +0,020) | +0,007 (−0,003 a +0,016) | 0,000 (−0,010 a +0,012) | −0,004 (−0,014 a +0,007) |
+
+  * **Em 1 semana, o clima piora** a previsão em todas as configurações, e a piora é estatisticamente significativa (o intervalo não inclui zero).
+  * **Em 4 semanas, o clima de S-1 a S-4 ou de S-1 a S-5 melhora** a previsão, também de forma significativa, mas pequena (cerca de 2% do erro).
+  * **Em 2 e 3 semanas, não há diferença** que se distinga do acaso.
+  * Isso é coerente com a biologia: o efeito do clima sobre os casos leva semanas para aparecer (desenvolvimento do mosquito, incubação no mosquito e na pessoa, notificação). Para a próxima semana, os casos atuais já dizem quase tudo; para 4 semanas à frente, o clima recente traz alguma informação a mais.
+  * No acerto de tendência, o clima também ajuda um pouco em 4 semanas (64,0% contra 63,2% sem clima; subidas detectadas: 42,7% contra 40,3%).
+
+* **Resultado 3: mais municípios ajudam cada vez menos.** Razão modelo/baseline conforme o número de municípios no treino (média dos sorteios):
+
+  | Municípios no treino | 1 semana | 2 semanas | 3 semanas | 4 semanas |
+  |---|---|---|---|---|
+  | 10 | 0,906 | 0,857 | 0,828 | 0,806 |
+  | 20 | 0,870 | 0,813 | 0,780 | 0,765 |
+  | 40 | 0,856 | 0,793 | 0,764 | 0,748 |
+  | 60 | 0,847 | 0,784 | 0,751 | 0,734 |
+  | 80 | 0,841 | 0,774 | 0,741 | 0,728 |
+  | *Limite estimado (infinitos municípios)* | *0,828* | *0,756* | *0,725* | *0,702* |
+  | *Previsto com 200 municípios* | *0,835* | *0,766* | *0,734* | *0,717* |
+
+  * De 10 para 40 municípios, o erro cai bastante (7% a 10%). De 40 para 80, cai só 2% a 3%.
+  * Pela curva ajustada, dobrar a base de 100 para 200 municípios reduziria o erro em cerca de 1%, e nem com infinitos municípios o ganho passaria de 2% a 4%.
+  * **Conclusão:** com 100 municípios, a quantidade de dados deixou de ser o principal limite. Ganhos maiores dependeriam de outras mudanças no modelo (novas informações ou outra forma de modelar), e não de mais municípios.
+  * **Ressalva:** a curva foi ajustada com 5 pontos e 3 sorteios por ponto; o limite estimado é uma extrapolação e deve ser lido como ordem de grandeza.
 
 ### Nota sobre os testes exploratórios
 

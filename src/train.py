@@ -96,16 +96,17 @@ def linhas_validas(df, horizonte, features=FEATURES):
     return validas.groupby('cidade', sort=False).head(-SEMANAS_INSTAVEIS)
 
 
-def avaliar_walk_forward(treino, validacao, horizontes=HORIZONTES, lacuna=0, features=FEATURES):
+def avaliar_walk_forward(treino, validacao, horizontes=HORIZONTES, lacuna=0, features=FEATURES, meses_por_retreino=1):
     """Erros semana a semana do modelo e do baseline, com retreino mensal.
 
     Cada linha usa os dados da semana t para prever a semana t + H. 'lacuna' simula
     dados atrasados: a previsão é feita na semana t + lacuna, quando as últimas
     'lacuna' semanas ainda não são confiáveis (usado em experimento_atraso.py).
     'features' permite testar outros conjuntos de variáveis (usado em experimento_variaveis.py).
+    'meses_por_retreino' > 1 retreina com menos frequência, para experimentos mais pesados.
     """
     ultima_semana = treino['data_iniSE'].max()
-    meses = pd.period_range(f'{PRIMEIRO_ANO_TESTE}-01', ultima_semana, freq='M')
+    meses = pd.period_range(f'{PRIMEIRO_ANO_TESTE}-01', ultima_semana, freq='M')[::meses_por_retreino]
     atraso = pd.Timedelta(weeks=lacuna)
     erros = []
     for horizonte in horizontes:
@@ -114,7 +115,7 @@ def avaliar_walk_forward(treino, validacao, horizontes=HORIZONTES, lacuna=0, fea
         dados_teste = [(grupo, linhas_validas(dados, horizonte, features)) for grupo, dados in
                        [('treino', treino), ('validacao', validacao)]]
         for mes in meses:
-            inicio, fim = mes.start_time, (mes + 1).start_time
+            inicio, fim = mes.start_time, (mes + meses_por_retreino).start_time
             # Retreino no início do mês: só entram semanas cujo alvo já era conhecido (e confiável) antes dele
             tr = dados_treino[dados_treino['data_iniSE'] + passo < inicio - atraso]
             modelo = novo_modelo().fit(tr[features], alvo_relativo(tr, horizonte))
@@ -142,7 +143,7 @@ def avaliar_walk_forward(treino, validacao, horizontes=HORIZONTES, lacuna=0, fea
                     'atual': te['casos_est'],
                     'anterior': te['casos_est_lag_1'],
                 }))
-        logging.info(f"Walk-forward H+{horizonte} concluído ({len(meses)} retreinos mensais).")
+        logging.info(f"Walk-forward H+{horizonte} concluído ({len(meses)} retreinos, a cada {meses_por_retreino} mês(es)).")
     return pd.concat(erros, ignore_index=True)
 
 
