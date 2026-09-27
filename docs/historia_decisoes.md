@@ -36,6 +36,7 @@ Este documento reconstrói, em ordem cronológica, as decisões técnicas tomada
 | 15 | Como as conclusões mudaram | | Síntese das decisões revistas | [15](#s15) |
 | 16 | Comparação de modelos | 27/09/2026 | 8 modelos comparados na tendência; o classificador é o melhor no acerto balanceado e o modelo por quantis no número de casos; escolha final em aberto | [16](#s16) |
 | 17 | Modelo contra o Rt | 27/09/2026 | O classificador supera a regra do Rt, a do `p_rt1` e um classificador treinado só com o Rt; o Rt segue fora dos modelos | [17](#s17) |
+| 18 | Clima no classificador | 27/09/2026 | Com o classificador, o clima de S-1 a S-4 melhora todos os horizontes (+0,006 a +0,010); entra no modelo de 4 semanas | [18](#s18) |
 
 Observação sobre as datas: o código herdado é de 21/09/2026 e quase todo o trabalho de revisão foi registrado em commits de 26/09/2026 (o último, que fixa versões do `scipy` e do `statsmodels`, é de 27/09/2026). A coluna de commits permite reconstruir a ordem exata com `git log --reverse`.
 
@@ -761,3 +762,44 @@ Avaliação idêntica à da seção 16 (validação cruzada por município, 2019
 python -m src.experimento_modelos     # precisa rodar antes (gera os resultados do classificador)
 python -m src.experimento_rt          # cerca de 15 minutos
 ```
+
+<a id="s18"></a>
+## 18. Clima no melhor modelo de tendência
+
+### Contexto
+
+O grupo decidiu que o clima entra no modelo de 4 semanas, com base no teste da [seção 14](#s14), em que o LightGBM de regressão melhorava só em 4 semanas com o clima de S-1 a S-4 ou de S-1 a S-5 (e piorava em 1 semana). Como a comparação de modelos ([seção 16](#s16)) apontou o LightGBM classificador como o melhor para a tendência, o teste foi repetido com ele.
+
+### O que foi testado
+
+O classificador sem clima contra duas versões com clima semana a semana (temperatura média, chuva total e umidade média) das semanas S-1 a S-4 e S-1 a S-5 (`src/modelos/lightgbm_classificador_clima.py`). Mesma avaliação da seção 16: validação cruzada por município, 2019 em diante, validação final nos 15 municípios, intervalos de confiança por bootstrap sobre municípios. Script `src/experimento_clima_classificador.py`; resultados em `reports/comparacao_clima_classificador.csv` e `reports/comparacao_clima_classificador_por_municipio.csv`. As janelas testadas foram as que tinham sido significativas na seção 14, para o experimento caber em cerca de 30 minutos.
+
+### Resultados
+
+**Acerto balanceado** (de 0 a 1; maior é melhor; o baseline tira 0,333). Validação cruzada, 100 municípios; entre parênteses, a diferença em relação ao classificador sem clima, com o intervalo de confiança de 95%:
+
+| Modelo | 1 semana | 2 semanas | 3 semanas | 4 semanas |
+|---|---|---|---|---|
+| Classificador sem clima | 0,419 | 0,554 | 0,605 | 0,623 |
+| Com clima S-1 a S-4 | 0,430 (+0,010; +0,006 a +0,015) | 0,560 (+0,007; +0,003 a +0,011) | 0,611 (+0,006; +0,002 a +0,011) | 0,633 (+0,010; +0,005 a +0,015) |
+| Com clima S-1 a S-5 | 0,427 (+0,008; +0,004 a +0,012) | 0,560 (+0,007; +0,002 a +0,011) | 0,611 (+0,006; +0,002 a +0,011) | 0,632 (+0,009; +0,004 a +0,014) |
+
+**Com 4 semanas de antecedência** (validação cruzada; porcentagens: maior é melhor, exceto "sentido oposto"): o clima de S-1 a S-4 aumenta as subidas detectadas de 54,8% para 57,2% e os alarmes de subida corretos de 56,9% para 58,1%, e reduz o sentido oposto de 8,9% para 8,2%, todos com intervalos de confiança que excluem zero.
+
+**Validação final (15 municípios):** as diferenças vão na mesma direção (de +0,002 a +0,009 com S-1 a S-4), mas só são estatisticamente significativas em 1 e 2 semanas; com 15 municípios, os intervalos são mais largos.
+
+### Leitura
+
+* Com o classificador, o clima **melhora todos os horizontes**, e não só o de 4 semanas, ao contrário do que acontecia com o modelo de regressão. O ganho é pequeno (de 0,6 a 1 ponto de acerto balanceado), mas consistente.
+* S-1 a S-4 e S-1 a S-5 são praticamente iguais; S-1 a S-4 usa menos variáveis.
+* Uma explicação possível: o classificador prevê diretamente a mudança de tendência, e o clima recente ajuda a distinguir uma subida real de uma oscilação; o modelo de regressão prevê a intensidade da variação, em que o clima acrescentava mais ruído nos horizontes curtos.
+
+### Decisão
+
+O clima de S-1 a S-4 entra no modelo de 4 semanas (decisão do grupo). Se o classificador for adotado no painel, os resultados indicam usar o clima também nos modelos de 1 a 3 semanas. A implementação no modelo de produção está pendente.
+
+### Limitações
+
+* Só o classificador foi testado com clima nesta etapa; o modelo por quantis (candidato para o número de casos) não foi testado.
+* O ganho é pequeno e, nos 15 municípios de validação, não é significativo em 3 e 4 semanas.
+

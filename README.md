@@ -243,14 +243,23 @@ Estado atual das decisões, com os números da base atual (115 municípios). Qua
 
 * **Conclusões:** o nosso modelo é melhor que qualquer uso do Rt, em todos os horizontes, com intervalos de confiança de 95% que excluem zero; nos 15 municípios de validação o resultado se repete. Mesmo o classificador treinado só com o Rt perde de 6 a 9 pontos, então os casos recentes contêm mais informação sobre a tendência do que o Rt. As regras diretas pouco superam o "sempre estável" e dão muitos alarmes falsos (só 21% a 36% dos alarmes da regra do Rt se confirmam). **Ressalva:** o Rt mede a transmissão atual e não foi criado para prever a variação dos casos com o nosso critério; a conclusão vale para essa pergunta específica.
 
-### 9. Clima no modelo (em aberto)
+### 9. Clima no modelo
 
-* **Situação:** o modelo em produção **não usa clima**. A decisão final está em aberto.
+* **Decisão do grupo:** o clima entra no modelo de 4 semanas. Com o LightGBM classificador (melhor modelo de tendência), o clima das semanas S-1 a S-4 também melhora as previsões de 1 a 3 semanas; a extensão aos outros horizontes depende da escolha do modelo (decisão 11).
+* **Clima usado:** temperatura média, chuva total e umidade média de cada uma das 4 semanas anteriores à semana atual S (o clima de S ainda não está disponível no momento da previsão, por causa do atraso do ERA5).
 * **Evidências:**
-  * **Com a base de SP (13 municípios vizinhos, clima parecido):** todas as combinações de clima testadas, agregadas ou semana a semana, pioraram a previsão.
-  * **Com a base nacional (validação cruzada nos 100 municípios, `reports/generalizacao_configuracoes.csv`):** o clima **piora** a previsão de 1 semana (de forma significativa), não faz diferença em 2 e 3 semanas e **melhora** um pouco a de 4 semanas com o clima das semanas S-1 a S-4 ou S-1 a S-5 (diferença de −0,014 na razão de erro, cerca de 2%, com intervalo de confiança que exclui zero).
-* **Interpretação:** o efeito do clima sobre os casos leva semanas para aparecer (desenvolvimento do mosquito, incubação e notificação). Para a próxima semana, os casos atuais já dizem quase tudo; para 4 semanas, o clima recente acrescenta um pouco. Com municípios de climas realmente diferentes, o modelo passou a conseguir aproveitar essa informação.
-* **Opções:** usar clima só no modelo de 4 semanas, ou manter todos sem clima e registrar que o ganho é pequeno.
+  * **Base de SP (13 municípios vizinhos, clima parecido):** todas as combinações de clima testadas pioraram a previsão.
+  * **Base nacional, LightGBM de regressão** (`reports/generalizacao_configuracoes.csv`; razão de erro, **menor é melhor**): o clima **piora** a previsão de 1 semana, não faz diferença em 2 e 3 semanas e **melhora** a de 4 semanas (−0,014 na razão, cerca de 2%).
+  * **Base nacional, LightGBM classificador** (`src/experimento_clima_classificador.py`, `reports/comparacao_clima_classificador.csv`; validação cruzada, 100 municípios; acerto balanceado, **de 0 a 1, maior é melhor, o baseline tira 0,333**):
+
+    | Modelo | 1 sem. | 2 sem. | 3 sem. | 4 sem. |
+    |---|---|---|---|---|
+    | Classificador sem clima | 0,419 | 0,554 | 0,605 | 0,623 |
+    | **Classificador com clima S-1 a S-4** | **0,430** | **0,560** | **0,611** | **0,633** |
+    | Classificador com clima S-1 a S-5 | 0,427 | 0,560 | 0,611 | 0,632 |
+
+    O clima de S-1 a S-4 melhora o acerto balanceado em todos os horizontes (de +0,006 a +0,010, com intervalos de confiança de 95% que excluem zero). Com 4 semanas, detecta mais subidas (57,2% contra 54,8%), tem mais alarmes corretos (58,1% contra 56,9%) e erra menos o sentido (8,2% contra 8,9%). Nos 15 municípios de validação, as diferenças vão na mesma direção (+0,002 a +0,009), mas só são significativas em 1 e 2 semanas.
+* **Interpretação:** o ganho é pequeno (cerca de 1 ponto). O efeito do clima sobre os casos leva semanas para aparecer (desenvolvimento do mosquito, incubação e notificação). O classificador aproveita o clima também nos horizontes curtos porque prevê diretamente a mudança de tendência, onde o clima recente ajuda a distinguir uma subida real de uma oscilação.
 
 ### 10. Base nacional e generalização
 
