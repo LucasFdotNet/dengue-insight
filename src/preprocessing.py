@@ -34,7 +34,7 @@ def load_and_clean_data(filepath, clima_path):
     # 2. Clima semanal (ERA5). Left join: semanas recentes que o ERA5 ainda
     # não cobre ficam sem clima, em vez de receber valor copiado.
     if clima_path is None:
-        # Modo --sem-clima: colunas de clima vazias (o modelo atual não usa clima)
+        # Modo --sem-clima: colunas de clima vazias (o classificador treina sem clima, ver run_preprocessing)
         df[COLUNAS_CLIMA] = np.nan
     else:
         clima = pd.read_csv(clima_path, parse_dates=['data_iniSE'])
@@ -82,8 +82,10 @@ def feature_engineering(df):
 
 def run_preprocessing(sem_clima=False):
     """sem_clima=True (opção --sem-clima) processa sem os dados climáticos, com as colunas
-    de clima vazias. Serve para treinar o modelo, que não usa clima, enquanto a ingestão de
-    clima não termina; o painel e a análise exploratória precisam do processamento completo."""
+    de clima vazias. Permite rodar o pipeline enquanto a ingestão de clima não termina, mas o
+    classificador de tendência é treinado sem clima e não reproduz o modelo em produção (o de
+    quantis não é afetado). Resultados oficiais, painel e análise exploratória precisam do
+    processamento completo."""
     os.makedirs('data/processed', exist_ok=True)
     if sem_clima:
         logging.warning("Processando SEM dados climáticos (--sem-clima). Rode de novo sem a opção "

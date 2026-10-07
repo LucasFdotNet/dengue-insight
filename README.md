@@ -105,7 +105,7 @@ As versões estão fixadas em `requirements.txt`.
 
    **Sobre a ingestão de clima:** a Open-Meteo limita o uso gratuito por minuto, por hora e por dia, e a série de 16 anos de cada município consome boa parte desses limites. O script espera sozinho nos limites por minuto e por hora, então a primeira execução completa (115 municípios) leva algumas horas e pode atingir o limite diário. Nesse caso, ele para, mantém o que já foi salvo e avisa para rodar de novo mais tarde; a nova execução continua de onde parou. Nas execuções seguintes, só as últimas 12 semanas de cada município são baixadas. Para baixar tudo de novo: `python -m src.ingestion_clima --completo`.
 
-   **Sem os dados de clima:** `python -m src.preprocessing --sem-clima` processa sem clima, o suficiente para treinar o modelo (que não usa clima); o painel e a análise exploratória precisam do processamento completo.
+   **Sem os dados de clima:** `python -m src.preprocessing --sem-clima` processa com as colunas de clima vazias, o que permite rodar o pipeline enquanto a ingestão de clima não termina. Nesse modo, o classificador de tendência é treinado sem clima e **não reproduz o modelo em produção** (que usa o clima de S-1 a S-4, decisão 9); o modelo de quantis não é afetado. Para os resultados oficiais, o painel e a análise exploratória, rode o processamento completo.
 
 ---
 
@@ -119,7 +119,7 @@ Os resultados usam três tipos de número. Cada tabela abaixo indica qual está 
 | **Acerto de tendência** | Fração das semanas em que o modelo acertou se os casos iriam subir, ficar estáveis ou cair | **Maior é melhor.** Comparar com o "sempre estável", que já acerta muito porque a maioria das semanas é estável |
 | **Acerto balanceado** | Média do acerto em cada uma das três situações (subiu, ficou estável, caiu), calculado separadamente | **Maior é melhor**, de 0 a 1. O baseline tira 0,333. **Não** é uma divisão pelo baseline |
 
-**Exemplo de acerto balanceado** (LightGBM atual, 4 semanas de antecedência, semanas de 100 municípios somadas): o modelo acertou 41,6% das semanas em que os casos subiram, 75,3% das estáveis e 60,7% das que caíram. O acerto balanceado é a média: (41,6% + 75,3% + 60,7%) / 3 = **0,592**. O baseline, que sempre diz "estável", acerta 0%, 100% e 0%: média de **0,333**.
+**Exemplo de acerto balanceado** (LightGBM de regressão, 4 semanas de antecedência, semanas de 100 municípios somadas): o modelo acertou 41,6% das semanas em que os casos subiram, 75,3% das estáveis e 60,7% das que caíram. O acerto balanceado é a média: (41,6% + 75,3% + 60,7%) / 3 = **0,592**. O baseline, que sempre diz "estável", acerta 0%, 100% e 0%: média de **0,333**.
 
 **Baseline de persistência:** a previsão mais simples possível, "daqui a H semanas haverá o mesmo número de casos de hoje". Na tendência, equivale a dizer sempre "estável". Um modelo só é útil se for melhor que isso.
 
@@ -174,7 +174,7 @@ Estado atual das decisões, com os números da base atual (115 municípios). Qua
 * **Limitações:** a grade do ERA5 tem 0,25°, então municípios muito próximos caem no mesmo ponto (os 115 municípios ocupam 109 pontos); e os dados chegam com cerca de 6 dias de atraso.
 * **Agregação:** semana epidemiológica (domingo a sábado); só entram semanas com os 7 dias.
 * **Atribuição:** dados ERA5 do Copernicus Climate Change Service, licença CC BY 4.0; acesso via Open-Meteo.
-* **Uso:** o clima aparece no painel e na análise exploratória. **No modelo, está em aberto** (decisão 9).
+* **Uso:** o clima aparece no painel e na análise exploratória e entra no **classificador de tendência** (temperatura média, chuva e umidade das semanas S-1 a S-4; decisão 9). O modelo de quantis (número de casos) não usa clima.
 
 ### 5. Modelo único com alvo relativo
 
@@ -192,7 +192,7 @@ Estado atual das decisões, com os números da base atual (115 municípios). Qua
   | Um modelo por município, alvo relativo | 0,89 | 0,83 | 0,76 | 0,76 |
   | **Modelo único, alvo relativo** | **0,87** | **0,79** | **0,75** | **0,72** |
 
-* **Variáveis do modelo:** casos atuais (em log), variação dos casos em relação a 1, 2, 3 e 4 semanas atrás e semana do ano. **Não usa o Rt** (decisão 8) **nem o clima** (decisão 9). A incidência por 100 mil habitantes foi retirada por ser redundante com os casos.
+* **Variáveis comuns aos modelos:** casos atuais (em log), variação dos casos em relação a 1, 2, 3 e 4 semanas atrás e semana do ano (`FEATURES`, em `src/train.py`). O classificador de tendência acrescenta o clima das semanas S-1 a S-4 (decisão 9); o modelo de quantis usa só as variáveis comuns. **Nenhum modelo usa o Rt** (decisão 8). A incidência por 100 mil habitantes foi retirada por ser redundante com os casos.
 * **Modelos em produção** (decisão 11): LightGBM **classificador** com clima das semanas S-1 a S-4, para a tendência, e LightGBM **por quantis**, para o número de casos com intervalo de 80%. Os dois usam hiperparâmetros fixos (300 árvores, taxa de aprendizado 0,05).
 
 ### 6. Avaliação: walk-forward, validação cruzada por município e baseline
@@ -280,20 +280,20 @@ Estado atual das decisões, com os números da base atual (115 municípios). Qua
   | Binomial negativa | 0,368 | 0,443 | 0,520 | 0,565 |
   | Ensemble (média de linear, binomial negativa e LightGBM) | 0,363 | 0,462 | 0,545 | 0,586 |
   | LightGBM por quantis | 0,374 | 0,499 | 0,554 | 0,586 |
-  | LightGBM atual (em produção) | 0,387 | 0,509 | 0,562 | 0,592 |
+  | LightGBM de regressão (usado no painel antes desta decisão) | 0,387 | 0,509 | 0,562 | 0,592 |
   | LightGBM ajustado | 0,398 | 0,507 | 0,562 | 0,589 |
   | **LightGBM classificador** | **0,419** | **0,554** | **0,605** | **0,623** |
 
 * **Conclusões:**
   * As relações não lineares fazem diferença: regressão linear e binomial negativa (o modelo clássico da epidemiologia para contagens) ficaram bem abaixo. Combinar modelos e ajustar hiperparâmetros não trouxe ganho.
-  * O **classificador**, que prevê a tendência diretamente, é o único significativamente melhor que o LightGBM em produção (3 a 4 pontos a mais). Ele detecta mais subidas (55% contra 42% em 4 semanas), mas com mais alarmes falsos (57% dos alarmes corretos, contra 65%) e não produz número de casos.
+  * O **classificador**, que prevê a tendência diretamente, é o único significativamente melhor que o LightGBM de regressão (3 a 4 pontos a mais). Ele detecta mais subidas (55% contra 42% em 4 semanas), mas com mais alarmes falsos (57% dos alarmes corretos, contra 65%) e não produz número de casos.
   * O **LightGBM por quantis** tem o menor erro em número de casos e um intervalo de previsão de 80% bem calibrado (o valor real caiu dentro dele em 78% a 82% das semanas).
 * **Decisão:** usar os dois modelos, cada um no que faz melhor. O **classificador com clima** (decisão 9) dá a tendência: no contexto do projeto, o mais importante é alertar uma subida, e ele detecta mais subidas que as alternativas. O **LightGBM por quantis** dá o número de casos, com uma faixa de 80% ("entre X e Y casos"). Os dois são independentes e podem divergir; o painel mostra os dois como são e avisa isso. Tabelas completas e limitações nas seções 16 a 19 de [`docs/historia_decisoes.md`](docs/historia_decisoes.md).
 
 ### 12. Previsão com dados atrasados
 
 * **Pergunta:** a avaliação usa os dados já revisados. Quanto pior o modelo seria sem os dados das semanas mais recentes, como acontece em tempo real?
-* **Simulação (pior caso)** (`src/experimento_atraso.py`, `reports/experimento_atraso.csv`): na semana X, as semanas X a X-3 não podem ser usadas; o último dado disponível é o de X-4. Para prever X+N, o modelo olha N+4 semanas à frente a partir de X-4, e o baseline repete o valor de X-4. Rodamos também com lacuna de 5 semanas. Na prática existe o nowcast do InfoDengue para as semanas recentes, então o desempenho real fica entre os dois cenários.
+* **Simulação (pior caso)** (`src/experimento_atraso.py`, `reports/experimento_atraso.csv`): na semana X, as semanas X a X-3 não podem ser usadas; o último dado disponível é o de X-4. Para prever X+N, o modelo olha N+4 semanas à frente a partir de X-4, e o baseline repete o valor de X-4. Rodamos também com lacuna de 5 semanas. O experimento usa o LightGBM de regressão (sem clima), e não os modelos em produção (decisão 11); a conclusão sobre o efeito do atraso deve valer para eles, mas não foi medida diretamente. Na prática existe o nowcast do InfoDengue para as semanas recentes, então o desempenho real fica entre os dois cenários.
 * **Resultado** (municípios de treino; erro médio em casos por semana e razão de erro, **menor é melhor**):
 
   | Antecedência | Modelo sem lacuna | Modelo com lacuna de 4 semanas | Baseline com lacuna de 4 semanas | Razão de erro com lacuna |

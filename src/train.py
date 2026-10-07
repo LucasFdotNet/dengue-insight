@@ -44,7 +44,8 @@ FEATURES = [
     'var_log_1', 'var_log_2', 'var_log_3', 'var_log_4',  # crescimento em relação a 1-4 semanas atrás
     'semana_ano',                                        # sazonalidade
 ]
-# Rt fora do modelo (usado só para comparação) e clima em aberto: ver decisões 8 e 9 no README
+# Rt fora dos modelos (usado só para comparação). O classificador de tendência acrescenta o clima
+# de S-1 a S-4 (src/modelos/lightgbm_classificador_clima.py). Ver decisões 8 e 9 no README
 
 # Tendência: "sobe" ou "cai" se a variação passa de 20% E de 5 casos; senão, "estável".
 # O mínimo absoluto evita que oscilações pequenas (ex.: 2 -> 3 casos, +50%) contem como subida.
