@@ -35,9 +35,6 @@ def pagina():
 
 def mostrar(cidade, df):
     info = CIDADES[cidade]
-    st.caption("As previsões abaixo são geradas por modelos analíticos e estão sujeitas a erro. A tendência e o "
-               "número de casos vêm de modelos diferentes e podem divergir; o número é uma estimativa, com uma "
-               "faixa que contém o valor real em cerca de 80% das semanas.")
     if info["papel"] == "validacao":
         st.info(f"{info['nome']} é um município de validação: seus dados nunca foram usados no treino do modelo.")
 
@@ -45,6 +42,15 @@ def mostrar(cidade, df):
     if previsoes.empty:
         st.error("Não há modelos treinados. Execute `python -m src.train` e recarregue o painel.")
         return
+
+    # ------------------------------------------------------------ Período e antecedência
+    ultimos_12 = "Últimos 12 meses"
+    todo = f"Todo o período (desde {PRIMEIRO_ANO_TESTE})"
+    anos = [str(a) for a in range(base.year, PRIMEIRO_ANO_TESTE - 1, -1)]
+    col_periodo, col_h = st.columns([1, 2])
+    periodo = col_periodo.selectbox("Período:", [ultimos_12, todo] + anos)
+    h = col_h.radio("Previsões passadas feitas com antecedência de:", list(previsoes["h"]),
+                    format_func=lambda x: f"{x} semana" + ("s" if x > 1 else ""), horizontal=True)
 
     # ------------------------------------------------------------ Cards das próximas semanas
     for coluna, (_, linha) in zip(st.columns(len(previsoes)), previsoes.iterrows()):
@@ -55,13 +61,6 @@ def mostrar(cidade, df):
     ultima = df.dropna(subset=["casos_est"])["data_iniSE"].max()
 
     # ------------------------------------------------------------ Gráfico
-    ultimos_12 = "Últimos 12 meses"
-    todo = f"Todo o período (desde {PRIMEIRO_ANO_TESTE})"
-    anos = [str(a) for a in range(base.year, PRIMEIRO_ANO_TESTE - 1, -1)]
-    col_periodo, col_h = st.columns([1, 2])
-    periodo = col_periodo.selectbox("Período:", [ultimos_12, todo] + anos)
-    h = col_h.radio("Previsões passadas feitas com antecedência de:", list(previsoes["h"]),
-                    format_func=lambda x: f"{x} semana" + ("s" if x > 1 else ""), horizontal=True)
     if periodo == ultimos_12:
         inicio, fim = ultima - pd.Timedelta(weeks=SEMANAS_ULTIMOS_12_MESES - 1), ultima
     elif periodo == todo:
@@ -113,3 +112,6 @@ def mostrar(cidade, df):
                 f"Modelo\") para {info['nome']}, então as {descartadas} semanas mais recentes ainda estão incompletas "
                 f"(em cinza no gráfico). As previsões partem da última semana considerada completa "
                 f"({base:%d/%m/%Y}); por isso algumas semanas previstas já passaram.")
+    st.caption("As previsões acima são geradas por modelos analíticos e estão sujeitas a erro. A tendência e o "
+               "número de casos vêm de modelos diferentes e podem divergir; o número é uma estimativa, com uma "
+               "faixa que contém o valor real em cerca de 80% das semanas.")
