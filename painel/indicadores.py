@@ -35,9 +35,6 @@ def pagina():
 
 def mostrar(cidade, df):
     info = CIDADES[cidade]
-    if info["papel"] == "validacao":
-        st.info(f"{info['nome']} é um município de validação: seus dados nunca foram usados no treino do modelo.")
-
     previsoes, base, descartadas = get_predictions(df)
     if previsoes.empty:
         st.error("Não há modelos treinados. Execute `python -m src.train` e recarregue o painel.")
@@ -112,6 +109,8 @@ def mostrar(cidade, df):
                 f"Modelo\") para {info['nome']}, então as {descartadas} semanas mais recentes ainda estão incompletas "
                 f"(em cinza no gráfico). As previsões partem da última semana considerada completa "
                 f"({base:%d/%m/%Y}); por isso algumas semanas previstas já passaram.")
+    if info["papel"] == "validacao":
+        st.info(f"{info['nome']} é um município de validação: seus dados nunca foram usados no treino do modelo.")
     st.caption("As previsões acima são geradas por modelos analíticos e estão sujeitas a erro. A tendência e o "
                "número de casos vêm de modelos diferentes e podem divergir; o número é uma estimativa, com uma "
                "faixa que contém o valor real em cerca de 80% das semanas.")
