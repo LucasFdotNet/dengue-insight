@@ -51,22 +51,46 @@ def _ordem(chave):
     return (0 if info["papel"] == "treino" else 1, nome)
 
 
+CABECALHO = "grupo:"  # prefixo das opções que são só títulos de grupo
+RECUO = " "  # espaço largo: não é colapsado no HTML, ao contrário do espaço comum
+
+
+def _rotulo(opcao):
+    if opcao.startswith(CABECALHO):
+        return f"{GRUPO[opcao[len(CABECALHO):]]}:"
+    return f"{RECUO}{CIDADES[opcao]['nome']} - {CIDADES[opcao]['uf']}"
+
+
+def _trocar_cabecalho(chave_widget, opcoes):
+    """Se um título de grupo for escolhido, seleciona o primeiro município daquele grupo."""
+    escolha = st.session_state[chave_widget]
+    if escolha.startswith(CABECALHO):
+        st.session_state[chave_widget] = opcoes[opcoes.index(escolha) + 1]
+
+
 def seletor_municipio(chave_widget):
     """Seleção do município, agrupada por papel (treino, validação) e em ordem alfabética.
 
-    O Streamlit não tem grupos (optgroup) no seletor; o grupo aparece no início do nome. A escolha
-    é guardada em st.session_state["municipio"] e compartilhada entre as páginas. Devolve a chave do
-    município e seus dados processados, ou None se não houver dados.
+    O Streamlit não tem grupos (optgroup) no seletor; cada grupo entra na lista como uma opção de
+    título, com os municípios recuados abaixo dele. A escolha é guardada em
+    st.session_state["municipio"] e compartilhada entre as páginas. Devolve a chave do município e
+    seus dados processados, ou None se não houver dados.
     """
     disponiveis = sorted([k for k in CIDADES if os.path.exists(f"data/processed/{k}_processed.csv")], key=_ordem)
     if not disponiveis:
         st.error("Nenhum dado processado encontrado. Execute ingestion.py, preprocessing.py e train.py.")
         return None, None
+    opcoes, papel_anterior = [], None
+    for k in disponiveis:
+        papel = CIDADES[k]["papel"]
+        if papel != papel_anterior:
+            opcoes.append(CABECALHO + papel)
+            papel_anterior = papel
+        opcoes.append(k)
     atual = st.session_state.get("municipio", MUNICIPIO_PADRAO)
     cidade = st.selectbox(
-        "Município:", disponiveis, index=disponiveis.index(atual) if atual in disponiveis else 0,
-        format_func=lambda k: f"{GRUPO[CIDADES[k]['papel']]} · {CIDADES[k]['nome']} - {CIDADES[k]['uf']}",
-        key=chave_widget,
+        "Município:", opcoes, index=opcoes.index(atual) if atual in disponiveis else 1,
+        format_func=_rotulo, key=chave_widget, on_change=_trocar_cabecalho, args=(chave_widget, opcoes),
         help="Treino: municípios usados para treinar o modelo. Validação: municípios que o modelo nunca viu no "
              "treino, usados para testar se ele funciona em outras regiões. Digite para buscar.",
     )
