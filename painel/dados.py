@@ -19,6 +19,15 @@ REGIAO_UF = {
 }
 SETA = {"sobe": ("▲", "Subida", "#c0392b"), "estável": ("▶", "Estável", "#7f8c8d"), "cai": ("▼", "Queda", "#27ae60")}
 FORMATO_DATA_HOVER = "%{x|%d/%m/%Y}: %{y:,.0f} casos"
+SOMENTE_LEITURA = {"displayModeBar": False, "scrollZoom": False, "doubleClick": False}
+
+
+def grafico(fig, alvo=st):
+    """Mostra o gráfico sem barra de ferramentas, zoom ou arraste; só a dica ao passar o mouse ou tocar."""
+    fig.update_layout(dragmode=False)
+    fig.update_xaxes(fixedrange=True)
+    fig.update_yaxes(fixedrange=True)
+    alvo.plotly_chart(fig, width="stretch", config=SOMENTE_LEITURA)
 
 
 @st.cache_data

@@ -3,7 +3,7 @@ import pandas as pd
 import plotly.graph_objects as go
 import streamlit as st
 
-from painel.dados import FORMATO_DATA_HOVER, SETA, carregar_previsoes_passadas, seletor_municipio
+from painel.dados import FORMATO_DATA_HOVER, SETA, carregar_previsoes_passadas, grafico, seletor_municipio
 from src.cidades import CIDADES
 from src.predict import get_predictions
 from src.train import PRIMEIRO_ANO_TESTE
@@ -12,18 +12,31 @@ SEMANAS_ULTIMOS_12_MESES = 52
 MAX_SEMANAS_COM_MARCADORES = 104
 
 
-def _card(coluna, linha):
+# Grade dos cards: 4 por linha, 2 em telas estreitas (mesmo limite em que o Streamlit empilha colunas).
+# Fontes proporcionais à largura da tela (clamp), sem quebra de linha na tendência.
+ESTILO_CARDS = """<style>
+.cards-previsao {display:grid;grid-template-columns:repeat(4,1fr);gap:1rem;margin-bottom:0.5rem}
+.card-previsao {border:1px solid rgba(49,51,63,0.2);border-radius:0.6rem;padding:1.1rem 1rem;min-height:9.5rem;
+                display:flex;flex-direction:column;justify-content:space-between}
+.card-previsao .data {font-size:clamp(0.75rem,0.9vw,0.9rem);color:#6b6b6b}
+.card-previsao .tendencia {font-size:clamp(1.15rem,2vw,1.9rem);font-weight:700;white-space:nowrap;margin:0.6rem 0}
+.card-previsao .casos {font-size:clamp(0.8rem,1vw,0.95rem);color:#444}
+.card-previsao .faixa {color:#888;white-space:nowrap}
+@media (max-width:640px) {
+  .cards-previsao {grid-template-columns:repeat(2,1fr);gap:0.6rem}
+  .card-previsao {padding:0.8rem 0.7rem;min-height:0}
+  .card-previsao .tendencia {margin:0.4rem 0}
+}
+</style>"""
+
+
+def _card(linha):
     seta, rotulo, cor = SETA[linha["tendencia"]]
-    # Fontes proporcionais à largura da tela (clamp), sem quebra de linha na tendência
-    coluna.markdown(f"""
-<div style="border:1px solid rgba(49,51,63,0.2);border-radius:0.6rem;padding:1.1rem 1rem;min-height:9.5rem;
-            display:flex;flex-direction:column;justify-content:space-between;margin-bottom:0.5rem">
-  <div style="font-size:clamp(0.75rem,0.9vw,0.9rem);color:#6b6b6b">Semana de {linha['data']:%d/%m/%Y}</div>
-  <div style="font-size:clamp(1.15rem,2vw,1.9rem);font-weight:700;color:{cor};white-space:nowrap;margin:0.6rem 0">
-    {seta} {rotulo}</div>
-  <div style="font-size:clamp(0.8rem,1vw,0.95rem);color:#444">≈ {linha['previsto']} casos
-    <span style="color:#888;white-space:nowrap">(entre {linha['inferior']} e {linha['superior']})</span></div>
-</div>""", unsafe_allow_html=True)
+    return f"""<div class="card-previsao">
+  <div class="data">Semana de {linha['data']:%d/%m/%Y}</div>
+  <div class="tendencia" style="color:{cor}">{seta} {rotulo}</div>
+  <div class="casos">≈ {linha['previsto']} casos <span class="faixa">(entre {linha['inferior']} e {linha['superior']})</span></div>
+</div>"""
 
 
 def pagina():
@@ -50,8 +63,8 @@ def mostrar(cidade, df):
                     format_func=lambda x: f"{x} semana" + ("s" if x > 1 else ""), horizontal=True)
 
     # ------------------------------------------------------------ Cards das próximas semanas
-    for coluna, (_, linha) in zip(st.columns(len(previsoes)), previsoes.iterrows()):
-        _card(coluna, linha)
+    cards = "".join(_card(linha) for _, linha in previsoes.iterrows())
+    st.markdown(f'{ESTILO_CARDS}<div class="cards-previsao">{cards}</div>', unsafe_allow_html=True)
     valor_base = df.loc[df["data_iniSE"] == base, "casos_est"].iloc[0]
     st.caption(f"Em relação à semana de {base:%d/%m/%Y} ({int(valor_base)} casos estimados). Subida ou queda: "
                "variação de mais de 20% e de 5 casos.")
@@ -98,9 +111,9 @@ def mostrar(cidade, df):
                                  hovertemplate=FORMATO_DATA_HOVER + "<extra>Previsão</extra>"))
 
     fig.update_layout(xaxis_title="Semana epidemiológica (data de início)", yaxis_title="Casos",
-                      xaxis_tickformat="%m/%Y", margin=dict(t=30),
+                      xaxis_tickformat="%m/%Y", margin=dict(l=0, r=0, t=10, b=0),
                       legend=dict(orientation="h", yanchor="top", y=-0.2))
-    st.plotly_chart(fig, width="stretch")
+    grafico(fig)
     st.caption("Previsão passada: o que o modelo teria previsto na época, sem conhecer o futuro (retreinado a cada "
                "mês só com os dados disponíveis até então). As últimas semanas não têm previsão passada porque "
                "os casos delas ainda estão sendo revisados. Detalhes e acerto por município em \"Detalhes do Modelo\".")

@@ -9,7 +9,7 @@ import plotly.graph_objects as go
 import streamlit as st
 
 from painel.dados import (FORMATO_DATA_HOVER, REGIAO_UF, ROTULO_PAPEL, carregar_csv, carregar_previsoes_passadas,
-                          seletor_municipio)
+                          grafico, seletor_municipio)
 from src.cidades import CIDADES
 from src.train import HORIZONTES, TENDENCIAS, caminho_modelo
 
@@ -127,7 +127,7 @@ só com o que já era conhecido e preveem as semanas seguintes. Os municípios d
         fig = px.bar(imp, x="importancia", y="variavel", orientation="h", title=titulo,
                      labels={"importancia": "Importância (% do total)", "variavel": ""})
         fig.update_layout(xaxis_tickformat=".0%", height=420, margin=dict(l=10, r=10, t=40, b=10))
-        coluna.plotly_chart(fig, width="stretch")
+        grafico(fig, coluna)
 
     st.markdown("""
 #### Limitações
@@ -175,9 +175,8 @@ def _comparacao():
                  labels={"valor": "Acerto balanceado (maior é melhor; baseline = 0,333)", "Modelo": ""})
     fig.add_vline(x=1 / 3, line_dash="dot", line_color="#555")
     fig.update_layout(height=480, legend_title_text="", margin=dict(l=10, r=10, t=50, b=10))
-    st.plotly_chart(fig, width="stretch")
-    st.caption("Barras de erro: intervalo de confiança de 95% (bootstrap sobre municípios). "
-               "Use o ícone de câmera no canto do gráfico para baixá-lo como imagem.")
+    grafico(fig)
+    st.caption("Barras de erro: intervalo de confiança de 95% (bootstrap sobre municípios).")
 
     # Evolução por antecedência
     ev = m[m["metrica"] == "acerto_balanceado"].copy()
@@ -186,7 +185,7 @@ def _comparacao():
                   title="Acerto balanceado por antecedência",
                   labels={"h": "Antecedência (semanas)", "valor": "Acerto balanceado"})
     fig.update_layout(xaxis_dtick=1, height=460, margin=dict(l=10, r=10, t=50, b=10))
-    st.plotly_chart(fig, width="stretch")
+    grafico(fig)
 
     # Tabela completa
     st.markdown(f"#### Todas as métricas ({h} semana(s) de antecedência)")
@@ -221,7 +220,7 @@ def _comparacao():
                                        showscale=False))
             fig.update_layout(title=MODELOS[modelo], yaxis_autorange="reversed", height=340,
                               margin=dict(l=10, r=10, t=50, b=10))
-            coluna.plotly_chart(fig, width="stretch")
+            grafico(fig, coluna)
 
 
 # ---------------------------------------------------------------- 3. Municípios
@@ -250,7 +249,7 @@ def _municipios():
                  color="Papel", color_discrete_map={"Treino": "#0275d8", "Validação": "#d9534f"},
                  title="Por UF", labels={"uf": "UF"})
     fig.update_layout(height=320, margin=dict(l=10, r=10, t=40, b=10), xaxis={"categoryorder": "total descending"})
-    c2.plotly_chart(fig, width="stretch")
+    grafico(fig, c2)
     lista = df[["nome", "uf", "Região", "Papel", "populacao", "criterio"]].rename(
         columns={"nome": "Município", "uf": "UF", "populacao": "População (2022)", "criterio": "Critério de inclusão"})
     with st.expander("Lista completa"):
@@ -289,7 +288,7 @@ def _municipio():
                              hovertemplate=FORMATO_DATA_HOVER + "<extra></extra>"))
     fig.update_layout(title="Histórico completo desde 2010", xaxis_tickformat="%m/%Y", yaxis_title="Casos estimados",
                       margin=dict(t=40))
-    st.plotly_chart(fig, width="stretch")
+    grafico(fig)
     with st.expander("O que são \"casos estimados\" e \"intervalo do nowcast\"?"):
         st.markdown(
             "- **Casos notificados**: casos já registrados no sistema. Nas semanas recentes, estão incompletos, "
