@@ -53,27 +53,73 @@ def limiares(df, percentil=PERCENTIL_ALTO, minimo=MIN_CASOS_ALTO):
 
 # --------------------------------------------------------------- três níveis
 
-# Verde (normal), amarelo (elevado) e vermelho (epidêmico): dois limiares por município e ano,
-# calculados como o limiar acima. Variantes comparadas em experimento_niveis.py:
-#   A: amarelo a partir do percentil 75, vermelho a partir do 90 (o "alto" já avaliado);
-#   B: amarelo numa faixa em torno do percentil 90 (do 80 ao 97), vermelho só muito acima (97).
-VARIANTES_NIVEIS = {'A': (0.75, 0.90), 'B': (0.80, 0.97)}
+# Verde (normal), amarelo (elevado) e vermelho (epidêmico). Variantes comparadas em experimento_niveis.py:
+#   A: percentis do histórico do município: amarelo a partir do 75, vermelho a partir do 90;
+#   B: percentis: amarelo do 80 ao 97 (faixa em torno do 90), vermelho a partir do 97;
+#   C: canal endêmico do Ministério da Saúde (Plano de Contingência Nacional para Dengue, Chikungunya
+#      e Zika, 2025, seção 5; ver docs/referencias.md): para cada semana epidemiológica, a mediana e o
+#      terceiro quartil (Q3) dos casos da mesma semana nos 5 anos anteriores; amarelo acima da
+#      mediana (faixa de "mobilização" do plano) e vermelho acima do Q3 ("alerta").
+VARIANTES_NIVEIS = {'A': ('percentis', 0.75, 0.90), 'B': ('percentis', 0.80, 0.97), 'C': ('canal',)}
+DESCRICAO_VARIANTES = {
+    'A': 'percentis: amarelo ≥ p75, vermelho ≥ p90',
+    'B': 'percentis: amarelo ≥ p80, vermelho ≥ p97',
+    'C': 'canal endêmico (MS): amarelo > mediana, vermelho > Q3 dos 5 anos anteriores',
+}
 MIN_CASOS_AMARELO = 5
 NOMES_NIVEIS = ['verde', 'amarelo', 'vermelho']
+
+# Canal endêmico: escolhas que o Plano de Contingência não define (registradas também no README)
+ANOS_CANAL = 5          # anos anteriores usados (o plano usa os últimos 5)
+# - anos epidêmicos NÃO são excluídos da série (o plano não manda excluir; excluir exigiria definir
+#   "ano epidêmico" antes de ter o canal);
+# - quartis pelo método linear do numpy (tipo 7 de Hyndman e Fan, o padrão do R e do Excel);
+# - casos, e não incidência: com a população praticamente constante em 5 anos, a comparação é a mesma;
+# - semanas com poucos casos: amarelo exige pelo menos MIN_CASOS_AMARELO casos e vermelho pelo menos
+#   MIN_CASOS_ALTO (os mesmos mínimos do InfoDengue), para que 1 ou 2 casos numa semana em que a
+#   mediana é zero não virem "alerta";
+# - a semana epidemiológica 53 usa o canal da semana 52;
+# - semanas de treino anteriores a 2015 usam o canal de 2010 a 2014 (como em limiares()).
+
+
+def canal_endemico(df):
+    """Mediana e Q3 dos casos de cada município, ano e semana epidemiológica, com os ANOS_CANAL anos anteriores."""
+    d = pd.DataFrame({'cidade': df['cidade'], 'ano': df['SE'] // 100, 'semana': np.minimum(df['SE'] % 100, 52),
+                      'casos': df['casos_est']})
+    linhas = []
+    for cidade, g in d.groupby('cidade'):
+        for ano in sorted(g['ano'].unique()):
+            ate = max(ano, PRIMEIRO_ANO_TESTE)
+            ref = g[(g['ano'] >= ate - ANOS_CANAL) & (g['ano'] < ate)].dropna(subset=['casos'])
+            q = ref.groupby('semana')['casos'].quantile([0.5, 0.75]).unstack()
+            linhas.append(pd.DataFrame({'cidade': cidade, 'ano': ano, 'semana': q.index,
+                                        'mediana': q[0.5].to_numpy(), 'q3': q[0.75].to_numpy()}))
+    return pd.concat(linhas, ignore_index=True)
 
 
 def adicionar_niveis(df, variante):
     """Acrescenta limiar_amarelo, limiar_vermelho, faixa (0 verde, 1 amarelo, 2 vermelho), faixa_h1 a faixa_h4 e as
     distâncias aos limiares. "faixa", e não "nivel", porque nivel é o alerta do InfoDengue nos dados."""
-    p_amarelo, p_vermelho = VARIANTES_NIVEIS[variante]
+    metodo = VARIANTES_NIVEIS[variante]
     df = df.sort_values(['cidade', 'data_iniSE']).copy()
-    df['ano'] = df['data_iniSE'].dt.year
-    for nome, p, minimo in [('amarelo', p_amarelo, MIN_CASOS_AMARELO), ('vermelho', p_vermelho, MIN_CASOS_ALTO)]:
-        df = df.merge(limiares(df, p, minimo).rename(columns={'limiar': f'limiar_{nome}'}), on=['cidade', 'ano'],
-                      how='left')
+    if metodo[0] == 'percentis':
+        df['ano'] = df['data_iniSE'].dt.year
+        for nome, p, minimo in [('amarelo', metodo[1], MIN_CASOS_AMARELO), ('vermelho', metodo[2], MIN_CASOS_ALTO)]:
+            df = df.merge(limiares(df, p, minimo).rename(columns={'limiar': f'limiar_{nome}'}), on=['cidade', 'ano'],
+                          how='left')
+        df = df.drop(columns='ano')
+        acima = {'amarelo': df['casos_est'] >= df['limiar_amarelo'], 'vermelho': df['casos_est'] >= df['limiar_vermelho']}
+    else:
+        df['ano'], df['semana'] = df['SE'] // 100, np.minimum(df['SE'] % 100, 52)
+        df = df.merge(canal_endemico(df), on=['cidade', 'ano', 'semana'], how='left').drop(columns=['ano', 'semana'])
+        # "Acima" da mediana e do Q3, como no plano, com os mínimos de casos
+        acima = {'amarelo': (df['casos_est'] > df['mediana']) & (df['casos_est'] >= MIN_CASOS_AMARELO),
+                 'vermelho': (df['casos_est'] > df['q3']) & (df['casos_est'] >= MIN_CASOS_ALTO)}
+        df['limiar_amarelo'] = np.maximum(df['mediana'], MIN_CASOS_AMARELO)
+        df['limiar_vermelho'] = np.maximum(df['q3'], MIN_CASOS_ALTO)
+    for nome in ('amarelo', 'vermelho'):
         df[f'razao_{nome}'] = np.log1p(df['casos_est']) - np.log1p(df[f'limiar_{nome}'])
-    df = df.drop(columns='ano')
-    faixa = (df['casos_est'] >= df['limiar_amarelo']).astype(float) + (df['casos_est'] >= df['limiar_vermelho'])
+    faixa = acima['amarelo'].astype(float) + acima['vermelho']
     df['faixa'] = faixa.where(df['casos_est'].notna())
     por_cidade = df.groupby('cidade', sort=False)['faixa']
     for h in HORIZONTES:

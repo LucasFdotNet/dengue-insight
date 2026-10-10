@@ -7,3 +7,7 @@ B,validacao_cruzada,Modelo: alerta de vermelho,270,0.837,3.0,2.54,496,0.502,0.32
 B,validacao_cruzada,Regra simples,270,0.793,2.0,2.397,545,0.415,0.424
 B,validacao_final,Modelo: alerta de vermelho,44,0.773,3.0,3.265,87,0.483,0.398
 B,validacao_final,Regra simples,44,0.864,3.0,2.711,105,0.371,0.584
+C,validacao_cruzada,Modelo: alerta de vermelho,905,0.035,2.0,2.188,57,0.561,0.033
+C,validacao_cruzada,Regra simples,905,0.361,2.0,2.456,1113,0.305,1.026
+C,validacao_final,Modelo: alerta de vermelho,140,0.029,1.5,1.5,8,0.5,0.035
+C,validacao_final,Regra simples,140,0.364,3.0,2.725,149,0.349,0.859

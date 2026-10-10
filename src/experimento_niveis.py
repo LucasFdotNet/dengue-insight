@@ -1,19 +1,21 @@
 """
-Experimento: previsão de três níveis (verde, amarelo, vermelho) e comparação de duas definições.
+Experimento: previsão de três níveis (verde, amarelo, vermelho) e comparação de definições.
 
 Definições (src/estados.VARIANTES_NIVEIS), com limiares por município calculados só com os
 anos anteriores:
   A: amarelo a partir do percentil 75, vermelho a partir do 90;
-  B: amarelo do percentil 80 ao 97 (faixa em torno do 90), vermelho a partir do 97.
+  B: amarelo do percentil 80 ao 97 (faixa em torno do 90), vermelho a partir do 97;
+  C: canal endêmico do Ministério da Saúde: amarelo acima da mediana e vermelho acima do Q3 dos
+     casos da mesma semana epidemiológica nos 5 anos anteriores.
 
 Previsões: como em experimento_estados.py (walk-forward com retreino trimestral desde 2015,
 validação cruzada por município e validação final), com o modelo de src/modelos/nivel_lightgbm.py.
 
-Nível previsto para S+H: vermelho se a probabilidade de vermelho passa do corte do vermelho;
-senão, amarelo se a probabilidade de amarelo ou vermelho passa do corte do amarelo; senão,
-verde. Cada corte é o menor em que, no passado, pelo menos metade das previsões daquele nível
-(ou acima) se confirmou; escolhido a cada trimestre e antecedência, só com as previsões
-anteriores dos municípios de treino. Comparação: persistência (o nível de S se mantém em S+H).
+Nível previsto para S+H: o mais provável. (Testada e descartada: escolher vermelho quando a
+probabilidade de vermelho passa de um corte em que, no passado, pelo menos metade das previsões
+de vermelho se confirmou; semana a semana, prevê vermelho demais e perde para a persistência.)
+Alerta de mobilização: entrada no vermelho, com o corte calibrado por alarme, como em
+experimento_estados.py. Comparação: persistência (o nível de S se mantém em S+H).
 
 Métricas por semana (2019 em diante): acerto, acerto balanceado, acerto nas semanas em que o
 nível muda entre S e S+H, vermelho detectado, previsões de vermelho corretas, epidemias
@@ -22,10 +24,11 @@ Métricas por episódio do vermelho (mobilização): como em experimento_estados
 
 Saídas:
   reports/niveis_semanas.csv, reports/niveis_episodios.csv, reports/niveis_cortes.csv
-  reports/figures/niveis/*.png (comparação das definições e quadradinhos por município)
+  reports/figures/niveis/quadradinhos_*.png (e, com --resumo, a comparação das definições A e B)
 
 Uso:
-  python -m src.experimento_niveis
+  python -m src.experimento_niveis              previsões, métricas e quadradinhos
+  python -m src.experimento_niveis --resumo     também os gráficos de comparação de A e B
 """
 import functools
 import logging
@@ -42,7 +45,7 @@ from threadpoolctl import threadpool_limits  # noqa: E402
 
 from src import experimento_estados as ee  # noqa: E402
 from src.cidades import CIDADES, cidades_por_papel  # noqa: E402
-from src.estados import NOMES_NIVEIS, VARIANTES_NIVEIS, adicionar_niveis  # noqa: E402
+from src.estados import DESCRICAO_VARIANTES, VARIANTES_NIVEIS, adicionar_niveis  # noqa: E402
 from src.experimento_generalizacao import grupos_de_municipios  # noqa: E402
 from src.modelos.nivel_lightgbm import NivelLightGBM  # noqa: E402
 from src.snapshot import id_dados_processados  # noqa: E402
@@ -62,7 +65,7 @@ ARQUIVO_SEMANAS = 'reports/niveis_semanas.csv'
 ARQUIVO_EPISODIOS = 'reports/niveis_episodios.csv'
 ARQUIVO_CORTES = 'reports/niveis_cortes.csv'
 # Exemplos para os quadradinhos: um município de treino e um de validação, com epidemias recentes
-EXEMPLOS = [('campinas', '2023-07-01', '2025-07-01'), ('sorocaba', '2023-07-01', '2025-07-01')]
+EXEMPLOS = [(c, '2023-07-01', '2025-07-01') for c in ('campinas', 'sorocaba', 'fortaleza', 'blumenau')]
 
 # Cores (paleta de status do guia de visualização; sempre com legenda em texto)
 COR_NIVEL = {0: '#0ca30c', 1: '#fab219', 2: '#d03b3b'}
@@ -295,7 +298,7 @@ def grafico_quadradinhos(t, alertas, variante, cidade, inicio, fim):
     real = base[(base['cidade'] == cidade) & (base['data_iniSE'] >= inicio) & (base['data_iniSE'] < fim)]
     semanas = sorted(real['data_iniSE'])
     pos = {d: i for i, d in enumerate(semanas)}
-    fig, ax = plt.subplots(figsize=(14, 4.3), facecolor=FUNDO)
+    fig, ax = plt.subplots(figsize=(14, 4.9), facecolor=FUNDO)
     ax.set_facecolor(FUNDO)
     linhas = ['Aconteceu', 'Alerta de vermelho'] + [f'Previsto {h} sem. antes' for h in HORIZONTES]
     for _, r in real.iterrows():
@@ -329,10 +332,10 @@ def grafico_quadradinhos(t, alertas, variante, cidade, inicio, fim):
         lado.set_visible(False)
     nome = CIDADES[cidade]['nome']
     papel = 'validação' if cidade in cidades_por_papel('validacao') else 'treino'
-    p_am, p_ve = VARIANTES_NIVEIS[variante]
-    ax.set_title(f'{nome} ({papel}) · definição {variante}: amarelo ≥ p{round(p_am * 100)}, '
-                 f'vermelho ≥ p{round(p_ve * 100)} · cada quadrado é uma semana; previsões = nível mais provável',
-                 loc='left', fontsize=11, color=TINTA)
+    ax.set_title(f'{nome} ({papel}) · definição {variante} ({DESCRICAO_VARIANTES[variante]})\n'
+                 'Cada coluna é uma semana. Nas linhas "Previsto x sem. antes", o quadrado mostra o nível mais provável '
+                 'previsto x semanas antes para aquela semana;\no alerta de vermelho aparece na semana em que foi emitido.',
+                 loc='left', fontsize=10, color=TINTA)
     legenda = [plt.Rectangle((0, 0), 1, 1, color=COR_NIVEL[k]) for k in range(3)]
     rotulos = ['verde: normal', 'amarelo: elevado', 'vermelho: epidêmico']
     legenda += [plt.Line2D([], [], marker='$•$', color=TINTA, linestyle='', markersize=7),
@@ -351,7 +354,7 @@ def grafico_quadradinhos(t, alertas, variante, cidade, inicio, fim):
 
 # --------------------------------------------------------------- execução
 
-def run_experimento(processos=PROCESSOS):
+def run_experimento(processos=PROCESSOS, resumo=False):
     id_ = id_dados_processados()
     fim = dados('A')[0]['data_iniSE'].max().to_period('M').strftime('%Y-%m')
     unidades = rodar_previsoes(id_, fim, processos)
@@ -380,8 +383,9 @@ def run_experimento(processos=PROCESSOS):
     semanas.round(3).to_csv(ARQUIVO_SEMANAS, index=False)
     pd.DataFrame(episodios_).round(3).to_csv(ARQUIVO_EPISODIOS, index=False)
     pd.concat(cortes_todos).to_csv(ARQUIVO_CORTES, index=False)
-    logging.info(f"Figura: {grafico_comparacao(semanas)}")
-    logging.info(f"Figura: {grafico_alertas(pd.DataFrame(episodios_))}")
+    if resumo:  # gráficos de comparação das definições A e B (python -m src.experimento_niveis --resumo)
+        logging.info(f"Figura: {grafico_comparacao(semanas[semanas['variante'].isin(['A', 'B'])])}")
+        logging.info(f"Figura: {grafico_alertas(pd.DataFrame(episodios_).query('variante in [\"A\", \"B\"]'))}")
     pd.set_option('display.width', 250)
     print(semanas[semanas['conjunto'] == 'validacao_cruzada'].round(3).to_string(index=False))
     print(pd.DataFrame(episodios_).round(3).to_string(index=False))
@@ -390,4 +394,4 @@ def run_experimento(processos=PROCESSOS):
 if __name__ == "__main__":
     n = int(sys.argv[sys.argv.index('--processos') + 1]) if '--processos' in sys.argv else PROCESSOS
     from src import experimento_niveis
-    experimento_niveis.run_experimento(n)
+    experimento_niveis.run_experimento(n, resumo='--resumo' in sys.argv)
