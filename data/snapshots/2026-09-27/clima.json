@@ -1,0 +1,696 @@
+{
+ "fonte": "clima",
+ "coleta": "2026-09-27T12:44:09",
+ "municipios": {
+  "campinas": {
+   "linhas": 872,
+   "primeira_semana": "2010-01-03",
+   "ultima_semana": "2026-09-13",
+   "sha256": "812ea277dbdb729b26b50b76b593a03d7739ab4b9591a215b1fe19a016511074"
+  },
+  "cosmopolis": {
+   "linhas": 872,
+   "primeira_semana": "2010-01-03",
+   "ultima_semana": "2026-09-13",
+   "sha256": "f14637387b9620424ea6dc12053200fb6b17b8cbec6c7bf948659bb3d6c8eb0c"
+  },
+  "limeira": {
+   "linhas": 872,
+   "primeira_semana": "2010-01-03",
+   "ultima_semana": "2026-09-13",
+   "sha256": "cba902cf46b08588c657d5ebec526f09188039e25cd009c8a1ae12bff020ac0c"
+  },
+  "piracicaba": {
+   "linhas": 872,
+   "primeira_semana": "2010-01-03",
+   "ultima_semana": "2026-09-13",
+   "sha256": "167f821e9008ad3631f6a48c2f462d9aab8ba6315240008628875f1d3c16c5f2"
+  },
+  "rio_claro": {
+   "linhas": 872,
+   "primeira_semana": "2010-01-03",
+   "ultima_semana": "2026-09-13",
+   "sha256": "0e802825c3ab393120febc319ae476727c772aebafeba408b5501f1b86aafebc"
+  },
+  "americana": {
+   "linhas": 872,
+   "primeira_semana": "2010-01-03",
+   "ultima_semana": "2026-09-13",
+   "sha256": "7c3f87ac3848a8dc5f11f1d698897487a7c8e3f5b110026d131b9365a6d304d4"
+  },
+  "sumare": {
+   "linhas": 872,
+   "primeira_semana": "2010-01-03",
+   "ultima_semana": "2026-09-13",
+   "sha256": "2b4c0bd9e9acc3d882cab5d2f33e755afa4786207af9c8fa3e923aaf52345492"
+  },
+  "hortolandia": {
+   "linhas": 872,
+   "primeira_semana": "2010-01-03",
+   "ultima_semana": "2026-09-13",
+   "sha256": "fe0e4d2b9597f6cc90ffd7c683e8f766a39ebf95a308f5327ce4564c2d4c9f8a"
+  },
+  "indaiatuba": {
+   "linhas": 872,
+   "primeira_semana": "2010-01-03",
+   "ultima_semana": "2026-09-13",
+   "sha256": "a2887f51d1a9b6d222481a3420c2442ac7428be7171e84278c22d88a2ba430bd"
+  },
+  "santa_barbara": {
+   "linhas": 872,
+   "primeira_semana": "2010-01-03",
+   "ultima_semana": "2026-09-13",
+   "sha256": "8d02fc89c9f70d331ae3c614c1838e64fc126183ea0999bc98ebbc4d965aaa95"
+  },
+  "paulinia": {
+   "linhas": 872,
+   "primeira_semana": "2010-01-03",
+   "ultima_semana": "2026-09-13",
+   "sha256": "6d139a06b2dc610d9f06f675a82c8a68b16124045b5cccf2d403ce60100e9c5f"
+  },
+  "valinhos": {
+   "linhas": 872,
+   "primeira_semana": "2010-01-03",
+   "ultima_semana": "2026-09-13",
+   "sha256": "f1963d612a6e94f68e579d6be13d1abce2540ccd8dc1bb47616ae0d58c7b87fd"
+  },
+  "araras": {
+   "linhas": 872,
+   "primeira_semana": "2010-01-03",
+   "ultima_semana": "2026-09-13",
+   "sha256": "244b0ee13b767b76b16279f62aa15460d2edf1c6cfbc1a1efcb6d37a90823867"
+  },
+  "brasilia": {
+   "linhas": 872,
+   "primeira_semana": "2010-01-03",
+   "ultima_semana": "2026-09-13",
+   "sha256": "4cf829cc0a254ada10eac34b97ad90458834763f4eb87dd0462890c59d307f18"
+  },
+  "goiania": {
+   "linhas": 872,
+   "primeira_semana": "2010-01-03",
+   "ultima_semana": "2026-09-13",
+   "sha256": "4777f56f3069a60354300aacddf7bd0c60bd5c141494a176ba93391367e2389f"
+  },
+  "campo_grande": {
+   "linhas": 872,
+   "primeira_semana": "2010-01-03",
+   "ultima_semana": "2026-09-13",
+   "sha256": "d532c18cca5e93606682ac79f77702022348f06b3fe6663215f39ee06f9189f8"
+  },
+  "cuiaba": {
+   "linhas": 872,
+   "primeira_semana": "2010-01-03",
+   "ultima_semana": "2026-09-13",
+   "sha256": "2f8c968bef9f41fd92509643c2cfce35dee9e56908e57622720e398c14af7052"
+  },
+  "maceio": {
+   "linhas": 872,
+   "primeira_semana": "2010-01-03",
+   "ultima_semana": "2026-09-13",
+   "sha256": "769c6a9aaf0767455d5c1d2de25c3ca478babde5d8a13ac891d41895dd3ce9be"
+  },
+  "salvador": {
+   "linhas": 872,
+   "primeira_semana": "2010-01-03",
+   "ultima_semana": "2026-09-13",
+   "sha256": "bc4e007e22fdad776693438201abbc5ff7ccc443e934c51fef585a13c28edca5"
+  },
+  "fortaleza": {
+   "linhas": 872,
+   "primeira_semana": "2010-01-03",
+   "ultima_semana": "2026-09-13",
+   "sha256": "078658ea2dd660f6f19b4caeb141bd472d82a5c68a4980b158170405d630482e"
+  },
+  "sao_luis": {
+   "linhas": 872,
+   "primeira_semana": "2010-01-03",
+   "ultima_semana": "2026-09-13",
+   "sha256": "1e4dfb75a954d65e170ce9ecfe8dbe72e73aebe6d4bc1d432f1ceb91af60dd8b"
+  },
+  "joao_pessoa": {
+   "linhas": 872,
+   "primeira_semana": "2010-01-03",
+   "ultima_semana": "2026-09-13",
+   "sha256": "2256ecc27554992a2b60ac5f40590d27c1861c650e5ea4c493ebc401f2c1fb3f"
+  },
+  "recife": {
+   "linhas": 872,
+   "primeira_semana": "2010-01-03",
+   "ultima_semana": "2026-09-13",
+   "sha256": "38d21cfe8849b474d5a3147b0f0fe32980897d2dcb70f850bda9dcc86d2a97ee"
+  },
+  "teresina": {
+   "linhas": 872,
+   "primeira_semana": "2010-01-03",
+   "ultima_semana": "2026-09-13",
+   "sha256": "20224d468505785780c7ed3bc751bc5cc9c10c76ed0e8b91da2a4d2c6c555c87"
+  },
+  "natal": {
+   "linhas": 872,
+   "primeira_semana": "2010-01-03",
+   "ultima_semana": "2026-09-13",
+   "sha256": "23d742dc4341da3b3f3fa71a3083af65de44b28d6c40741912f4161048da5eb9"
+  },
+  "aracaju": {
+   "linhas": 872,
+   "primeira_semana": "2010-01-03",
+   "ultima_semana": "2026-09-13",
+   "sha256": "3dde1f992283317c052bd6929ffd9bcbcb9a681e54fe8154cb1722bf811bc99b"
+  },
+  "rio_branco": {
+   "linhas": 872,
+   "primeira_semana": "2010-01-03",
+   "ultima_semana": "2026-09-13",
+   "sha256": "91e4b92a38f1a75f96b286eff791f0c55cff7eee483ef4d9b2d595cc9e5833f5"
+  },
+  "manaus": {
+   "linhas": 872,
+   "primeira_semana": "2010-01-03",
+   "ultima_semana": "2026-09-13",
+   "sha256": "8497ade17c604fdbe54144cea01f52a61efed49edfb658eee249bebdff358c17"
+  },
+  "macapa": {
+   "linhas": 872,
+   "primeira_semana": "2010-01-03",
+   "ultima_semana": "2026-09-13",
+   "sha256": "a975dc5470730a1b18e55d9fa5244903b9f0eb16bd95f0d66bc7c1e28c6f422a"
+  },
+  "belem": {
+   "linhas": 872,
+   "primeira_semana": "2010-01-03",
+   "ultima_semana": "2026-09-13",
+   "sha256": "eb3b83e489875512c5fd131c46f3f9f991586c0e80c33d0b9ca3cee6e079d427"
+  },
+  "porto_velho": {
+   "linhas": 872,
+   "primeira_semana": "2010-01-03",
+   "ultima_semana": "2026-09-13",
+   "sha256": "efd17644add52defc620f4ae333aaeb4d75e7665c718e6bc87824dd51cadbd8d"
+  },
+  "boa_vista": {
+   "linhas": 872,
+   "primeira_semana": "2010-01-03",
+   "ultima_semana": "2026-09-13",
+   "sha256": "a33c1dfdb940b68d136b09572cdb6e9f1e46d1013f9e3c4f529069770cb30f26"
+  },
+  "palmas": {
+   "linhas": 872,
+   "primeira_semana": "2010-01-03",
+   "ultima_semana": "2026-09-13",
+   "sha256": "4a9629e2528ce8c45f12df51e1a0086472409b528627d9d65a295a6a9f6c9744"
+  },
+  "vitoria": {
+   "linhas": 872,
+   "primeira_semana": "2010-01-03",
+   "ultima_semana": "2026-09-13",
+   "sha256": "c24e4e7a50c7c629a35c96ccfa5c5c674c2f85926f1d4e13b24bb462632c3135"
+  },
+  "belo_horizonte": {
+   "linhas": 872,
+   "primeira_semana": "2010-01-03",
+   "ultima_semana": "2026-09-13",
+   "sha256": "3759bfff357e898d7010008f471865fbafb2f581421a5d0b60a3fdfdacf38de7"
+  },
+  "rio_de_janeiro": {
+   "linhas": 872,
+   "primeira_semana": "2010-01-03",
+   "ultima_semana": "2026-09-13",
+   "sha256": "a1b6f8f3c8af575029bcc98b4ef8d730a6d599aa79e89494dfa21258b134c28d"
+  },
+  "curitiba": {
+   "linhas": 872,
+   "primeira_semana": "2010-01-03",
+   "ultima_semana": "2026-09-13",
+   "sha256": "e727f921b2a4a92a3cdc422aa9e07197af03419c53dce5952da84f3806b95ff3"
+  },
+  "porto_alegre": {
+   "linhas": 872,
+   "primeira_semana": "2010-01-03",
+   "ultima_semana": "2026-09-13",
+   "sha256": "0112ef34f5a95326c4e429b40a6ac88d43e1b35a28f37e8768cf7d79865d6eff"
+  },
+  "florianopolis": {
+   "linhas": 872,
+   "primeira_semana": "2010-01-03",
+   "ultima_semana": "2026-09-13",
+   "sha256": "b0d02797df1cf741e7bd5cb7b2ce09ea9e342b7d72aaa03db85c9c86018e3695"
+  },
+  "anapolis": {
+   "linhas": 872,
+   "primeira_semana": "2010-01-03",
+   "ultima_semana": "2026-09-13",
+   "sha256": "8f62f1b03b159e8782be34082ec1f4981a504c8b19a544dfecba066eac380c6e"
+  },
+  "dourados": {
+   "linhas": 872,
+   "primeira_semana": "2010-01-03",
+   "ultima_semana": "2026-09-13",
+   "sha256": "db4d0e4aea89195eaf3795f809d4a1787d674ad4ecc0cb58813ec01cfd5d42f1"
+  },
+  "rondonopolis": {
+   "linhas": 872,
+   "primeira_semana": "2010-01-03",
+   "ultima_semana": "2026-09-13",
+   "sha256": "86ea1771cb32afed9f8cb4c8eee3da6fa521fc3a6fc088bc49bf4d8e7803692f"
+  },
+  "arapiraca": {
+   "linhas": 872,
+   "primeira_semana": "2010-01-03",
+   "ultima_semana": "2026-09-13",
+   "sha256": "ecc7bdfc4e0e14e0d77908cf2d8c5b934fece4da2032f0cf056ddabde505aef6"
+  },
+  "feira_de_santana": {
+   "linhas": 872,
+   "primeira_semana": "2010-01-03",
+   "ultima_semana": "2026-09-13",
+   "sha256": "2736c509587be9b8083b990776b40abeb40b135fa509a62f57aa374bd048ce35"
+  },
+  "juazeiro_do_norte": {
+   "linhas": 872,
+   "primeira_semana": "2010-01-03",
+   "ultima_semana": "2026-09-13",
+   "sha256": "261661a0a3a15a7ad1b96349be6216c9570f05ad91a898f4d56f12068f2c0706"
+  },
+  "imperatriz": {
+   "linhas": 872,
+   "primeira_semana": "2010-01-03",
+   "ultima_semana": "2026-09-13",
+   "sha256": "1793090242c35323762746bb7575121ef6072353a7ff72c38668d8e978f35e23"
+  },
+  "campina_grande": {
+   "linhas": 872,
+   "primeira_semana": "2010-01-03",
+   "ultima_semana": "2026-09-13",
+   "sha256": "8852f394872cc3c24c1b075afa15eaf237fb9fe15103957d6ddbac3a406c811a"
+  },
+  "petrolina": {
+   "linhas": 872,
+   "primeira_semana": "2010-01-03",
+   "ultima_semana": "2026-09-13",
+   "sha256": "5da254efc7c0ebf73953c61103522a43c0bcb2eabef4412711e5de421046e9c7"
+  },
+  "parnaiba": {
+   "linhas": 872,
+   "primeira_semana": "2010-01-03",
+   "ultima_semana": "2026-09-13",
+   "sha256": "98f532c8e314bcdfe64a4aef3669c62b5cab40ac98e6a74b11848ec47b8c8613"
+  },
+  "mossoro": {
+   "linhas": 872,
+   "primeira_semana": "2010-01-03",
+   "ultima_semana": "2026-09-13",
+   "sha256": "b0cee75614f36bb69812ab2e58150ab6dce29b68b52404cd2b7de92f5c290526"
+  },
+  "lagarto": {
+   "linhas": 872,
+   "primeira_semana": "2010-01-03",
+   "ultima_semana": "2026-09-13",
+   "sha256": "a2937fd156ffe608328f5474b5ce9bd7d0b9ab010a0ff4b9c3ca52325e5ec254"
+  },
+  "itacoatiara": {
+   "linhas": 872,
+   "primeira_semana": "2010-01-03",
+   "ultima_semana": "2026-09-13",
+   "sha256": "4697a9a3ec2ce5e8b18e406a2ec6a8d61913bfc8b115afd5d704daed89629b67"
+  },
+  "santarem": {
+   "linhas": 872,
+   "primeira_semana": "2010-01-03",
+   "ultima_semana": "2026-09-13",
+   "sha256": "8f558a7662ae49bdfe0be34d022248e67078ed9c99f89ede25fddf38257190d5"
+  },
+  "ji_parana": {
+   "linhas": 872,
+   "primeira_semana": "2010-01-03",
+   "ultima_semana": "2026-09-13",
+   "sha256": "59d81c496708f637a978127667b97cc2ebdd525f71fdf62ab413f7e3940ee2ae"
+  },
+  "araguaina": {
+   "linhas": 872,
+   "primeira_semana": "2010-01-03",
+   "ultima_semana": "2026-09-13",
+   "sha256": "ae3073a459efa6ff1088d6db2db19dc40469fb1136fc877a1f0a3eb580a01c36"
+  },
+  "cachoeiro_de_itapemirim": {
+   "linhas": 872,
+   "primeira_semana": "2010-01-03",
+   "ultima_semana": "2026-09-13",
+   "sha256": "612e774c6edb349e950f0ba6ca3405394e39bf01db837ce84739038be815e436"
+  },
+  "uberlandia": {
+   "linhas": 872,
+   "primeira_semana": "2010-01-03",
+   "ultima_semana": "2026-09-13",
+   "sha256": "0b6c1623e9f1a48b22c367d47b3410315105b0535b35fa19dcae3a21196aca2e"
+  },
+  "campos_dos_goytacazes": {
+   "linhas": 872,
+   "primeira_semana": "2010-01-03",
+   "ultima_semana": "2026-09-13",
+   "sha256": "263b968ca19de9b9c0b30bfbd3b2f3eeffd75e0bb8ce063f85de042571a611a8"
+  },
+  "londrina": {
+   "linhas": 872,
+   "primeira_semana": "2010-01-03",
+   "ultima_semana": "2026-09-13",
+   "sha256": "f9694e862536ec76bc904913e52679e7e4af9471b20508e29d376b60fe5d5b99"
+  },
+  "caxias_do_sul": {
+   "linhas": 872,
+   "primeira_semana": "2010-01-03",
+   "ultima_semana": "2026-09-13",
+   "sha256": "bc96cc317dd3e9de1b7fb062a77afa52de00f10cb6e8fbd9ef1754fc2c825418"
+  },
+  "joinville": {
+   "linhas": 872,
+   "primeira_semana": "2010-01-03",
+   "ultima_semana": "2026-09-13",
+   "sha256": "25114d9e6dedc25f0605d65ffc1c180cd22902067533f6f575eec0338248e0e2"
+  },
+  "juiz_de_fora": {
+   "linhas": 872,
+   "primeira_semana": "2010-01-03",
+   "ultima_semana": "2026-09-13",
+   "sha256": "617705d201e105ac8d765390c9ae3e8096d1ba788e7b61ee19f60ac88412fdc8"
+  },
+  "montes_claros": {
+   "linhas": 872,
+   "primeira_semana": "2010-01-03",
+   "ultima_semana": "2026-09-13",
+   "sha256": "74231b79b92b15db1cf5325b36f98d3be20d60e1534a6beace6b939a7b6d1792"
+  },
+  "itabuna": {
+   "linhas": 872,
+   "primeira_semana": "2010-01-03",
+   "ultima_semana": "2026-09-13",
+   "sha256": "2e130140c65f5bc4ad51ad5612834079a6bb8afb2ee83efbe17101fa17a130a6"
+  },
+  "luis_eduardo_magalhaes": {
+   "linhas": 872,
+   "primeira_semana": "2010-01-03",
+   "ultima_semana": "2026-09-13",
+   "sha256": "976f060c5a7b85bb77b7d43f5103043e9778cb2bb273680bbc38507d39721952"
+  },
+  "teixeira_de_freitas": {
+   "linhas": 872,
+   "primeira_semana": "2010-01-03",
+   "ultima_semana": "2026-09-13",
+   "sha256": "41fe22195eba0315b759f76b18aacc6c582c8cdbb49d96f24c6790debcd2bc88"
+  },
+  "barreiras": {
+   "linhas": 872,
+   "primeira_semana": "2010-01-03",
+   "ultima_semana": "2026-09-13",
+   "sha256": "429eabb418593538f646f7b07f73cfebd74c9021e7f2b4d821b0c6f0edfae6ba"
+  },
+  "sobral": {
+   "linhas": 872,
+   "primeira_semana": "2010-01-03",
+   "ultima_semana": "2026-09-13",
+   "sha256": "ce45d287c198a607ad7d9601d6acf6c4c8299df0e7c630384aecae2fec36b71c"
+  },
+  "itapipoca": {
+   "linhas": 872,
+   "primeira_semana": "2010-01-03",
+   "ultima_semana": "2026-09-13",
+   "sha256": "cca350d886bf4264b573b9d36d3c6135909b6e3c4860f34c8ad8e8ab51f1eaff"
+  },
+  "jatai": {
+   "linhas": 872,
+   "primeira_semana": "2010-01-03",
+   "ultima_semana": "2026-09-13",
+   "sha256": "5b17d4e5a14974a275b0ffebe9caa7a9381600d7384fa54217adf6a09961d2f0"
+  },
+  "balsas": {
+   "linhas": 872,
+   "primeira_semana": "2010-01-03",
+   "ultima_semana": "2026-09-13",
+   "sha256": "cdbd77d476483df605fc87381baf6abba080a73ae5b9495265eeb6d419eaf91a"
+  },
+  "varginha": {
+   "linhas": 872,
+   "primeira_semana": "2010-01-03",
+   "ultima_semana": "2026-09-13",
+   "sha256": "84e8e66bcebf3d74452b29d84766244fab587ad5d333ac0e55a458288e1080ec"
+  },
+  "itabira": {
+   "linhas": 872,
+   "primeira_semana": "2010-01-03",
+   "ultima_semana": "2026-09-13",
+   "sha256": "c9b0825968130f564139773e631221ee68c96d4b2a89bc841507fb6ed2e0c98c"
+  },
+  "passos": {
+   "linhas": 872,
+   "primeira_semana": "2010-01-03",
+   "ultima_semana": "2026-09-13",
+   "sha256": "391d0507959f0db9ae0216a587052717f3fc7cdc50b7f421f41b36ae57bb3a28"
+  },
+  "conselheiro_lafaiete": {
+   "linhas": 872,
+   "primeira_semana": "2010-01-03",
+   "ultima_semana": "2026-09-13",
+   "sha256": "07da7d3e29eb7f81278ae7d40d9f45ff27860f5a93e3f067c3ea0bca691deb1b"
+  },
+  "araxa": {
+   "linhas": 872,
+   "primeira_semana": "2010-01-03",
+   "ultima_semana": "2026-09-13",
+   "sha256": "52daff73db051a838bfad2b5a680e7ee84c02cd13965dc3750c2696c9551abf3"
+  },
+  "patos_de_minas": {
+   "linhas": 872,
+   "primeira_semana": "2010-01-03",
+   "ultima_semana": "2026-09-13",
+   "sha256": "f2279f7e47d0f374fca1868ec9be6774d73601775a682bd08a1d7793544e0fec"
+  },
+  "altamira": {
+   "linhas": 872,
+   "primeira_semana": "2010-01-03",
+   "ultima_semana": "2026-09-13",
+   "sha256": "0540884f751c45cc83c4adce53beea945d5b3081d6c491718021cd98a36dc1d2"
+  },
+  "itaituba": {
+   "linhas": 872,
+   "primeira_semana": "2010-01-03",
+   "ultima_semana": "2026-09-13",
+   "sha256": "ec38d7f41dd763dec99302cadaef527e29bc9a44370b88a0670b4398bf4ab534"
+  },
+  "garanhuns": {
+   "linhas": 872,
+   "primeira_semana": "2010-01-03",
+   "ultima_semana": "2026-09-13",
+   "sha256": "52d4572a1977a935930a5ec8795c28412e5ca13f613dd6c64ff47de586ac1807"
+  },
+  "foz_do_iguacu": {
+   "linhas": 872,
+   "primeira_semana": "2010-01-03",
+   "ultima_semana": "2026-09-13",
+   "sha256": "eca1fa6d0165c9f77d28018046b120a409827544e8e6d9cbc6f5a0c7c96f7679"
+  },
+  "umuarama": {
+   "linhas": 872,
+   "primeira_semana": "2010-01-03",
+   "ultima_semana": "2026-09-13",
+   "sha256": "59e58523545f08c86eebcd450060234d3cebd87e7703e6cacd69f3ccd51eeb69"
+  },
+  "cascavel": {
+   "linhas": 872,
+   "primeira_semana": "2010-01-03",
+   "ultima_semana": "2026-09-13",
+   "sha256": "1662c36eaa4ecfecbae10a70ed7491cb30f0fc8136dd0875a2d188b71b67adfb"
+  },
+  "resende": {
+   "linhas": 872,
+   "primeira_semana": "2010-01-03",
+   "ultima_semana": "2026-09-13",
+   "sha256": "4fccafc984c40e0d611953b48281b16a8cdce3879ec0b8b3d4ea07ce5e3d24fd"
+  },
+  "angra_dos_reis": {
+   "linhas": 872,
+   "primeira_semana": "2010-01-03",
+   "ultima_semana": "2026-09-13",
+   "sha256": "5303a0a489656d0f2a940c5af9e7ec0627a33f05a625e3265f7e8ba1c9889644"
+  },
+  "itaperuna": {
+   "linhas": 872,
+   "primeira_semana": "2010-01-03",
+   "ultima_semana": "2026-09-13",
+   "sha256": "9bfa11d3aee01d27231850af7bf9d72f174aaaf93127a9c193b365adf172f3b3"
+  },
+  "nova_friburgo": {
+   "linhas": 872,
+   "primeira_semana": "2010-01-03",
+   "ultima_semana": "2026-09-13",
+   "sha256": "08be7fdfc4ba78577239e5c457bc73981f70dd08922ef80cd415ef10b5c70cda"
+  },
+  "rio_das_ostras": {
+   "linhas": 872,
+   "primeira_semana": "2010-01-03",
+   "ultima_semana": "2026-09-13",
+   "sha256": "a40df9c43868151393748f7443dc0853f29a0428d26995e1c97028ab059c1075"
+  },
+  "santa_cruz_do_sul": {
+   "linhas": 872,
+   "primeira_semana": "2010-01-03",
+   "ultima_semana": "2026-09-13",
+   "sha256": "ca0e7ec6c9b9da2a0c1dc9559e88e913f64d1b4c8151dd8532416b2a2580b170"
+  },
+  "erechim": {
+   "linhas": 872,
+   "primeira_semana": "2010-01-03",
+   "ultima_semana": "2026-09-13",
+   "sha256": "b5d396da3400e77b46cb0fea74001b1fa7cb90d85613eb81e32b27bb69750f05"
+  },
+  "santa_maria": {
+   "linhas": 872,
+   "primeira_semana": "2010-01-03",
+   "ultima_semana": "2026-09-13",
+   "sha256": "59406ec3349463d8e551b7e1309eba66d7aaf798f79b878b47bb3bfe745d5dcc"
+  },
+  "chapeco": {
+   "linhas": 872,
+   "primeira_semana": "2010-01-03",
+   "ultima_semana": "2026-09-13",
+   "sha256": "43dbf246b3091886db2f50619ee9f3eedad0386c8943ce79c4c52947a73fc486"
+  },
+  "caraguatatuba": {
+   "linhas": 872,
+   "primeira_semana": "2010-01-03",
+   "ultima_semana": "2026-09-13",
+   "sha256": "5d34c030f5de0036bf134f72290268e0788e2a482fc621c34b345dee70b11c45"
+  },
+  "catanduva": {
+   "linhas": 872,
+   "primeira_semana": "2010-01-03",
+   "ultima_semana": "2026-09-13",
+   "sha256": "a60bb2c61f4ce6e0669e40238fd288dfc41c27eb3f7eaf585f9e57b85e14d130"
+  },
+  "aracatuba": {
+   "linhas": 872,
+   "primeira_semana": "2010-01-03",
+   "ultima_semana": "2026-09-13",
+   "sha256": "e821d9f83bb96d09bab42428e5e439bc54825a3ada79a659f9821f15fcfb882a"
+  },
+  "marilia": {
+   "linhas": 872,
+   "primeira_semana": "2010-01-03",
+   "ultima_semana": "2026-09-13",
+   "sha256": "c5700aa8da4cc96bbf7a8d6b17e4e9e135c199c7ae147d6865cffb283f12e297"
+  },
+  "araraquara": {
+   "linhas": 872,
+   "primeira_semana": "2010-01-03",
+   "ultima_semana": "2026-09-13",
+   "sha256": "93144010acfc1818c1838495fa4477ffd4d3012cbdf313cd4354778d90bfac45"
+  },
+  "barretos": {
+   "linhas": 872,
+   "primeira_semana": "2010-01-03",
+   "ultima_semana": "2026-09-13",
+   "sha256": "4410bb9d24afa2db7539f094cf447303a7a6f376a7d10172ddecf333132ac163"
+  },
+  "sao_jose_dos_campos": {
+   "linhas": 872,
+   "primeira_semana": "2010-01-03",
+   "ultima_semana": "2026-09-13",
+   "sha256": "858dc9e2f99573e1c7b0d33a22263f6710e1558d9b307e11425925f78da15d26"
+  },
+  "assis": {
+   "linhas": 872,
+   "primeira_semana": "2010-01-03",
+   "ultima_semana": "2026-09-13",
+   "sha256": "16d2cd539bc9657589f0e6445021f6dca74f99759c6c0a0e9c81fd1664296dc1"
+  },
+  "sao_jose_rio_preto": {
+   "linhas": 872,
+   "primeira_semana": "2010-01-03",
+   "ultima_semana": "2026-09-13",
+   "sha256": "44f6b98f9c2af495dc6586332bed0095ba961ada08f92854072d3aa15abb9779"
+  },
+  "ribeirao_preto": {
+   "linhas": 872,
+   "primeira_semana": "2010-01-03",
+   "ultima_semana": "2026-09-13",
+   "sha256": "ba97c7c025e39236aa46660d875f7ce0348c18d38cdd141de5082d4a33b73a22"
+  },
+  "sorocaba": {
+   "linhas": 872,
+   "primeira_semana": "2010-01-03",
+   "ultima_semana": "2026-09-13",
+   "sha256": "3bb524cd3f693af5dd08419e099f01066c5dc03c5d5f59595622bad2dd73c862"
+  },
+  "presidente_prudente": {
+   "linhas": 872,
+   "primeira_semana": "2010-01-03",
+   "ultima_semana": "2026-09-13",
+   "sha256": "a1bf41b73b218ab57e5af6b0e1aa5bac1239b1e5c4f009311178ad3efa0cd71a"
+  },
+  "bauru": {
+   "linhas": 872,
+   "primeira_semana": "2010-01-03",
+   "ultima_semana": "2026-09-13",
+   "sha256": "028a746a2fd0e1c88ced9160f0aba944f061bb16f254cdce1fba71fd29adfd0d"
+  },
+  "santos": {
+   "linhas": 872,
+   "primeira_semana": "2010-01-03",
+   "ultima_semana": "2026-09-13",
+   "sha256": "bd5126a9029469805c6c544ccf81c49639eeee9ae491330a8f60faccef6a2520"
+  },
+  "rio_verde": {
+   "linhas": 872,
+   "primeira_semana": "2010-01-03",
+   "ultima_semana": "2026-09-13",
+   "sha256": "7f5064547c64b5468d10837f58f777c11805d8033863dc2ffd0b4df932ac2843"
+  },
+  "caruaru": {
+   "linhas": 872,
+   "primeira_semana": "2010-01-03",
+   "ultima_semana": "2026-09-13",
+   "sha256": "5d88438ebade5262dcfe96fb5f976b1ef91afcaab3ebde55df7d01ff76b4e9de"
+  },
+  "parauapebas": {
+   "linhas": 872,
+   "primeira_semana": "2010-01-03",
+   "ultima_semana": "2026-09-13",
+   "sha256": "943f846248482df84132967686ac90363da6465f859dab7727bb0f82e5b93d68"
+  },
+  "uberaba": {
+   "linhas": 872,
+   "primeira_semana": "2010-01-03",
+   "ultima_semana": "2026-09-13",
+   "sha256": "0a4b846a0d89413d03b674039a7230c3d2c15ade105368c3e0868d29a19ec988"
+  },
+  "maringa": {
+   "linhas": 872,
+   "primeira_semana": "2010-01-03",
+   "ultima_semana": "2026-09-13",
+   "sha256": "dd48ed05b4d2a8ce58f7033f47d74a212e6c5bc1da2680e1ed92bf936b33c952"
+  },
+  "vitoria_da_conquista": {
+   "linhas": 872,
+   "primeira_semana": "2010-01-03",
+   "ultima_semana": "2026-09-13",
+   "sha256": "06e555d8fa89bccfe0f0ffd8ef53eab637b0e63d1885056b0a36721169597e6b"
+  },
+  "blumenau": {
+   "linhas": 872,
+   "primeira_semana": "2010-01-03",
+   "ultima_semana": "2026-09-13",
+   "sha256": "113a6e42b1df02067198f84aab0f3627720445f242edb5bcfb8b574421a446d8"
+  },
+  "sinop": {
+   "linhas": 872,
+   "primeira_semana": "2010-01-03",
+   "ultima_semana": "2026-09-13",
+   "sha256": "30e36defb581205b73212525f6e92704fe7d85da9c29a58416965d95d75203f5"
+  },
+  "manacapuru": {
+   "linhas": 872,
+   "primeira_semana": "2010-01-03",
+   "ultima_semana": "2026-09-13",
+   "sha256": "8e4025bfaaaa0779339b47a2a535231d0f655dc1fb87f4988731beace4da49a1"
+  }
+ }
+}
