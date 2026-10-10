@@ -1,441 +1,441 @@
 modelo,descricao,conjunto,h,metrica,valor,ic95_inf,ic95_sup,dif_vs_referencia,dif_ic95_inf,dif_ic95_sup,municipios
-baseline_persistencia,"Baseline de persistência (repete os casos atuais; tendência sempre ""estável"")",validacao_cruzada,1,acerto,0.6536,0.6339,0.6736,-0.0062,-0.009,-0.0033,100
-baseline_persistencia,"Baseline de persistência (repete os casos atuais; tendência sempre ""estável"")",validacao_cruzada,1,acerto_balanceado,0.3333,0.3333,0.3333,-0.0533,-0.0591,-0.0476,100
-baseline_persistencia,"Baseline de persistência (repete os casos atuais; tendência sempre ""estável"")",validacao_cruzada,1,subidas_detectadas,0.0,0.0,0.0,-0.0731,-0.0811,-0.0653,100
-baseline_persistencia,"Baseline de persistência (repete os casos atuais; tendência sempre ""estável"")",validacao_cruzada,1,quedas_detectadas,0.0,0.0,0.0,-0.1304,-0.1457,-0.1159,100
-baseline_persistencia,"Baseline de persistência (repete os casos atuais; tendência sempre ""estável"")",validacao_cruzada,1,sentido_oposto,0.0,0.0,0.0,-0.0052,-0.006,-0.0045,100
-baseline_persistencia,"Baseline de persistência (repete os casos atuais; tendência sempre ""estável"")",validacao_cruzada,1,razao_mae,1.0,1.0,1.0,0.1772,0.1431,0.2058,100
-baseline_persistencia,"Baseline de persistência (repete os casos atuais; tendência sempre ""estável"")",validacao_cruzada,2,acerto,0.5517,0.5279,0.5769,-0.0668,-0.0784,-0.0546,100
-baseline_persistencia,"Baseline de persistência (repete os casos atuais; tendência sempre ""estável"")",validacao_cruzada,2,acerto_balanceado,0.3333,0.3333,0.3333,-0.176,-0.1882,-0.1626,100
-baseline_persistencia,"Baseline de persistência (repete os casos atuais; tendência sempre ""estável"")",validacao_cruzada,2,subidas_detectadas,0.0,0.0,0.0,-0.2497,-0.2647,-0.2342,100
-baseline_persistencia,"Baseline de persistência (repete os casos atuais; tendência sempre ""estável"")",validacao_cruzada,2,quedas_detectadas,0.0,0.0,0.0,-0.4329,-0.4615,-0.4048,100
-baseline_persistencia,"Baseline de persistência (repete os casos atuais; tendência sempre ""estável"")",validacao_cruzada,2,sentido_oposto,0.0,0.0,0.0,-0.0209,-0.0232,-0.0186,100
-baseline_persistencia,"Baseline de persistência (repete os casos atuais; tendência sempre ""estável"")",validacao_cruzada,2,razao_mae,1.0,1.0,1.0,0.2422,0.2034,0.2805,100
-baseline_persistencia,"Baseline de persistência (repete os casos atuais; tendência sempre ""estável"")",validacao_cruzada,3,acerto,0.4872,0.4612,0.5142,-0.127,-0.1434,-0.1105,100
-baseline_persistencia,"Baseline de persistência (repete os casos atuais; tendência sempre ""estável"")",validacao_cruzada,3,acerto_balanceado,0.3333,0.3333,0.3333,-0.2289,-0.2437,-0.2135,100
-baseline_persistencia,"Baseline de persistência (repete os casos atuais; tendência sempre ""estável"")",validacao_cruzada,3,subidas_detectadas,0.0,0.0,0.0,-0.346,-0.3639,-0.3273,100
-baseline_persistencia,"Baseline de persistência (repete os casos atuais; tendência sempre ""estável"")",validacao_cruzada,3,quedas_detectadas,0.0,0.0,0.0,-0.5529,-0.5792,-0.5245,100
-baseline_persistencia,"Baseline de persistência (repete os casos atuais; tendência sempre ""estável"")",validacao_cruzada,3,sentido_oposto,0.0,0.0,0.0,-0.0361,-0.0405,-0.0319,100
-baseline_persistencia,"Baseline de persistência (repete os casos atuais; tendência sempre ""estável"")",validacao_cruzada,3,razao_mae,1.0,1.0,1.0,0.272,0.2335,0.3025,100
-baseline_persistencia,"Baseline de persistência (repete os casos atuais; tendência sempre ""estável"")",validacao_cruzada,4,acerto,0.4423,0.4135,0.471,-0.1762,-0.1974,-0.1557,100
-baseline_persistencia,"Baseline de persistência (repete os casos atuais; tendência sempre ""estável"")",validacao_cruzada,4,acerto_balanceado,0.3333,0.3333,0.3333,-0.2586,-0.2731,-0.2424,100
-baseline_persistencia,"Baseline de persistência (repete os casos atuais; tendência sempre ""estável"")",validacao_cruzada,4,subidas_detectadas,0.0,0.0,0.0,-0.4164,-0.4372,-0.3948,100
-baseline_persistencia,"Baseline de persistência (repete os casos atuais; tendência sempre ""estável"")",validacao_cruzada,4,quedas_detectadas,0.0,0.0,0.0,-0.6068,-0.6311,-0.5819,100
-baseline_persistencia,"Baseline de persistência (repete os casos atuais; tendência sempre ""estável"")",validacao_cruzada,4,sentido_oposto,0.0,0.0,0.0,-0.0505,-0.0562,-0.0449,100
-baseline_persistencia,"Baseline de persistência (repete os casos atuais; tendência sempre ""estável"")",validacao_cruzada,4,razao_mae,1.0,1.0,1.0,0.2827,0.2502,0.3088,100
-baseline_persistencia,"Baseline de persistência (repete os casos atuais; tendência sempre ""estável"")",validacao_final,1,acerto,0.6275,0.5904,0.6706,-0.0043,-0.0124,0.0034,15
-baseline_persistencia,"Baseline de persistência (repete os casos atuais; tendência sempre ""estável"")",validacao_final,1,acerto_balanceado,0.3333,0.3333,0.3333,-0.0538,-0.0693,-0.0397,15
-baseline_persistencia,"Baseline de persistência (repete os casos atuais; tendência sempre ""estável"")",validacao_final,1,subidas_detectadas,0.0,0.0,0.0,-0.0685,-0.0908,-0.0473,15
-baseline_persistencia,"Baseline de persistência (repete os casos atuais; tendência sempre ""estável"")",validacao_final,1,quedas_detectadas,0.0,0.0,0.0,-0.1494,-0.1866,-0.1175,15
-baseline_persistencia,"Baseline de persistência (repete os casos atuais; tendência sempre ""estável"")",validacao_final,1,sentido_oposto,0.0,0.0,0.0,-0.0058,-0.0077,-0.0041,15
-baseline_persistencia,"Baseline de persistência (repete os casos atuais; tendência sempre ""estável"")",validacao_final,1,razao_mae,1.0,1.0,1.0,0.2164,0.1814,0.249,15
-baseline_persistencia,"Baseline de persistência (repete os casos atuais; tendência sempre ""estável"")",validacao_final,2,acerto,0.4938,0.4482,0.5477,-0.0897,-0.1185,-0.0593,15
-baseline_persistencia,"Baseline de persistência (repete os casos atuais; tendência sempre ""estável"")",validacao_final,2,acerto_balanceado,0.3333,0.3333,0.3333,-0.1845,-0.2154,-0.151,15
-baseline_persistencia,"Baseline de persistência (repete os casos atuais; tendência sempre ""estável"")",validacao_final,2,subidas_detectadas,0.0,0.0,0.0,-0.265,-0.2974,-0.2323,15
-baseline_persistencia,"Baseline de persistência (repete os casos atuais; tendência sempre ""estável"")",validacao_final,2,quedas_detectadas,0.0,0.0,0.0,-0.4942,-0.5589,-0.4264,15
-baseline_persistencia,"Baseline de persistência (repete os casos atuais; tendência sempre ""estável"")",validacao_final,2,sentido_oposto,0.0,0.0,0.0,-0.0232,-0.0294,-0.0173,15
-baseline_persistencia,"Baseline de persistência (repete os casos atuais; tendência sempre ""estável"")",validacao_final,2,razao_mae,1.0,1.0,1.0,0.2867,0.2462,0.3223,15
-baseline_persistencia,"Baseline de persistência (repete os casos atuais; tendência sempre ""estável"")",validacao_final,3,acerto,0.4307,0.381,0.4939,-0.1614,-0.1986,-0.1215,15
-baseline_persistencia,"Baseline de persistência (repete os casos atuais; tendência sempre ""estável"")",validacao_final,3,acerto_balanceado,0.3333,0.3333,0.3333,-0.2385,-0.2641,-0.2102,15
-baseline_persistencia,"Baseline de persistência (repete os casos atuais; tendência sempre ""estável"")",validacao_final,3,subidas_detectadas,0.0,0.0,0.0,-0.3769,-0.4076,-0.3435,15
-baseline_persistencia,"Baseline de persistência (repete os casos atuais; tendência sempre ""estável"")",validacao_final,3,quedas_detectadas,0.0,0.0,0.0,-0.6303,-0.686,-0.5727,15
-baseline_persistencia,"Baseline de persistência (repete os casos atuais; tendência sempre ""estável"")",validacao_final,3,sentido_oposto,0.0,0.0,0.0,-0.036,-0.0446,-0.0278,15
-baseline_persistencia,"Baseline de persistência (repete os casos atuais; tendência sempre ""estável"")",validacao_final,3,razao_mae,1.0,1.0,1.0,0.3159,0.2778,0.3532,15
-baseline_persistencia,"Baseline de persistência (repete os casos atuais; tendência sempre ""estável"")",validacao_final,4,acerto,0.3766,0.3246,0.4433,-0.2227,-0.2694,-0.1741,15
-baseline_persistencia,"Baseline de persistência (repete os casos atuais; tendência sempre ""estável"")",validacao_final,4,acerto_balanceado,0.3333,0.3333,0.3333,-0.2605,-0.2894,-0.2288,15
-baseline_persistencia,"Baseline de persistência (repete os casos atuais; tendência sempre ""estável"")",validacao_final,4,subidas_detectadas,0.0,0.0,0.0,-0.4567,-0.4792,-0.4311,15
-baseline_persistencia,"Baseline de persistência (repete os casos atuais; tendência sempre ""estável"")",validacao_final,4,quedas_detectadas,0.0,0.0,0.0,-0.6661,-0.7146,-0.6085,15
-baseline_persistencia,"Baseline de persistência (repete os casos atuais; tendência sempre ""estável"")",validacao_final,4,sentido_oposto,0.0,0.0,0.0,-0.0474,-0.055,-0.0397,15
-baseline_persistencia,"Baseline de persistência (repete os casos atuais; tendência sempre ""estável"")",validacao_final,4,razao_mae,1.0,1.0,1.0,0.3385,0.2949,0.3768,15
-regressao_linear,Regressão linear Ridge (alvo relativo),validacao_cruzada,1,acerto,0.6372,0.6169,0.658,-0.0226,-0.0277,-0.0173,100
-regressao_linear,Regressão linear Ridge (alvo relativo),validacao_cruzada,1,acerto_balanceado,0.3674,0.363,0.372,-0.0193,-0.0274,-0.0111,100
-regressao_linear,Regressão linear Ridge (alvo relativo),validacao_cruzada,1,subidas_detectadas,0.0656,0.0596,0.0718,-0.0076,-0.0166,0.0016,100
-regressao_linear,Regressão linear Ridge (alvo relativo),validacao_cruzada,1,alarmes_subida_corretos,0.4244,0.3983,0.4514,-0.1459,-0.1805,-0.1112,100
-regressao_linear,Regressão linear Ridge (alvo relativo),validacao_cruzada,1,quedas_detectadas,0.1065,0.097,0.1161,-0.0239,-0.044,-0.0033,100
-regressao_linear,Regressão linear Ridge (alvo relativo),validacao_cruzada,1,sentido_oposto,0.0186,0.0163,0.0208,0.0134,0.0113,0.0153,100
-regressao_linear,Regressão linear Ridge (alvo relativo),validacao_cruzada,1,razao_mae,1.1612,1.1275,1.1904,0.3384,0.2745,0.3942,100
-regressao_linear,Regressão linear Ridge (alvo relativo),validacao_cruzada,2,acerto,0.5626,0.5396,0.5876,-0.0559,-0.0651,-0.0467,100
-regressao_linear,Regressão linear Ridge (alvo relativo),validacao_cruzada,2,acerto_balanceado,0.4283,0.4215,0.4349,-0.081,-0.0923,-0.0688,100
-regressao_linear,Regressão linear Ridge (alvo relativo),validacao_cruzada,2,subidas_detectadas,0.1187,0.1095,0.1271,-0.131,-0.1479,-0.1138,100
-regressao_linear,Regressão linear Ridge (alvo relativo),validacao_cruzada,2,alarmes_subida_corretos,0.5038,0.4791,0.528,-0.1366,-0.1603,-0.1126,100
-regressao_linear,Regressão linear Ridge (alvo relativo),validacao_cruzada,2,quedas_detectadas,0.3249,0.3011,0.3513,-0.1081,-0.1354,-0.0801,100
-regressao_linear,Regressão linear Ridge (alvo relativo),validacao_cruzada,2,sentido_oposto,0.0335,0.0294,0.0377,0.0127,0.0095,0.0161,100
-regressao_linear,Regressão linear Ridge (alvo relativo),validacao_cruzada,2,razao_mae,0.9918,0.9771,1.0055,0.2341,0.1894,0.2749,100
-regressao_linear,Regressão linear Ridge (alvo relativo),validacao_cruzada,3,acerto,0.5601,0.5379,0.5831,-0.0542,-0.0623,-0.0457,100
-regressao_linear,Regressão linear Ridge (alvo relativo),validacao_cruzada,3,acerto_balanceado,0.4959,0.4857,0.5053,-0.0664,-0.0751,-0.0576,100
-regressao_linear,Regressão linear Ridge (alvo relativo),validacao_cruzada,3,subidas_detectadas,0.1851,0.1725,0.1973,-0.1608,-0.1781,-0.1438,100
-regressao_linear,Regressão linear Ridge (alvo relativo),validacao_cruzada,3,alarmes_subida_corretos,0.5244,0.498,0.5499,-0.1259,-0.1451,-0.1062,100
-regressao_linear,Regressão linear Ridge (alvo relativo),validacao_cruzada,3,quedas_detectadas,0.5279,0.5011,0.5554,-0.025,-0.0426,-0.009,100
-regressao_linear,Regressão linear Ridge (alvo relativo),validacao_cruzada,3,sentido_oposto,0.0519,0.0461,0.058,0.0158,0.012,0.0199,100
-regressao_linear,Regressão linear Ridge (alvo relativo),validacao_cruzada,3,razao_mae,0.9015,0.8883,0.9167,0.1736,0.141,0.1988,100
-regressao_linear,Regressão linear Ridge (alvo relativo),validacao_cruzada,4,acerto,0.5694,0.5475,0.5925,-0.0491,-0.0578,-0.0415,100
-regressao_linear,Regressão linear Ridge (alvo relativo),validacao_cruzada,4,acerto_balanceado,0.5363,0.5237,0.5477,-0.0556,-0.0637,-0.0481,100
-regressao_linear,Regressão linear Ridge (alvo relativo),validacao_cruzada,4,subidas_detectadas,0.2563,0.2399,0.2711,-0.1601,-0.1776,-0.1431,100
-regressao_linear,Regressão linear Ridge (alvo relativo),validacao_cruzada,4,alarmes_subida_corretos,0.5471,0.5209,0.5739,-0.1038,-0.1173,-0.0889,100
-regressao_linear,Regressão linear Ridge (alvo relativo),validacao_cruzada,4,quedas_detectadas,0.6181,0.5927,0.644,0.0114,-0.0019,0.0236,100
-regressao_linear,Regressão linear Ridge (alvo relativo),validacao_cruzada,4,sentido_oposto,0.0662,0.0589,0.0737,0.0157,0.0114,0.0202,100
-regressao_linear,Regressão linear Ridge (alvo relativo),validacao_cruzada,4,razao_mae,0.838,0.8225,0.8552,0.1207,0.0989,0.1387,100
-regressao_linear,Regressão linear Ridge (alvo relativo),validacao_final,1,acerto,0.6128,0.5741,0.6571,-0.0189,-0.0307,-0.0073,15
-regressao_linear,Regressão linear Ridge (alvo relativo),validacao_final,1,acerto_balanceado,0.366,0.3567,0.3749,-0.0211,-0.0428,-0.0017,15
-regressao_linear,Regressão linear Ridge (alvo relativo),validacao_final,1,subidas_detectadas,0.0659,0.0548,0.076,-0.0026,-0.0214,0.0145,15
+baseline_persistencia,"Baseline de persistência (repete os casos atuais; tendência sempre ""estável"")",validacao_cruzada,1,acerto,0.6539,0.6345,0.6739,-0.0062,-0.0089,-0.0033,100
+baseline_persistencia,"Baseline de persistência (repete os casos atuais; tendência sempre ""estável"")",validacao_cruzada,1,acerto_balanceado,0.3333,0.3333,0.3333,-0.0532,-0.0589,-0.0476,100
+baseline_persistencia,"Baseline de persistência (repete os casos atuais; tendência sempre ""estável"")",validacao_cruzada,1,subidas_detectadas,0.0,0.0,0.0,-0.0729,-0.0808,-0.0651,100
+baseline_persistencia,"Baseline de persistência (repete os casos atuais; tendência sempre ""estável"")",validacao_cruzada,1,quedas_detectadas,0.0,0.0,0.0,-0.1299,-0.1452,-0.1153,100
+baseline_persistencia,"Baseline de persistência (repete os casos atuais; tendência sempre ""estável"")",validacao_cruzada,1,sentido_oposto,0.0,0.0,0.0,-0.0052,-0.0059,-0.0044,100
+baseline_persistencia,"Baseline de persistência (repete os casos atuais; tendência sempre ""estável"")",validacao_cruzada,1,razao_mae,1.0,1.0,1.0,0.1771,0.1429,0.2058,100
+baseline_persistencia,"Baseline de persistência (repete os casos atuais; tendência sempre ""estável"")",validacao_cruzada,2,acerto,0.5515,0.5278,0.5767,-0.0666,-0.0783,-0.0543,100
+baseline_persistencia,"Baseline de persistência (repete os casos atuais; tendência sempre ""estável"")",validacao_cruzada,2,acerto_balanceado,0.3333,0.3333,0.3333,-0.1761,-0.1883,-0.1628,100
+baseline_persistencia,"Baseline de persistência (repete os casos atuais; tendência sempre ""estável"")",validacao_cruzada,2,subidas_detectadas,0.0,0.0,0.0,-0.2491,-0.2641,-0.2337,100
+baseline_persistencia,"Baseline de persistência (repete os casos atuais; tendência sempre ""estável"")",validacao_cruzada,2,quedas_detectadas,0.0,0.0,0.0,-0.4354,-0.4646,-0.4073,100
+baseline_persistencia,"Baseline de persistência (repete os casos atuais; tendência sempre ""estável"")",validacao_cruzada,2,sentido_oposto,0.0,0.0,0.0,-0.0211,-0.0234,-0.0188,100
+baseline_persistencia,"Baseline de persistência (repete os casos atuais; tendência sempre ""estável"")",validacao_cruzada,2,razao_mae,1.0,1.0,1.0,0.2424,0.2034,0.2804,100
+baseline_persistencia,"Baseline de persistência (repete os casos atuais; tendência sempre ""estável"")",validacao_cruzada,3,acerto,0.4871,0.4611,0.514,-0.1271,-0.1438,-0.1104,100
+baseline_persistencia,"Baseline de persistência (repete os casos atuais; tendência sempre ""estável"")",validacao_cruzada,3,acerto_balanceado,0.3333,0.3333,0.3333,-0.2292,-0.2439,-0.2138,100
+baseline_persistencia,"Baseline de persistência (repete os casos atuais; tendência sempre ""estável"")",validacao_cruzada,3,subidas_detectadas,0.0,0.0,0.0,-0.3451,-0.3631,-0.3263,100
+baseline_persistencia,"Baseline de persistência (repete os casos atuais; tendência sempre ""estável"")",validacao_cruzada,3,quedas_detectadas,0.0,0.0,0.0,-0.5558,-0.582,-0.5273,100
+baseline_persistencia,"Baseline de persistência (repete os casos atuais; tendência sempre ""estável"")",validacao_cruzada,3,sentido_oposto,0.0,0.0,0.0,-0.0362,-0.0407,-0.0319,100
+baseline_persistencia,"Baseline de persistência (repete os casos atuais; tendência sempre ""estável"")",validacao_cruzada,3,razao_mae,1.0,1.0,1.0,0.2718,0.2332,0.3023,100
+baseline_persistencia,"Baseline de persistência (repete os casos atuais; tendência sempre ""estável"")",validacao_cruzada,4,acerto,0.4424,0.4137,0.4711,-0.1764,-0.1975,-0.1558,100
+baseline_persistencia,"Baseline de persistência (repete os casos atuais; tendência sempre ""estável"")",validacao_cruzada,4,acerto_balanceado,0.3333,0.3333,0.3333,-0.2589,-0.2733,-0.2426,100
+baseline_persistencia,"Baseline de persistência (repete os casos atuais; tendência sempre ""estável"")",validacao_cruzada,4,subidas_detectadas,0.0,0.0,0.0,-0.4157,-0.4366,-0.3938,100
+baseline_persistencia,"Baseline de persistência (repete os casos atuais; tendência sempre ""estável"")",validacao_cruzada,4,quedas_detectadas,0.0,0.0,0.0,-0.6096,-0.6339,-0.5847,100
+baseline_persistencia,"Baseline de persistência (repete os casos atuais; tendência sempre ""estável"")",validacao_cruzada,4,sentido_oposto,0.0,0.0,0.0,-0.0505,-0.0564,-0.0449,100
+baseline_persistencia,"Baseline de persistência (repete os casos atuais; tendência sempre ""estável"")",validacao_cruzada,4,razao_mae,1.0,1.0,1.0,0.2826,0.2503,0.3088,100
+baseline_persistencia,"Baseline de persistência (repete os casos atuais; tendência sempre ""estável"")",validacao_final,1,acerto,0.6275,0.5902,0.6709,-0.0044,-0.0126,0.0029,15
+baseline_persistencia,"Baseline de persistência (repete os casos atuais; tendência sempre ""estável"")",validacao_final,1,acerto_balanceado,0.3333,0.3333,0.3333,-0.0536,-0.0687,-0.0396,15
+baseline_persistencia,"Baseline de persistência (repete os casos atuais; tendência sempre ""estável"")",validacao_final,1,subidas_detectadas,0.0,0.0,0.0,-0.0682,-0.0903,-0.0471,15
+baseline_persistencia,"Baseline de persistência (repete os casos atuais; tendência sempre ""estável"")",validacao_final,1,quedas_detectadas,0.0,0.0,0.0,-0.1485,-0.1854,-0.1167,15
+baseline_persistencia,"Baseline de persistência (repete os casos atuais; tendência sempre ""estável"")",validacao_final,1,sentido_oposto,0.0,0.0,0.0,-0.0058,-0.0076,-0.0041,15
+baseline_persistencia,"Baseline de persistência (repete os casos atuais; tendência sempre ""estável"")",validacao_final,1,razao_mae,1.0,1.0,1.0,0.2161,0.1815,0.2488,15
+baseline_persistencia,"Baseline de persistência (repete os casos atuais; tendência sempre ""estável"")",validacao_final,2,acerto,0.494,0.4483,0.5481,-0.09,-0.1185,-0.0595,15
+baseline_persistencia,"Baseline de persistência (repete os casos atuais; tendência sempre ""estável"")",validacao_final,2,acerto_balanceado,0.3333,0.3333,0.3333,-0.185,-0.2154,-0.1518,15
+baseline_persistencia,"Baseline de persistência (repete os casos atuais; tendência sempre ""estável"")",validacao_final,2,subidas_detectadas,0.0,0.0,0.0,-0.2648,-0.2972,-0.2322,15
+baseline_persistencia,"Baseline de persistência (repete os casos atuais; tendência sempre ""estável"")",validacao_final,2,quedas_detectadas,0.0,0.0,0.0,-0.4966,-0.5586,-0.4309,15
+baseline_persistencia,"Baseline de persistência (repete os casos atuais; tendência sempre ""estável"")",validacao_final,2,sentido_oposto,0.0,0.0,0.0,-0.023,-0.0291,-0.0172,15
+baseline_persistencia,"Baseline de persistência (repete os casos atuais; tendência sempre ""estável"")",validacao_final,2,razao_mae,1.0,1.0,1.0,0.2869,0.2465,0.3222,15
+baseline_persistencia,"Baseline de persistência (repete os casos atuais; tendência sempre ""estável"")",validacao_final,3,acerto,0.431,0.3814,0.494,-0.1615,-0.1981,-0.1221,15
+baseline_persistencia,"Baseline de persistência (repete os casos atuais; tendência sempre ""estável"")",validacao_final,3,acerto_balanceado,0.3333,0.3333,0.3333,-0.2389,-0.2645,-0.2104,15
+baseline_persistencia,"Baseline de persistência (repete os casos atuais; tendência sempre ""estável"")",validacao_final,3,subidas_detectadas,0.0,0.0,0.0,-0.3773,-0.4086,-0.3438,15
+baseline_persistencia,"Baseline de persistência (repete os casos atuais; tendência sempre ""estável"")",validacao_final,3,quedas_detectadas,0.0,0.0,0.0,-0.6328,-0.6881,-0.5756,15
+baseline_persistencia,"Baseline de persistência (repete os casos atuais; tendência sempre ""estável"")",validacao_final,3,sentido_oposto,0.0,0.0,0.0,-0.0358,-0.0447,-0.0275,15
+baseline_persistencia,"Baseline de persistência (repete os casos atuais; tendência sempre ""estável"")",validacao_final,3,razao_mae,1.0,1.0,1.0,0.3162,0.278,0.3533,15
+baseline_persistencia,"Baseline de persistência (repete os casos atuais; tendência sempre ""estável"")",validacao_final,4,acerto,0.3768,0.3246,0.4429,-0.2226,-0.2686,-0.1738,15
+baseline_persistencia,"Baseline de persistência (repete os casos atuais; tendência sempre ""estável"")",validacao_final,4,acerto_balanceado,0.3333,0.3333,0.3333,-0.2604,-0.2886,-0.2291,15
+baseline_persistencia,"Baseline de persistência (repete os casos atuais; tendência sempre ""estável"")",validacao_final,4,subidas_detectadas,0.0,0.0,0.0,-0.4562,-0.4785,-0.4307,15
+baseline_persistencia,"Baseline de persistência (repete os casos atuais; tendência sempre ""estável"")",validacao_final,4,quedas_detectadas,0.0,0.0,0.0,-0.6685,-0.715,-0.6114,15
+baseline_persistencia,"Baseline de persistência (repete os casos atuais; tendência sempre ""estável"")",validacao_final,4,sentido_oposto,0.0,0.0,0.0,-0.0475,-0.055,-0.0398,15
+baseline_persistencia,"Baseline de persistência (repete os casos atuais; tendência sempre ""estável"")",validacao_final,4,razao_mae,1.0,1.0,1.0,0.3385,0.2949,0.3769,15
+regressao_linear,Regressão linear Ridge (alvo relativo),validacao_cruzada,1,acerto,0.6374,0.617,0.6582,-0.0228,-0.0278,-0.0176,100
+regressao_linear,Regressão linear Ridge (alvo relativo),validacao_cruzada,1,acerto_balanceado,0.3673,0.363,0.3718,-0.0192,-0.0272,-0.0112,100
+regressao_linear,Regressão linear Ridge (alvo relativo),validacao_cruzada,1,subidas_detectadas,0.0655,0.0595,0.0717,-0.0074,-0.0164,0.0016,100
+regressao_linear,Regressão linear Ridge (alvo relativo),validacao_cruzada,1,alarmes_subida_corretos,0.425,0.3986,0.4517,-0.1473,-0.1815,-0.1127,100
+regressao_linear,Regressão linear Ridge (alvo relativo),validacao_cruzada,1,quedas_detectadas,0.1067,0.0973,0.1163,-0.0232,-0.0432,-0.0027,100
+regressao_linear,Regressão linear Ridge (alvo relativo),validacao_cruzada,1,sentido_oposto,0.0186,0.0163,0.0208,0.0135,0.0114,0.0154,100
+regressao_linear,Regressão linear Ridge (alvo relativo),validacao_cruzada,1,razao_mae,1.1608,1.1271,1.1899,0.3379,0.274,0.3938,100
+regressao_linear,Regressão linear Ridge (alvo relativo),validacao_cruzada,2,acerto,0.5627,0.5397,0.5876,-0.0555,-0.0647,-0.0465,100
+regressao_linear,Regressão linear Ridge (alvo relativo),validacao_cruzada,2,acerto_balanceado,0.429,0.4221,0.4357,-0.0805,-0.0916,-0.0685,100
+regressao_linear,Regressão linear Ridge (alvo relativo),validacao_cruzada,2,subidas_detectadas,0.1184,0.1093,0.1268,-0.1308,-0.1475,-0.1139,100
+regressao_linear,Regressão linear Ridge (alvo relativo),validacao_cruzada,2,alarmes_subida_corretos,0.5036,0.4791,0.5276,-0.1371,-0.1608,-0.113,100
+regressao_linear,Regressão linear Ridge (alvo relativo),validacao_cruzada,2,quedas_detectadas,0.3284,0.3048,0.3554,-0.107,-0.1341,-0.0794,100
+regressao_linear,Regressão linear Ridge (alvo relativo),validacao_cruzada,2,sentido_oposto,0.0336,0.0294,0.0378,0.0125,0.0094,0.0159,100
+regressao_linear,Regressão linear Ridge (alvo relativo),validacao_cruzada,2,razao_mae,0.9914,0.9766,1.005,0.2338,0.1892,0.2746,100
+regressao_linear,Regressão linear Ridge (alvo relativo),validacao_cruzada,3,acerto,0.5603,0.5382,0.5834,-0.0539,-0.062,-0.0457,100
+regressao_linear,Regressão linear Ridge (alvo relativo),validacao_cruzada,3,acerto_balanceado,0.4963,0.486,0.5058,-0.0662,-0.075,-0.0575,100
+regressao_linear,Regressão linear Ridge (alvo relativo),validacao_cruzada,3,subidas_detectadas,0.1846,0.172,0.1968,-0.1605,-0.1778,-0.1431,100
+regressao_linear,Regressão linear Ridge (alvo relativo),validacao_cruzada,3,alarmes_subida_corretos,0.5242,0.4978,0.5496,-0.1268,-0.1458,-0.1069,100
+regressao_linear,Regressão linear Ridge (alvo relativo),validacao_cruzada,3,quedas_detectadas,0.5309,0.504,0.5586,-0.0249,-0.0424,-0.009,100
+regressao_linear,Regressão linear Ridge (alvo relativo),validacao_cruzada,3,sentido_oposto,0.052,0.0461,0.0581,0.0158,0.0121,0.0199,100
+regressao_linear,Regressão linear Ridge (alvo relativo),validacao_cruzada,3,razao_mae,0.9014,0.8882,0.9167,0.1732,0.1409,0.1986,100
+regressao_linear,Regressão linear Ridge (alvo relativo),validacao_cruzada,4,acerto,0.5696,0.5479,0.5927,-0.0492,-0.0579,-0.0416,100
+regressao_linear,Regressão linear Ridge (alvo relativo),validacao_cruzada,4,acerto_balanceado,0.5364,0.5238,0.5477,-0.0558,-0.0639,-0.0482,100
+regressao_linear,Regressão linear Ridge (alvo relativo),validacao_cruzada,4,subidas_detectadas,0.2558,0.2394,0.2706,-0.16,-0.1776,-0.1429,100
+regressao_linear,Regressão linear Ridge (alvo relativo),validacao_cruzada,4,alarmes_subida_corretos,0.5472,0.521,0.574,-0.1041,-0.1177,-0.0893,100
+regressao_linear,Regressão linear Ridge (alvo relativo),validacao_cruzada,4,quedas_detectadas,0.6204,0.5951,0.6464,0.0108,-0.0024,0.023,100
+regressao_linear,Regressão linear Ridge (alvo relativo),validacao_cruzada,4,sentido_oposto,0.0663,0.0589,0.0738,0.0157,0.0115,0.0202,100
+regressao_linear,Regressão linear Ridge (alvo relativo),validacao_cruzada,4,razao_mae,0.838,0.8224,0.8552,0.1206,0.0988,0.1385,100
+regressao_linear,Regressão linear Ridge (alvo relativo),validacao_final,1,acerto,0.6132,0.574,0.6575,-0.0187,-0.0302,-0.0073,15
+regressao_linear,Regressão linear Ridge (alvo relativo),validacao_final,1,acerto_balanceado,0.3662,0.3567,0.3756,-0.0207,-0.042,-0.0014,15
+regressao_linear,Regressão linear Ridge (alvo relativo),validacao_final,1,subidas_detectadas,0.0656,0.0546,0.0757,-0.0026,-0.0213,0.0145,15
 regressao_linear,Regressão linear Ridge (alvo relativo),validacao_final,1,alarmes_subida_corretos,0.4444,0.3981,0.4964,-0.1364,-0.1967,-0.0543,15
-regressao_linear,Regressão linear Ridge (alvo relativo),validacao_final,1,quedas_detectadas,0.1057,0.0858,0.1286,-0.0436,-0.0973,0.0046,15
-regressao_linear,Regressão linear Ridge (alvo relativo),validacao_final,1,sentido_oposto,0.0184,0.0145,0.0223,0.0126,0.009,0.0162,15
-regressao_linear,Regressão linear Ridge (alvo relativo),validacao_final,1,razao_mae,1.1571,1.1093,1.1944,0.3735,0.3029,0.4215,15
-regressao_linear,Regressão linear Ridge (alvo relativo),validacao_final,2,acerto,0.5027,0.4641,0.5539,-0.0809,-0.106,-0.0535,15
-regressao_linear,Regressão linear Ridge (alvo relativo),validacao_final,2,acerto_balanceado,0.4225,0.4089,0.4354,-0.0954,-0.1223,-0.0661,15
-regressao_linear,Regressão linear Ridge (alvo relativo),validacao_final,2,subidas_detectadas,0.1138,0.0998,0.1281,-0.1511,-0.1884,-0.1105,15
-regressao_linear,Regressão linear Ridge (alvo relativo),validacao_final,2,alarmes_subida_corretos,0.4872,0.4388,0.5458,-0.1784,-0.2207,-0.1286,15
-regressao_linear,Regressão linear Ridge (alvo relativo),validacao_final,2,quedas_detectadas,0.3934,0.3427,0.449,-0.1008,-0.1396,-0.0612,15
-regressao_linear,Regressão linear Ridge (alvo relativo),validacao_final,2,sentido_oposto,0.0368,0.0297,0.0434,0.0135,0.0068,0.0203,15
-regressao_linear,Regressão linear Ridge (alvo relativo),validacao_final,2,razao_mae,0.9814,0.9476,1.0137,0.2681,0.2198,0.3101,15
-regressao_linear,Regressão linear Ridge (alvo relativo),validacao_final,3,acerto,0.5208,0.4847,0.5698,-0.0713,-0.0927,-0.0482,15
-regressao_linear,Regressão linear Ridge (alvo relativo),validacao_final,3,acerto_balanceado,0.4976,0.4754,0.52,-0.0742,-0.0942,-0.053,15
-regressao_linear,Regressão linear Ridge (alvo relativo),validacao_final,3,subidas_detectadas,0.2111,0.1813,0.2427,-0.1658,-0.2071,-0.1201,15
-regressao_linear,Regressão linear Ridge (alvo relativo),validacao_final,3,alarmes_subida_corretos,0.5769,0.5143,0.6357,-0.1018,-0.1406,-0.0517,15
-regressao_linear,Regressão linear Ridge (alvo relativo),validacao_final,3,quedas_detectadas,0.6291,0.5667,0.6874,-0.0012,-0.0213,0.017,15
-regressao_linear,Regressão linear Ridge (alvo relativo),validacao_final,3,sentido_oposto,0.0566,0.0475,0.0651,0.0206,0.0108,0.03,15
-regressao_linear,Regressão linear Ridge (alvo relativo),validacao_final,3,razao_mae,0.8881,0.8599,0.9134,0.2041,0.1669,0.2373,15
-regressao_linear,Regressão linear Ridge (alvo relativo),validacao_final,4,acerto,0.5232,0.4873,0.5679,-0.0761,-0.0981,-0.0526,15
-regressao_linear,Regressão linear Ridge (alvo relativo),validacao_final,4,acerto_balanceado,0.516,0.484,0.5423,-0.0779,-0.0998,-0.0554,15
-regressao_linear,Regressão linear Ridge (alvo relativo),validacao_final,4,subidas_detectadas,0.2652,0.2378,0.2947,-0.1916,-0.2269,-0.1507,15
+regressao_linear,Regressão linear Ridge (alvo relativo),validacao_final,1,quedas_detectadas,0.1061,0.0854,0.1301,-0.0424,-0.0967,0.007,15
+regressao_linear,Regressão linear Ridge (alvo relativo),validacao_final,1,sentido_oposto,0.0185,0.0146,0.0224,0.0127,0.0092,0.0163,15
+regressao_linear,Regressão linear Ridge (alvo relativo),validacao_final,1,razao_mae,1.1568,1.1089,1.1942,0.3729,0.3023,0.421,15
+regressao_linear,Regressão linear Ridge (alvo relativo),validacao_final,2,acerto,0.5034,0.4648,0.5544,-0.0806,-0.1054,-0.0536,15
+regressao_linear,Regressão linear Ridge (alvo relativo),validacao_final,2,acerto_balanceado,0.4232,0.4097,0.4363,-0.0951,-0.1211,-0.0662,15
+regressao_linear,Regressão linear Ridge (alvo relativo),validacao_final,2,subidas_detectadas,0.1138,0.0997,0.128,-0.151,-0.1883,-0.1105,15
+regressao_linear,Regressão linear Ridge (alvo relativo),validacao_final,2,alarmes_subida_corretos,0.4872,0.4388,0.5458,-0.1795,-0.2219,-0.1295,15
+regressao_linear,Regressão linear Ridge (alvo relativo),validacao_final,2,quedas_detectadas,0.3967,0.3447,0.4531,-0.0999,-0.1369,-0.0625,15
+regressao_linear,Regressão linear Ridge (alvo relativo),validacao_final,2,sentido_oposto,0.0366,0.0296,0.0432,0.0136,0.007,0.0206,15
+regressao_linear,Regressão linear Ridge (alvo relativo),validacao_final,2,razao_mae,0.9808,0.9471,1.0132,0.2677,0.2193,0.3094,15
+regressao_linear,Regressão linear Ridge (alvo relativo),validacao_final,3,acerto,0.5207,0.4846,0.5702,-0.0718,-0.0933,-0.0488,15
+regressao_linear,Regressão linear Ridge (alvo relativo),validacao_final,3,acerto_balanceado,0.4973,0.475,0.5198,-0.0749,-0.0948,-0.0538,15
+regressao_linear,Regressão linear Ridge (alvo relativo),validacao_final,3,subidas_detectadas,0.211,0.1811,0.2426,-0.1663,-0.208,-0.1206,15
+regressao_linear,Regressão linear Ridge (alvo relativo),validacao_final,3,alarmes_subida_corretos,0.5769,0.5143,0.6357,-0.1051,-0.1454,-0.0536,15
+regressao_linear,Regressão linear Ridge (alvo relativo),validacao_final,3,quedas_detectadas,0.631,0.5688,0.689,-0.0018,-0.0212,0.017,15
+regressao_linear,Regressão linear Ridge (alvo relativo),validacao_final,3,sentido_oposto,0.0564,0.0472,0.065,0.0206,0.0107,0.03,15
+regressao_linear,Regressão linear Ridge (alvo relativo),validacao_final,3,razao_mae,0.8877,0.8596,0.9129,0.2039,0.1669,0.2371,15
+regressao_linear,Regressão linear Ridge (alvo relativo),validacao_final,4,acerto,0.5238,0.4877,0.5689,-0.0756,-0.0971,-0.0521,15
+regressao_linear,Regressão linear Ridge (alvo relativo),validacao_final,4,acerto_balanceado,0.5161,0.484,0.5424,-0.0776,-0.0991,-0.0551,15
+regressao_linear,Regressão linear Ridge (alvo relativo),validacao_final,4,subidas_detectadas,0.2649,0.2378,0.2944,-0.1914,-0.2267,-0.1505,15
 regressao_linear,Regressão linear Ridge (alvo relativo),validacao_final,4,alarmes_subida_corretos,0.5626,0.5085,0.6089,-0.1276,-0.1648,-0.084,15
-regressao_linear,Regressão linear Ridge (alvo relativo),validacao_final,4,quedas_detectadas,0.6943,0.6315,0.7434,0.0281,0.0079,0.0476,15
-regressao_linear,Regressão linear Ridge (alvo relativo),validacao_final,4,sentido_oposto,0.0814,0.0687,0.0926,0.034,0.0237,0.0435,15
-regressao_linear,Regressão linear Ridge (alvo relativo),validacao_final,4,razao_mae,0.8202,0.7944,0.8457,0.1587,0.1262,0.1887,15
-binomial_negativa,Regressão binomial negativa (GLM para contagens),validacao_cruzada,1,acerto,0.64,0.6193,0.6607,-0.0197,-0.0246,-0.0151,100
-binomial_negativa,Regressão binomial negativa (GLM para contagens),validacao_cruzada,1,acerto_balanceado,0.3677,0.3641,0.3714,-0.019,-0.0259,-0.0117,100
-binomial_negativa,Regressão binomial negativa (GLM para contagens),validacao_cruzada,1,subidas_detectadas,0.1193,0.1093,0.1288,0.0462,0.0345,0.0582,100
-binomial_negativa,Regressão binomial negativa (GLM para contagens),validacao_cruzada,1,alarmes_subida_corretos,0.33,0.3094,0.3504,-0.2404,-0.2755,-0.2012,100
-binomial_negativa,Regressão binomial negativa (GLM para contagens),validacao_cruzada,1,quedas_detectadas,0.0505,0.0445,0.0568,-0.0799,-0.0973,-0.0624,100
+regressao_linear,Regressão linear Ridge (alvo relativo),validacao_final,4,quedas_detectadas,0.6969,0.6344,0.7454,0.0284,0.0083,0.0484,15
+regressao_linear,Regressão linear Ridge (alvo relativo),validacao_final,4,sentido_oposto,0.0814,0.0685,0.0925,0.0338,0.0236,0.0432,15
+regressao_linear,Regressão linear Ridge (alvo relativo),validacao_final,4,razao_mae,0.8201,0.7943,0.8455,0.1586,0.126,0.1886,15
+binomial_negativa,Regressão binomial negativa (GLM para contagens),validacao_cruzada,1,acerto,0.6402,0.6195,0.6608,-0.0199,-0.0247,-0.0154,100
+binomial_negativa,Regressão binomial negativa (GLM para contagens),validacao_cruzada,1,acerto_balanceado,0.3675,0.3639,0.3712,-0.019,-0.0258,-0.0118,100
+binomial_negativa,Regressão binomial negativa (GLM para contagens),validacao_cruzada,1,subidas_detectadas,0.1189,0.109,0.1285,0.046,0.0345,0.0579,100
+binomial_negativa,Regressão binomial negativa (GLM para contagens),validacao_cruzada,1,alarmes_subida_corretos,0.33,0.3094,0.3504,-0.2422,-0.2773,-0.2036,100
+binomial_negativa,Regressão binomial negativa (GLM para contagens),validacao_cruzada,1,quedas_detectadas,0.0504,0.0444,0.0566,-0.0795,-0.0969,-0.0622,100
 binomial_negativa,Regressão binomial negativa (GLM para contagens),validacao_cruzada,1,sentido_oposto,0.0138,0.0122,0.0154,0.0086,0.0072,0.0101,100
-binomial_negativa,Regressão binomial negativa (GLM para contagens),validacao_cruzada,1,razao_mae,1.1104,1.0513,1.1727,0.2876,0.2054,0.3687,100
-binomial_negativa,Regressão binomial negativa (GLM para contagens),validacao_cruzada,2,acerto,0.5587,0.5361,0.5835,-0.0598,-0.0687,-0.0508,100
-binomial_negativa,Regressão binomial negativa (GLM para contagens),validacao_cruzada,2,acerto_balanceado,0.443,0.4359,0.4499,-0.0663,-0.0778,-0.0547,100
-binomial_negativa,Regressão binomial negativa (GLM para contagens),validacao_cruzada,2,subidas_detectadas,0.359,0.3415,0.3764,0.1094,0.0923,0.127,100
-binomial_negativa,Regressão binomial negativa (GLM para contagens),validacao_cruzada,2,alarmes_subida_corretos,0.4258,0.4096,0.4414,-0.2146,-0.2341,-0.1955,100
-binomial_negativa,Regressão binomial negativa (GLM para contagens),validacao_cruzada,2,quedas_detectadas,0.1762,0.1662,0.1858,-0.2568,-0.2871,-0.2266,100
-binomial_negativa,Regressão binomial negativa (GLM para contagens),validacao_cruzada,2,sentido_oposto,0.0436,0.0391,0.0481,0.0227,0.0191,0.0263,100
-binomial_negativa,Regressão binomial negativa (GLM para contagens),validacao_cruzada,2,razao_mae,0.9897,0.9522,1.0301,0.2319,0.1786,0.2827,100
-binomial_negativa,Regressão binomial negativa (GLM para contagens),validacao_cruzada,3,acerto,0.561,0.5395,0.5832,-0.0533,-0.0614,-0.0456,100
-binomial_negativa,Regressão binomial negativa (GLM para contagens),validacao_cruzada,3,acerto_balanceado,0.5202,0.5078,0.5321,-0.042,-0.0516,-0.0327,100
-binomial_negativa,Regressão binomial negativa (GLM para contagens),validacao_cruzada,3,subidas_detectadas,0.5114,0.4907,0.5295,0.1654,0.1494,0.181,100
-binomial_negativa,Regressão binomial negativa (GLM para contagens),validacao_cruzada,3,alarmes_subida_corretos,0.4731,0.4546,0.4924,-0.1772,-0.1908,-0.1633,100
-binomial_negativa,Regressão binomial negativa (GLM para contagens),validacao_cruzada,3,quedas_detectadas,0.353,0.3325,0.375,-0.1999,-0.2233,-0.1774,100
-binomial_negativa,Regressão binomial negativa (GLM para contagens),validacao_cruzada,3,sentido_oposto,0.067,0.0603,0.0742,0.031,0.0273,0.0349,100
-binomial_negativa,Regressão binomial negativa (GLM para contagens),validacao_cruzada,3,razao_mae,0.9218,0.8872,0.9585,0.1939,0.15,0.231,100
-binomial_negativa,Regressão binomial negativa (GLM para contagens),validacao_cruzada,4,acerto,0.5766,0.5578,0.597,-0.042,-0.0494,-0.0352,100
-binomial_negativa,Regressão binomial negativa (GLM para contagens),validacao_cruzada,4,acerto_balanceado,0.565,0.5508,0.5789,-0.0269,-0.0348,-0.0193,100
-binomial_negativa,Regressão binomial negativa (GLM para contagens),validacao_cruzada,4,subidas_detectadas,0.5984,0.5763,0.619,0.1821,0.1681,0.1959,100
-binomial_negativa,Regressão binomial negativa (GLM para contagens),validacao_cruzada,4,alarmes_subida_corretos,0.4947,0.474,0.5162,-0.1562,-0.1678,-0.1442,100
-binomial_negativa,Regressão binomial negativa (GLM para contagens),validacao_cruzada,4,quedas_detectadas,0.4591,0.435,0.4834,-0.1476,-0.1648,-0.1316,100
-binomial_negativa,Regressão binomial negativa (GLM para contagens),validacao_cruzada,4,sentido_oposto,0.0821,0.0746,0.0899,0.0316,0.0276,0.0353,100
-binomial_negativa,Regressão binomial negativa (GLM para contagens),validacao_cruzada,4,razao_mae,0.8722,0.8405,0.9097,0.1549,0.1205,0.1854,100
-binomial_negativa,Regressão binomial negativa (GLM para contagens),validacao_final,1,acerto,0.6131,0.5753,0.6563,-0.0186,-0.0283,-0.0087,15
-binomial_negativa,Regressão binomial negativa (GLM para contagens),validacao_final,1,acerto_balanceado,0.3701,0.3631,0.3766,-0.017,-0.0352,-0.0005,15
-binomial_negativa,Regressão binomial negativa (GLM para contagens),validacao_final,1,subidas_detectadas,0.1482,0.1264,0.1681,0.0797,0.0554,0.1047,15
+binomial_negativa,Regressão binomial negativa (GLM para contagens),validacao_cruzada,1,razao_mae,1.11,1.0513,1.1721,0.2871,0.2049,0.3682,100
+binomial_negativa,Regressão binomial negativa (GLM para contagens),validacao_cruzada,2,acerto,0.5589,0.5362,0.5837,-0.0593,-0.0681,-0.0504,100
+binomial_negativa,Regressão binomial negativa (GLM para contagens),validacao_cruzada,2,acerto_balanceado,0.444,0.4368,0.4509,-0.0655,-0.0768,-0.054,100
+binomial_negativa,Regressão binomial negativa (GLM para contagens),validacao_cruzada,2,subidas_detectadas,0.3581,0.3406,0.3755,0.109,0.0916,0.1263,100
+binomial_negativa,Regressão binomial negativa (GLM para contagens),validacao_cruzada,2,alarmes_subida_corretos,0.4258,0.4096,0.4416,-0.2149,-0.2336,-0.1961,100
+binomial_negativa,Regressão binomial negativa (GLM para contagens),validacao_cruzada,2,quedas_detectadas,0.1808,0.1709,0.1907,-0.2546,-0.2849,-0.2241,100
+binomial_negativa,Regressão binomial negativa (GLM para contagens),validacao_cruzada,2,sentido_oposto,0.0436,0.0391,0.0482,0.0226,0.0191,0.0261,100
+binomial_negativa,Regressão binomial negativa (GLM para contagens),validacao_cruzada,2,razao_mae,0.9891,0.9516,1.0295,0.2315,0.1782,0.2823,100
+binomial_negativa,Regressão binomial negativa (GLM para contagens),validacao_cruzada,3,acerto,0.5612,0.5396,0.5835,-0.053,-0.0611,-0.0454,100
+binomial_negativa,Regressão binomial negativa (GLM para contagens),validacao_cruzada,3,acerto_balanceado,0.521,0.5085,0.533,-0.0415,-0.051,-0.0322,100
+binomial_negativa,Regressão binomial negativa (GLM para contagens),validacao_cruzada,3,subidas_detectadas,0.5101,0.4893,0.5283,0.165,0.1487,0.1806,100
+binomial_negativa,Regressão binomial negativa (GLM para contagens),validacao_cruzada,3,alarmes_subida_corretos,0.4732,0.4547,0.4926,-0.1777,-0.1915,-0.164,100
+binomial_negativa,Regressão binomial negativa (GLM para contagens),validacao_cruzada,3,quedas_detectadas,0.3572,0.3365,0.3794,-0.1986,-0.2218,-0.1762,100
+binomial_negativa,Regressão binomial negativa (GLM para contagens),validacao_cruzada,3,sentido_oposto,0.067,0.0603,0.0741,0.0308,0.0272,0.0348,100
+binomial_negativa,Regressão binomial negativa (GLM para contagens),validacao_cruzada,3,razao_mae,0.9215,0.887,0.9582,0.1934,0.1495,0.2304,100
+binomial_negativa,Regressão binomial negativa (GLM para contagens),validacao_cruzada,4,acerto,0.5767,0.5578,0.5971,-0.0421,-0.0494,-0.0354,100
+binomial_negativa,Regressão binomial negativa (GLM para contagens),validacao_cruzada,4,acerto_balanceado,0.5654,0.551,0.5796,-0.0268,-0.0345,-0.0192,100
+binomial_negativa,Regressão binomial negativa (GLM para contagens),validacao_cruzada,4,subidas_detectadas,0.5971,0.5748,0.6177,0.1813,0.1674,0.1949,100
+binomial_negativa,Regressão binomial negativa (GLM para contagens),validacao_cruzada,4,alarmes_subida_corretos,0.4948,0.4741,0.5163,-0.1565,-0.1681,-0.1441,100
+binomial_negativa,Regressão binomial negativa (GLM para contagens),validacao_cruzada,4,quedas_detectadas,0.4624,0.4385,0.487,-0.1471,-0.1643,-0.1311,100
+binomial_negativa,Regressão binomial negativa (GLM para contagens),validacao_cruzada,4,sentido_oposto,0.082,0.0744,0.0898,0.0314,0.0275,0.0352,100
+binomial_negativa,Regressão binomial negativa (GLM para contagens),validacao_cruzada,4,razao_mae,0.872,0.8402,0.9096,0.1546,0.12,0.185,100
+binomial_negativa,Regressão binomial negativa (GLM para contagens),validacao_final,1,acerto,0.6136,0.5757,0.6567,-0.0183,-0.028,-0.0087,15
+binomial_negativa,Regressão binomial negativa (GLM para contagens),validacao_final,1,acerto_balanceado,0.3704,0.3634,0.377,-0.0165,-0.0348,-0.0001,15
+binomial_negativa,Regressão binomial negativa (GLM para contagens),validacao_final,1,subidas_detectadas,0.1475,0.1256,0.1677,0.0794,0.0551,0.1044,15
 binomial_negativa,Regressão binomial negativa (GLM para contagens),validacao_final,1,alarmes_subida_corretos,0.354,0.3224,0.3914,-0.2268,-0.2896,-0.1324,15
-binomial_negativa,Regressão binomial negativa (GLM para contagens),validacao_final,1,quedas_detectadas,0.0436,0.0275,0.0626,-0.1057,-0.1537,-0.0616,15
-binomial_negativa,Regressão binomial negativa (GLM para contagens),validacao_final,1,sentido_oposto,0.0152,0.0119,0.0191,0.0094,0.0068,0.0123,15
-binomial_negativa,Regressão binomial negativa (GLM para contagens),validacao_final,1,razao_mae,1.0672,1.0034,1.1357,0.2836,0.2135,0.3486,15
-binomial_negativa,Regressão binomial negativa (GLM para contagens),validacao_final,2,acerto,0.5015,0.4665,0.5499,-0.0821,-0.1072,-0.0547,15
-binomial_negativa,Regressão binomial negativa (GLM para contagens),validacao_final,2,acerto_balanceado,0.44,0.4251,0.4563,-0.0779,-0.1063,-0.0478,15
-binomial_negativa,Regressão binomial negativa (GLM para contagens),validacao_final,2,subidas_detectadas,0.4154,0.3765,0.4556,0.1505,0.1093,0.1905,15
-binomial_negativa,Regressão binomial negativa (GLM para contagens),validacao_final,2,alarmes_subida_corretos,0.4345,0.4039,0.462,-0.231,-0.2802,-0.1798,15
-binomial_negativa,Regressão binomial negativa (GLM para contagens),validacao_final,2,quedas_detectadas,0.2118,0.1946,0.2274,-0.2824,-0.3442,-0.2142,15
-binomial_negativa,Regressão binomial negativa (GLM para contagens),validacao_final,2,sentido_oposto,0.0472,0.0386,0.0552,0.0239,0.0183,0.0303,15
-binomial_negativa,Regressão binomial negativa (GLM para contagens),validacao_final,2,razao_mae,0.9483,0.8897,1.0152,0.235,0.1789,0.2855,15
-binomial_negativa,Regressão binomial negativa (GLM para contagens),validacao_final,3,acerto,0.5308,0.5008,0.569,-0.0614,-0.0763,-0.0464,15
-binomial_negativa,Regressão binomial negativa (GLM para contagens),validacao_final,3,acerto_balanceado,0.524,0.4991,0.5482,-0.0478,-0.0649,-0.0303,15
-binomial_negativa,Regressão binomial negativa (GLM para contagens),validacao_final,3,subidas_detectadas,0.5735,0.5325,0.6114,0.1966,0.1601,0.2345,15
-binomial_negativa,Regressão binomial negativa (GLM para contagens),validacao_final,3,alarmes_subida_corretos,0.4909,0.4492,0.5266,-0.1877,-0.2141,-0.1609,15
-binomial_negativa,Regressão binomial negativa (GLM para contagens),validacao_final,3,quedas_detectadas,0.4272,0.3775,0.4703,-0.2031,-0.2337,-0.1687,15
-binomial_negativa,Regressão binomial negativa (GLM para contagens),validacao_final,3,sentido_oposto,0.0744,0.0631,0.0848,0.0384,0.0295,0.0476,15
-binomial_negativa,Regressão binomial negativa (GLM para contagens),validacao_final,3,razao_mae,0.8833,0.8257,0.9481,0.1992,0.1468,0.2466,15
-binomial_negativa,Regressão binomial negativa (GLM para contagens),validacao_final,4,acerto,0.5533,0.5234,0.5851,-0.046,-0.0624,-0.0301,15
-binomial_negativa,Regressão binomial negativa (GLM para contagens),validacao_final,4,acerto_balanceado,0.558,0.5264,0.586,-0.0359,-0.0516,-0.0213,15
-binomial_negativa,Regressão binomial negativa (GLM para contagens),validacao_final,4,subidas_detectadas,0.6433,0.6149,0.6678,0.1865,0.1619,0.2108,15
+binomial_negativa,Regressão binomial negativa (GLM para contagens),validacao_final,1,quedas_detectadas,0.0444,0.0274,0.0653,-0.1041,-0.1525,-0.0591,15
+binomial_negativa,Regressão binomial negativa (GLM para contagens),validacao_final,1,sentido_oposto,0.0153,0.012,0.019,0.0095,0.0071,0.0124,15
+binomial_negativa,Regressão binomial negativa (GLM para contagens),validacao_final,1,razao_mae,1.0669,1.0032,1.1355,0.2831,0.2132,0.3477,15
+binomial_negativa,Regressão binomial negativa (GLM para contagens),validacao_final,2,acerto,0.5026,0.4677,0.5505,-0.0815,-0.1063,-0.0548,15
+binomial_negativa,Regressão binomial negativa (GLM para contagens),validacao_final,2,acerto_balanceado,0.4415,0.4267,0.4578,-0.0768,-0.1043,-0.0473,15
+binomial_negativa,Regressão binomial negativa (GLM para contagens),validacao_final,2,subidas_detectadas,0.4152,0.3763,0.4556,0.1504,0.1093,0.1905,15
+binomial_negativa,Regressão binomial negativa (GLM para contagens),validacao_final,2,alarmes_subida_corretos,0.4345,0.4039,0.462,-0.2321,-0.2813,-0.181,15
+binomial_negativa,Regressão binomial negativa (GLM para contagens),validacao_final,2,quedas_detectadas,0.2167,0.1981,0.2326,-0.2799,-0.3389,-0.2162,15
+binomial_negativa,Regressão binomial negativa (GLM para contagens),validacao_final,2,sentido_oposto,0.0469,0.0384,0.0549,0.024,0.0182,0.0301,15
+binomial_negativa,Regressão binomial negativa (GLM para contagens),validacao_final,2,razao_mae,0.9477,0.8889,1.0147,0.2346,0.1783,0.2853,15
+binomial_negativa,Regressão binomial negativa (GLM para contagens),validacao_final,3,acerto,0.5306,0.5006,0.569,-0.0619,-0.0767,-0.0472,15
+binomial_negativa,Regressão binomial negativa (GLM para contagens),validacao_final,3,acerto_balanceado,0.5244,0.4994,0.5486,-0.0478,-0.0647,-0.0303,15
+binomial_negativa,Regressão binomial negativa (GLM para contagens),validacao_final,3,subidas_detectadas,0.5732,0.5314,0.6114,0.1959,0.1594,0.2343,15
+binomial_negativa,Regressão binomial negativa (GLM para contagens),validacao_final,3,alarmes_subida_corretos,0.4909,0.4492,0.5266,-0.191,-0.2182,-0.1636,15
+binomial_negativa,Regressão binomial negativa (GLM para contagens),validacao_final,3,quedas_detectadas,0.4308,0.3812,0.4731,-0.202,-0.2322,-0.1681,15
+binomial_negativa,Regressão binomial negativa (GLM para contagens),validacao_final,3,sentido_oposto,0.0742,0.0629,0.0846,0.0384,0.0295,0.0474,15
+binomial_negativa,Regressão binomial negativa (GLM para contagens),validacao_final,3,razao_mae,0.8829,0.8253,0.9475,0.199,0.1466,0.2465,15
+binomial_negativa,Regressão binomial negativa (GLM para contagens),validacao_final,4,acerto,0.5533,0.5231,0.5853,-0.046,-0.0619,-0.0304,15
+binomial_negativa,Regressão binomial negativa (GLM para contagens),validacao_final,4,acerto_balanceado,0.5583,0.5267,0.5863,-0.0355,-0.0509,-0.0213,15
+binomial_negativa,Regressão binomial negativa (GLM para contagens),validacao_final,4,subidas_detectadas,0.6425,0.6139,0.6671,0.1863,0.1617,0.2107,15
 binomial_negativa,Regressão binomial negativa (GLM para contagens),validacao_final,4,alarmes_subida_corretos,0.5214,0.4762,0.5599,-0.1688,-0.1855,-0.15,15
-binomial_negativa,Regressão binomial negativa (GLM para contagens),validacao_final,4,quedas_detectadas,0.5357,0.4788,0.5788,-0.1304,-0.1552,-0.1045,15
-binomial_negativa,Regressão binomial negativa (GLM para contagens),validacao_final,4,sentido_oposto,0.0893,0.0784,0.0998,0.0419,0.0352,0.0498,15
-binomial_negativa,Regressão binomial negativa (GLM para contagens),validacao_final,4,razao_mae,0.8292,0.7725,0.8975,0.1677,0.1207,0.2079,15
-lightgbm_atual,LightGBM atual (hiperparâmetros fixos),validacao_cruzada,1,acerto,0.6598,0.6406,0.6796,0.0,0.0,0.0,100
-lightgbm_atual,LightGBM atual (hiperparâmetros fixos),validacao_cruzada,1,acerto_balanceado,0.3866,0.381,0.3924,0.0,0.0,0.0,100
-lightgbm_atual,LightGBM atual (hiperparâmetros fixos),validacao_cruzada,1,subidas_detectadas,0.0731,0.0653,0.0811,0.0,0.0,0.0,100
-lightgbm_atual,LightGBM atual (hiperparâmetros fixos),validacao_cruzada,1,alarmes_subida_corretos,0.5703,0.5354,0.6018,0.0,0.0,0.0,100
-lightgbm_atual,LightGBM atual (hiperparâmetros fixos),validacao_cruzada,1,quedas_detectadas,0.1304,0.1159,0.1457,0.0,0.0,0.0,100
-lightgbm_atual,LightGBM atual (hiperparâmetros fixos),validacao_cruzada,1,sentido_oposto,0.0052,0.0045,0.006,0.0,0.0,0.0,100
-lightgbm_atual,LightGBM atual (hiperparâmetros fixos),validacao_cruzada,1,razao_mae,0.8228,0.7942,0.8569,0.0,0.0,0.0,100
-lightgbm_atual,LightGBM atual (hiperparâmetros fixos),validacao_cruzada,2,acerto,0.6185,0.5981,0.6391,0.0,0.0,0.0,100
-lightgbm_atual,LightGBM atual (hiperparâmetros fixos),validacao_cruzada,2,acerto_balanceado,0.5093,0.496,0.5216,0.0,0.0,0.0,100
-lightgbm_atual,LightGBM atual (hiperparâmetros fixos),validacao_cruzada,2,subidas_detectadas,0.2497,0.2342,0.2647,0.0,0.0,0.0,100
-lightgbm_atual,LightGBM atual (hiperparâmetros fixos),validacao_cruzada,2,alarmes_subida_corretos,0.6404,0.615,0.6636,0.0,0.0,0.0,100
-lightgbm_atual,LightGBM atual (hiperparâmetros fixos),validacao_cruzada,2,quedas_detectadas,0.4329,0.4048,0.4615,0.0,0.0,0.0,100
-lightgbm_atual,LightGBM atual (hiperparâmetros fixos),validacao_cruzada,2,sentido_oposto,0.0209,0.0186,0.0232,0.0,0.0,0.0,100
-lightgbm_atual,LightGBM atual (hiperparâmetros fixos),validacao_cruzada,2,razao_mae,0.7578,0.7195,0.7966,0.0,0.0,0.0,100
-lightgbm_atual,LightGBM atual (hiperparâmetros fixos),validacao_cruzada,3,acerto,0.6142,0.5926,0.6362,0.0,0.0,0.0,100
-lightgbm_atual,LightGBM atual (hiperparâmetros fixos),validacao_cruzada,3,acerto_balanceado,0.5623,0.5468,0.577,0.0,0.0,0.0,100
-lightgbm_atual,LightGBM atual (hiperparâmetros fixos),validacao_cruzada,3,subidas_detectadas,0.346,0.3273,0.3639,0.0,0.0,0.0,100
-lightgbm_atual,LightGBM atual (hiperparâmetros fixos),validacao_cruzada,3,alarmes_subida_corretos,0.6503,0.6246,0.6756,0.0,0.0,0.0,100
-lightgbm_atual,LightGBM atual (hiperparâmetros fixos),validacao_cruzada,3,quedas_detectadas,0.5529,0.5245,0.5792,0.0,0.0,0.0,100
-lightgbm_atual,LightGBM atual (hiperparâmetros fixos),validacao_cruzada,3,sentido_oposto,0.0361,0.0319,0.0405,0.0,0.0,0.0,100
-lightgbm_atual,LightGBM atual (hiperparâmetros fixos),validacao_cruzada,3,razao_mae,0.728,0.6975,0.7665,0.0,0.0,0.0,100
-lightgbm_atual,LightGBM atual (hiperparâmetros fixos),validacao_cruzada,4,acerto,0.6186,0.598,0.64,0.0,0.0,0.0,100
-lightgbm_atual,LightGBM atual (hiperparâmetros fixos),validacao_cruzada,4,acerto_balanceado,0.5919,0.5757,0.6064,0.0,0.0,0.0,100
-lightgbm_atual,LightGBM atual (hiperparâmetros fixos),validacao_cruzada,4,subidas_detectadas,0.4164,0.3948,0.4372,0.0,0.0,0.0,100
-lightgbm_atual,LightGBM atual (hiperparâmetros fixos),validacao_cruzada,4,alarmes_subida_corretos,0.6509,0.6259,0.6765,0.0,0.0,0.0,100
-lightgbm_atual,LightGBM atual (hiperparâmetros fixos),validacao_cruzada,4,quedas_detectadas,0.6068,0.5819,0.6311,0.0,0.0,0.0,100
-lightgbm_atual,LightGBM atual (hiperparâmetros fixos),validacao_cruzada,4,sentido_oposto,0.0505,0.0449,0.0562,0.0,0.0,0.0,100
-lightgbm_atual,LightGBM atual (hiperparâmetros fixos),validacao_cruzada,4,razao_mae,0.7173,0.6912,0.7498,0.0,0.0,0.0,100
-lightgbm_atual,LightGBM atual (hiperparâmetros fixos),validacao_final,1,acerto,0.6317,0.5942,0.6752,0.0,0.0,0.0,15
-lightgbm_atual,LightGBM atual (hiperparâmetros fixos),validacao_final,1,acerto_balanceado,0.3871,0.373,0.4026,0.0,0.0,0.0,15
-lightgbm_atual,LightGBM atual (hiperparâmetros fixos),validacao_final,1,subidas_detectadas,0.0685,0.0473,0.0908,0.0,0.0,0.0,15
+binomial_negativa,Regressão binomial negativa (GLM para contagens),validacao_final,4,quedas_detectadas,0.5386,0.4822,0.5815,-0.1298,-0.1542,-0.1046,15
+binomial_negativa,Regressão binomial negativa (GLM para contagens),validacao_final,4,sentido_oposto,0.0892,0.0781,0.0998,0.0417,0.035,0.0496,15
+binomial_negativa,Regressão binomial negativa (GLM para contagens),validacao_final,4,razao_mae,0.829,0.7726,0.8968,0.1676,0.1207,0.2077,15
+lightgbm_atual,LightGBM atual (hiperparâmetros fixos),validacao_cruzada,1,acerto,0.6602,0.641,0.6798,0.0,0.0,0.0,100
+lightgbm_atual,LightGBM atual (hiperparâmetros fixos),validacao_cruzada,1,acerto_balanceado,0.3865,0.3809,0.3922,0.0,0.0,0.0,100
+lightgbm_atual,LightGBM atual (hiperparâmetros fixos),validacao_cruzada,1,subidas_detectadas,0.0729,0.0651,0.0808,0.0,0.0,0.0,100
+lightgbm_atual,LightGBM atual (hiperparâmetros fixos),validacao_cruzada,1,alarmes_subida_corretos,0.5722,0.5376,0.6034,0.0,0.0,0.0,100
+lightgbm_atual,LightGBM atual (hiperparâmetros fixos),validacao_cruzada,1,quedas_detectadas,0.1299,0.1153,0.1452,0.0,0.0,0.0,100
+lightgbm_atual,LightGBM atual (hiperparâmetros fixos),validacao_cruzada,1,sentido_oposto,0.0052,0.0044,0.0059,0.0,0.0,0.0,100
+lightgbm_atual,LightGBM atual (hiperparâmetros fixos),validacao_cruzada,1,razao_mae,0.8229,0.7942,0.8571,0.0,0.0,0.0,100
+lightgbm_atual,LightGBM atual (hiperparâmetros fixos),validacao_cruzada,2,acerto,0.6182,0.5979,0.6386,0.0,0.0,0.0,100
+lightgbm_atual,LightGBM atual (hiperparâmetros fixos),validacao_cruzada,2,acerto_balanceado,0.5095,0.4961,0.5216,0.0,0.0,0.0,100
+lightgbm_atual,LightGBM atual (hiperparâmetros fixos),validacao_cruzada,2,subidas_detectadas,0.2491,0.2337,0.2641,0.0,0.0,0.0,100
+lightgbm_atual,LightGBM atual (hiperparâmetros fixos),validacao_cruzada,2,alarmes_subida_corretos,0.6407,0.6158,0.6636,0.0,0.0,0.0,100
+lightgbm_atual,LightGBM atual (hiperparâmetros fixos),validacao_cruzada,2,quedas_detectadas,0.4354,0.4073,0.4646,0.0,0.0,0.0,100
+lightgbm_atual,LightGBM atual (hiperparâmetros fixos),validacao_cruzada,2,sentido_oposto,0.0211,0.0188,0.0234,0.0,0.0,0.0,100
+lightgbm_atual,LightGBM atual (hiperparâmetros fixos),validacao_cruzada,2,razao_mae,0.7576,0.7196,0.7966,0.0,0.0,0.0,100
+lightgbm_atual,LightGBM atual (hiperparâmetros fixos),validacao_cruzada,3,acerto,0.6142,0.5922,0.6361,0.0,0.0,0.0,100
+lightgbm_atual,LightGBM atual (hiperparâmetros fixos),validacao_cruzada,3,acerto_balanceado,0.5625,0.5471,0.5772,0.0,0.0,0.0,100
+lightgbm_atual,LightGBM atual (hiperparâmetros fixos),validacao_cruzada,3,subidas_detectadas,0.3451,0.3263,0.3631,0.0,0.0,0.0,100
+lightgbm_atual,LightGBM atual (hiperparâmetros fixos),validacao_cruzada,3,alarmes_subida_corretos,0.651,0.6254,0.6761,0.0,0.0,0.0,100
+lightgbm_atual,LightGBM atual (hiperparâmetros fixos),validacao_cruzada,3,quedas_detectadas,0.5558,0.5273,0.582,0.0,0.0,0.0,100
+lightgbm_atual,LightGBM atual (hiperparâmetros fixos),validacao_cruzada,3,sentido_oposto,0.0362,0.0319,0.0407,0.0,0.0,0.0,100
+lightgbm_atual,LightGBM atual (hiperparâmetros fixos),validacao_cruzada,3,razao_mae,0.7282,0.6977,0.7668,0.0,0.0,0.0,100
+lightgbm_atual,LightGBM atual (hiperparâmetros fixos),validacao_cruzada,4,acerto,0.6188,0.598,0.6403,0.0,0.0,0.0,100
+lightgbm_atual,LightGBM atual (hiperparâmetros fixos),validacao_cruzada,4,acerto_balanceado,0.5922,0.576,0.6067,0.0,0.0,0.0,100
+lightgbm_atual,LightGBM atual (hiperparâmetros fixos),validacao_cruzada,4,subidas_detectadas,0.4157,0.3938,0.4366,0.0,0.0,0.0,100
+lightgbm_atual,LightGBM atual (hiperparâmetros fixos),validacao_cruzada,4,alarmes_subida_corretos,0.6513,0.6261,0.6772,0.0,0.0,0.0,100
+lightgbm_atual,LightGBM atual (hiperparâmetros fixos),validacao_cruzada,4,quedas_detectadas,0.6096,0.5847,0.6339,0.0,0.0,0.0,100
+lightgbm_atual,LightGBM atual (hiperparâmetros fixos),validacao_cruzada,4,sentido_oposto,0.0505,0.0449,0.0564,0.0,0.0,0.0,100
+lightgbm_atual,LightGBM atual (hiperparâmetros fixos),validacao_cruzada,4,razao_mae,0.7174,0.6912,0.7497,0.0,0.0,0.0,100
+lightgbm_atual,LightGBM atual (hiperparâmetros fixos),validacao_final,1,acerto,0.6319,0.5942,0.676,0.0,0.0,0.0,15
+lightgbm_atual,LightGBM atual (hiperparâmetros fixos),validacao_final,1,acerto_balanceado,0.3869,0.373,0.402,0.0,0.0,0.0,15
+lightgbm_atual,LightGBM atual (hiperparâmetros fixos),validacao_final,1,subidas_detectadas,0.0682,0.0471,0.0903,0.0,0.0,0.0,15
 lightgbm_atual,LightGBM atual (hiperparâmetros fixos),validacao_final,1,alarmes_subida_corretos,0.5809,0.4779,0.6514,0.0,0.0,0.0,15
-lightgbm_atual,LightGBM atual (hiperparâmetros fixos),validacao_final,1,quedas_detectadas,0.1494,0.1175,0.1866,0.0,0.0,0.0,15
-lightgbm_atual,LightGBM atual (hiperparâmetros fixos),validacao_final,1,sentido_oposto,0.0058,0.0041,0.0077,0.0,0.0,0.0,15
-lightgbm_atual,LightGBM atual (hiperparâmetros fixos),validacao_final,1,razao_mae,0.7836,0.751,0.8186,0.0,0.0,0.0,15
-lightgbm_atual,LightGBM atual (hiperparâmetros fixos),validacao_final,2,acerto,0.5836,0.5407,0.6325,0.0,0.0,0.0,15
-lightgbm_atual,LightGBM atual (hiperparâmetros fixos),validacao_final,2,acerto_balanceado,0.5178,0.4843,0.5488,0.0,0.0,0.0,15
-lightgbm_atual,LightGBM atual (hiperparâmetros fixos),validacao_final,2,subidas_detectadas,0.265,0.2323,0.2974,0.0,0.0,0.0,15
-lightgbm_atual,LightGBM atual (hiperparâmetros fixos),validacao_final,2,alarmes_subida_corretos,0.6656,0.6015,0.7227,0.0,0.0,0.0,15
-lightgbm_atual,LightGBM atual (hiperparâmetros fixos),validacao_final,2,quedas_detectadas,0.4942,0.4264,0.5589,0.0,0.0,0.0,15
-lightgbm_atual,LightGBM atual (hiperparâmetros fixos),validacao_final,2,sentido_oposto,0.0232,0.0173,0.0294,0.0,0.0,0.0,15
-lightgbm_atual,LightGBM atual (hiperparâmetros fixos),validacao_final,2,razao_mae,0.7133,0.6777,0.7538,0.0,0.0,0.0,15
-lightgbm_atual,LightGBM atual (hiperparâmetros fixos),validacao_final,3,acerto,0.5921,0.5589,0.632,0.0,0.0,0.0,15
-lightgbm_atual,LightGBM atual (hiperparâmetros fixos),validacao_final,3,acerto_balanceado,0.5718,0.5435,0.5974,0.0,0.0,0.0,15
-lightgbm_atual,LightGBM atual (hiperparâmetros fixos),validacao_final,3,subidas_detectadas,0.3769,0.3435,0.4076,0.0,0.0,0.0,15
-lightgbm_atual,LightGBM atual (hiperparâmetros fixos),validacao_final,3,alarmes_subida_corretos,0.6786,0.6192,0.7297,0.0,0.0,0.0,15
-lightgbm_atual,LightGBM atual (hiperparâmetros fixos),validacao_final,3,quedas_detectadas,0.6303,0.5727,0.686,0.0,0.0,0.0,15
-lightgbm_atual,LightGBM atual (hiperparâmetros fixos),validacao_final,3,sentido_oposto,0.036,0.0278,0.0446,0.0,0.0,0.0,15
-lightgbm_atual,LightGBM atual (hiperparâmetros fixos),validacao_final,3,razao_mae,0.6841,0.6468,0.7222,0.0,0.0,0.0,15
-lightgbm_atual,LightGBM atual (hiperparâmetros fixos),validacao_final,4,acerto,0.5993,0.5649,0.6375,0.0,0.0,0.0,15
-lightgbm_atual,LightGBM atual (hiperparâmetros fixos),validacao_final,4,acerto_balanceado,0.5939,0.5621,0.6227,0.0,0.0,0.0,15
-lightgbm_atual,LightGBM atual (hiperparâmetros fixos),validacao_final,4,subidas_detectadas,0.4567,0.4311,0.4792,0.0,0.0,0.0,15
+lightgbm_atual,LightGBM atual (hiperparâmetros fixos),validacao_final,1,quedas_detectadas,0.1485,0.1167,0.1854,0.0,0.0,0.0,15
+lightgbm_atual,LightGBM atual (hiperparâmetros fixos),validacao_final,1,sentido_oposto,0.0058,0.0041,0.0076,0.0,0.0,0.0,15
+lightgbm_atual,LightGBM atual (hiperparâmetros fixos),validacao_final,1,razao_mae,0.7839,0.7512,0.8185,0.0,0.0,0.0,15
+lightgbm_atual,LightGBM atual (hiperparâmetros fixos),validacao_final,2,acerto,0.584,0.5417,0.633,0.0,0.0,0.0,15
+lightgbm_atual,LightGBM atual (hiperparâmetros fixos),validacao_final,2,acerto_balanceado,0.5183,0.4851,0.5487,0.0,0.0,0.0,15
+lightgbm_atual,LightGBM atual (hiperparâmetros fixos),validacao_final,2,subidas_detectadas,0.2648,0.2322,0.2972,0.0,0.0,0.0,15
+lightgbm_atual,LightGBM atual (hiperparâmetros fixos),validacao_final,2,alarmes_subida_corretos,0.6667,0.6028,0.7237,0.0,0.0,0.0,15
+lightgbm_atual,LightGBM atual (hiperparâmetros fixos),validacao_final,2,quedas_detectadas,0.4966,0.4309,0.5586,0.0,0.0,0.0,15
+lightgbm_atual,LightGBM atual (hiperparâmetros fixos),validacao_final,2,sentido_oposto,0.023,0.0172,0.0291,0.0,0.0,0.0,15
+lightgbm_atual,LightGBM atual (hiperparâmetros fixos),validacao_final,2,razao_mae,0.7131,0.6778,0.7535,0.0,0.0,0.0,15
+lightgbm_atual,LightGBM atual (hiperparâmetros fixos),validacao_final,3,acerto,0.5925,0.5592,0.6322,0.0,0.0,0.0,15
+lightgbm_atual,LightGBM atual (hiperparâmetros fixos),validacao_final,3,acerto_balanceado,0.5722,0.5438,0.5979,0.0,0.0,0.0,15
+lightgbm_atual,LightGBM atual (hiperparâmetros fixos),validacao_final,3,subidas_detectadas,0.3773,0.3438,0.4086,0.0,0.0,0.0,15
+lightgbm_atual,LightGBM atual (hiperparâmetros fixos),validacao_final,3,alarmes_subida_corretos,0.682,0.6222,0.732,0.0,0.0,0.0,15
+lightgbm_atual,LightGBM atual (hiperparâmetros fixos),validacao_final,3,quedas_detectadas,0.6328,0.5756,0.6881,0.0,0.0,0.0,15
+lightgbm_atual,LightGBM atual (hiperparâmetros fixos),validacao_final,3,sentido_oposto,0.0358,0.0275,0.0447,0.0,0.0,0.0,15
+lightgbm_atual,LightGBM atual (hiperparâmetros fixos),validacao_final,3,razao_mae,0.6838,0.6467,0.722,0.0,0.0,0.0,15
+lightgbm_atual,LightGBM atual (hiperparâmetros fixos),validacao_final,4,acerto,0.5993,0.5651,0.6373,0.0,0.0,0.0,15
+lightgbm_atual,LightGBM atual (hiperparâmetros fixos),validacao_final,4,acerto_balanceado,0.5937,0.5624,0.6219,0.0,0.0,0.0,15
+lightgbm_atual,LightGBM atual (hiperparâmetros fixos),validacao_final,4,subidas_detectadas,0.4562,0.4307,0.4785,0.0,0.0,0.0,15
 lightgbm_atual,LightGBM atual (hiperparâmetros fixos),validacao_final,4,alarmes_subida_corretos,0.6902,0.6426,0.7293,0.0,0.0,0.0,15
-lightgbm_atual,LightGBM atual (hiperparâmetros fixos),validacao_final,4,quedas_detectadas,0.6661,0.6085,0.7146,0.0,0.0,0.0,15
-lightgbm_atual,LightGBM atual (hiperparâmetros fixos),validacao_final,4,sentido_oposto,0.0474,0.0397,0.055,0.0,0.0,0.0,15
-lightgbm_atual,LightGBM atual (hiperparâmetros fixos),validacao_final,4,razao_mae,0.6615,0.6232,0.7051,0.0,0.0,0.0,15
-lightgbm_ajustado,"LightGBM com hiperparâmetros ajustados (busca em grade, 2015-2018)",validacao_cruzada,1,acerto,0.6577,0.6387,0.6774,-0.0021,-0.0044,0.0002,100
-lightgbm_ajustado,"LightGBM com hiperparâmetros ajustados (busca em grade, 2015-2018)",validacao_cruzada,1,acerto_balanceado,0.3976,0.3912,0.4041,0.0109,0.0073,0.0144,100
-lightgbm_ajustado,"LightGBM com hiperparâmetros ajustados (busca em grade, 2015-2018)",validacao_cruzada,1,subidas_detectadas,0.0951,0.0863,0.104,0.022,0.0153,0.0285,100
-lightgbm_ajustado,"LightGBM com hiperparâmetros ajustados (busca em grade, 2015-2018)",validacao_cruzada,1,alarmes_subida_corretos,0.5359,0.5043,0.5672,-0.0345,-0.061,-0.0077,100
-lightgbm_ajustado,"LightGBM com hiperparâmetros ajustados (busca em grade, 2015-2018)",validacao_cruzada,1,quedas_detectadas,0.1573,0.1428,0.1715,0.0269,0.02,0.0338,100
-lightgbm_ajustado,"LightGBM com hiperparâmetros ajustados (busca em grade, 2015-2018)",validacao_cruzada,1,sentido_oposto,0.0068,0.0059,0.0077,0.0016,0.001,0.0023,100
-lightgbm_ajustado,"LightGBM com hiperparâmetros ajustados (busca em grade, 2015-2018)",validacao_cruzada,1,razao_mae,0.8286,0.801,0.862,0.0058,0.0015,0.0095,100
-lightgbm_ajustado,"LightGBM com hiperparâmetros ajustados (busca em grade, 2015-2018)",validacao_cruzada,2,acerto,0.6148,0.5944,0.6353,-0.0036,-0.0062,-0.0011,100
-lightgbm_ajustado,"LightGBM com hiperparâmetros ajustados (busca em grade, 2015-2018)",validacao_cruzada,2,acerto_balanceado,0.5067,0.4941,0.5183,-0.0026,-0.0055,0.0002,100
-lightgbm_ajustado,"LightGBM com hiperparâmetros ajustados (busca em grade, 2015-2018)",validacao_cruzada,2,subidas_detectadas,0.2554,0.2413,0.2688,0.0057,0.0001,0.0113,100
-lightgbm_ajustado,"LightGBM com hiperparâmetros ajustados (busca em grade, 2015-2018)",validacao_cruzada,2,alarmes_subida_corretos,0.621,0.598,0.6428,-0.0194,-0.029,-0.0098,100
-lightgbm_ajustado,"LightGBM com hiperparâmetros ajustados (busca em grade, 2015-2018)",validacao_cruzada,2,quedas_detectadas,0.4254,0.3981,0.4529,-0.0076,-0.013,-0.0021,100
-lightgbm_ajustado,"LightGBM com hiperparâmetros ajustados (busca em grade, 2015-2018)",validacao_cruzada,2,sentido_oposto,0.0216,0.0194,0.024,0.0008,-0.0002,0.0018,100
-lightgbm_ajustado,"LightGBM com hiperparâmetros ajustados (busca em grade, 2015-2018)",validacao_cruzada,2,razao_mae,0.7642,0.7289,0.8007,0.0064,0.0017,0.0108,100
-lightgbm_ajustado,"LightGBM com hiperparâmetros ajustados (busca em grade, 2015-2018)",validacao_cruzada,3,acerto,0.6129,0.5917,0.6343,-0.0014,-0.0041,0.0015,100
-lightgbm_ajustado,"LightGBM com hiperparâmetros ajustados (busca em grade, 2015-2018)",validacao_cruzada,3,acerto_balanceado,0.5619,0.5479,0.5756,-0.0004,-0.0033,0.0027,100
-lightgbm_ajustado,"LightGBM com hiperparâmetros ajustados (busca em grade, 2015-2018)",validacao_cruzada,3,subidas_detectadas,0.3507,0.3336,0.367,0.0047,-0.0012,0.0109,100
-lightgbm_ajustado,"LightGBM com hiperparâmetros ajustados (busca em grade, 2015-2018)",validacao_cruzada,3,alarmes_subida_corretos,0.6418,0.6178,0.6656,-0.0085,-0.0164,-0.0006,100
-lightgbm_ajustado,"LightGBM com hiperparâmetros ajustados (busca em grade, 2015-2018)",validacao_cruzada,3,quedas_detectadas,0.5517,0.5259,0.5766,-0.0012,-0.0062,0.0042,100
-lightgbm_ajustado,"LightGBM com hiperparâmetros ajustados (busca em grade, 2015-2018)",validacao_cruzada,3,sentido_oposto,0.0368,0.0327,0.041,0.0007,-0.0005,0.0018,100
-lightgbm_ajustado,"LightGBM com hiperparâmetros ajustados (busca em grade, 2015-2018)",validacao_cruzada,3,razao_mae,0.7325,0.7034,0.7694,0.0045,-0.0046,0.0122,100
-lightgbm_ajustado,"LightGBM com hiperparâmetros ajustados (busca em grade, 2015-2018)",validacao_cruzada,4,acerto,0.6153,0.5947,0.6366,-0.0033,-0.0059,-0.0008,100
-lightgbm_ajustado,"LightGBM com hiperparâmetros ajustados (busca em grade, 2015-2018)",validacao_cruzada,4,acerto_balanceado,0.5889,0.5737,0.6032,-0.003,-0.0057,-0.0002,100
-lightgbm_ajustado,"LightGBM com hiperparâmetros ajustados (busca em grade, 2015-2018)",validacao_cruzada,4,subidas_detectadas,0.4116,0.392,0.4299,-0.0047,-0.0108,0.0012,100
-lightgbm_ajustado,"LightGBM com hiperparâmetros ajustados (busca em grade, 2015-2018)",validacao_cruzada,4,alarmes_subida_corretos,0.6432,0.619,0.668,-0.0077,-0.0138,-0.0019,100
-lightgbm_ajustado,"LightGBM com hiperparâmetros ajustados (busca em grade, 2015-2018)",validacao_cruzada,4,quedas_detectadas,0.6077,0.5831,0.6304,0.0009,-0.0043,0.0061,100
-lightgbm_ajustado,"LightGBM com hiperparâmetros ajustados (busca em grade, 2015-2018)",validacao_cruzada,4,sentido_oposto,0.0506,0.0452,0.0561,0.0002,-0.0013,0.0015,100
-lightgbm_ajustado,"LightGBM com hiperparâmetros ajustados (busca em grade, 2015-2018)",validacao_cruzada,4,razao_mae,0.7138,0.6847,0.749,-0.0036,-0.0094,0.0023,100
-lightgbm_ajustado,"LightGBM com hiperparâmetros ajustados (busca em grade, 2015-2018)",validacao_final,1,acerto,0.6314,0.5949,0.6745,-0.0003,-0.0053,0.0041,15
-lightgbm_ajustado,"LightGBM com hiperparâmetros ajustados (busca em grade, 2015-2018)",validacao_final,1,acerto_balanceado,0.3979,0.3817,0.4141,0.0107,0.0037,0.0173,15
-lightgbm_ajustado,"LightGBM com hiperparâmetros ajustados (busca em grade, 2015-2018)",validacao_final,1,subidas_detectadas,0.0979,0.0741,0.1213,0.0295,0.0175,0.04,15
-lightgbm_ajustado,"LightGBM com hiperparâmetros ajustados (busca em grade, 2015-2018)",validacao_final,1,alarmes_subida_corretos,0.5567,0.4637,0.6244,-0.0242,-0.0672,0.0217,15
-lightgbm_ajustado,"LightGBM com hiperparâmetros ajustados (busca em grade, 2015-2018)",validacao_final,1,quedas_detectadas,0.1668,0.136,0.1987,0.0175,0.001,0.0332,15
-lightgbm_ajustado,"LightGBM com hiperparâmetros ajustados (busca em grade, 2015-2018)",validacao_final,1,sentido_oposto,0.0082,0.0061,0.0102,0.0024,0.0005,0.0041,15
-lightgbm_ajustado,"LightGBM com hiperparâmetros ajustados (busca em grade, 2015-2018)",validacao_final,1,razao_mae,0.7977,0.7623,0.8342,0.0141,0.007,0.0217,15
-lightgbm_ajustado,"LightGBM com hiperparâmetros ajustados (busca em grade, 2015-2018)",validacao_final,2,acerto,0.5836,0.5412,0.6323,0.0,-0.0053,0.0051,15
-lightgbm_ajustado,"LightGBM com hiperparâmetros ajustados (busca em grade, 2015-2018)",validacao_final,2,acerto_balanceado,0.5185,0.4857,0.5503,0.0006,-0.0054,0.0068,15
-lightgbm_ajustado,"LightGBM com hiperparâmetros ajustados (busca em grade, 2015-2018)",validacao_final,2,subidas_detectadas,0.2803,0.247,0.3146,0.0153,0.0,0.0309,15
-lightgbm_ajustado,"LightGBM com hiperparâmetros ajustados (busca em grade, 2015-2018)",validacao_final,2,alarmes_subida_corretos,0.6683,0.6053,0.7222,0.0027,-0.0137,0.0215,15
-lightgbm_ajustado,"LightGBM com hiperparâmetros ajustados (busca em grade, 2015-2018)",validacao_final,2,quedas_detectadas,0.4832,0.4173,0.5506,-0.011,-0.0196,-0.0008,15
-lightgbm_ajustado,"LightGBM com hiperparâmetros ajustados (busca em grade, 2015-2018)",validacao_final,2,sentido_oposto,0.0221,0.0161,0.0284,-0.0012,-0.0027,0.0003,15
-lightgbm_ajustado,"LightGBM com hiperparâmetros ajustados (busca em grade, 2015-2018)",validacao_final,2,razao_mae,0.7225,0.6822,0.7658,0.0092,-0.0008,0.0196,15
-lightgbm_ajustado,"LightGBM com hiperparâmetros ajustados (busca em grade, 2015-2018)",validacao_final,3,acerto,0.5895,0.5532,0.6315,-0.0026,-0.0091,0.0038,15
-lightgbm_ajustado,"LightGBM com hiperparâmetros ajustados (busca em grade, 2015-2018)",validacao_final,3,acerto_balanceado,0.5699,0.5392,0.5982,-0.002,-0.0083,0.0047,15
-lightgbm_ajustado,"LightGBM com hiperparâmetros ajustados (busca em grade, 2015-2018)",validacao_final,3,subidas_detectadas,0.3829,0.3502,0.4129,0.006,-0.0078,0.0202,15
-lightgbm_ajustado,"LightGBM com hiperparâmetros ajustados (busca em grade, 2015-2018)",validacao_final,3,alarmes_subida_corretos,0.6814,0.6221,0.735,0.0027,-0.0122,0.0199,15
-lightgbm_ajustado,"LightGBM com hiperparâmetros ajustados (busca em grade, 2015-2018)",validacao_final,3,quedas_detectadas,0.6243,0.5693,0.6795,-0.006,-0.0161,0.0043,15
-lightgbm_ajustado,"LightGBM com hiperparâmetros ajustados (busca em grade, 2015-2018)",validacao_final,3,sentido_oposto,0.0379,0.0298,0.0456,0.0019,-0.0007,0.0046,15
-lightgbm_ajustado,"LightGBM com hiperparâmetros ajustados (busca em grade, 2015-2018)",validacao_final,3,razao_mae,0.6905,0.6481,0.7362,0.0064,-0.0042,0.0191,15
-lightgbm_ajustado,"LightGBM com hiperparâmetros ajustados (busca em grade, 2015-2018)",validacao_final,4,acerto,0.5981,0.5627,0.6361,-0.0012,-0.0053,0.0024,15
-lightgbm_ajustado,"LightGBM com hiperparâmetros ajustados (busca em grade, 2015-2018)",validacao_final,4,acerto_balanceado,0.5928,0.5605,0.6218,-0.0011,-0.0053,0.0026,15
-lightgbm_ajustado,"LightGBM com hiperparâmetros ajustados (busca em grade, 2015-2018)",validacao_final,4,subidas_detectadas,0.4528,0.4257,0.4774,-0.0039,-0.0138,0.006,15
-lightgbm_ajustado,"LightGBM com hiperparâmetros ajustados (busca em grade, 2015-2018)",validacao_final,4,alarmes_subida_corretos,0.6779,0.6296,0.7159,-0.0123,-0.0209,-0.003,15
-lightgbm_ajustado,"LightGBM com hiperparâmetros ajustados (busca em grade, 2015-2018)",validacao_final,4,quedas_detectadas,0.6705,0.6156,0.719,0.0043,-0.0041,0.0132,15
-lightgbm_ajustado,"LightGBM com hiperparâmetros ajustados (busca em grade, 2015-2018)",validacao_final,4,sentido_oposto,0.0498,0.0414,0.0586,0.0024,-0.0009,0.0057,15
-lightgbm_ajustado,"LightGBM com hiperparâmetros ajustados (busca em grade, 2015-2018)",validacao_final,4,razao_mae,0.6695,0.6199,0.7276,0.0079,-0.0071,0.0258,15
-lightgbm_quantis,LightGBM por quantis (mediana e intervalo de 80%),validacao_cruzada,1,acerto,0.6596,0.6407,0.6791,-0.0002,-0.0019,0.0017,100
-lightgbm_quantis,LightGBM por quantis (mediana e intervalo de 80%),validacao_cruzada,1,acerto_balanceado,0.3735,0.3693,0.3779,-0.0131,-0.0163,-0.0099,100
-lightgbm_quantis,LightGBM por quantis (mediana e intervalo de 80%),validacao_cruzada,1,subidas_detectadas,0.0701,0.0627,0.0774,-0.0031,-0.009,0.0029,100
-lightgbm_quantis,LightGBM por quantis (mediana e intervalo de 80%),validacao_cruzada,1,alarmes_subida_corretos,0.5393,0.5011,0.574,-0.031,-0.0621,0.0024,100
-lightgbm_quantis,LightGBM por quantis (mediana e intervalo de 80%),validacao_cruzada,1,quedas_detectadas,0.0812,0.0697,0.0931,-0.0493,-0.0568,-0.042,100
-lightgbm_quantis,LightGBM por quantis (mediana e intervalo de 80%),validacao_cruzada,1,sentido_oposto,0.004,0.0032,0.0048,-0.0012,-0.0018,-0.0006,100
-lightgbm_quantis,LightGBM por quantis (mediana e intervalo de 80%),validacao_cruzada,1,razao_mae,0.8126,0.7798,0.8493,-0.0102,-0.0155,-0.0049,100
-lightgbm_quantis,LightGBM por quantis (mediana e intervalo de 80%),validacao_cruzada,1,cobertura_intervalo_80,0.7957,0.7892,0.8021,,,,100
-lightgbm_quantis,LightGBM por quantis (mediana e intervalo de 80%),validacao_cruzada,2,acerto,0.6198,0.6002,0.64,0.0013,-0.0016,0.0041,100
-lightgbm_quantis,LightGBM por quantis (mediana e intervalo de 80%),validacao_cruzada,2,acerto_balanceado,0.4991,0.487,0.5107,-0.0102,-0.0139,-0.0068,100
-lightgbm_quantis,LightGBM por quantis (mediana e intervalo de 80%),validacao_cruzada,2,subidas_detectadas,0.2541,0.2391,0.269,0.0045,-0.001,0.0097,100
-lightgbm_quantis,LightGBM por quantis (mediana e intervalo de 80%),validacao_cruzada,2,alarmes_subida_corretos,0.6297,0.6064,0.6532,-0.0108,-0.0213,-0.0002,100
-lightgbm_quantis,LightGBM por quantis (mediana e intervalo de 80%),validacao_cruzada,2,quedas_detectadas,0.3738,0.3459,0.4025,-0.0591,-0.0666,-0.0519,100
-lightgbm_quantis,LightGBM por quantis (mediana e intervalo de 80%),validacao_cruzada,2,sentido_oposto,0.0173,0.0151,0.0195,-0.0036,-0.0045,-0.0027,100
-lightgbm_quantis,LightGBM por quantis (mediana e intervalo de 80%),validacao_cruzada,2,razao_mae,0.7514,0.7147,0.79,-0.0064,-0.0145,0.0022,100
-lightgbm_quantis,LightGBM por quantis (mediana e intervalo de 80%),validacao_cruzada,2,cobertura_intervalo_80,0.7917,0.7846,0.7983,,,,100
-lightgbm_quantis,LightGBM por quantis (mediana e intervalo de 80%),validacao_cruzada,3,acerto,0.6133,0.5917,0.6347,-0.001,-0.0036,0.0018,100
-lightgbm_quantis,LightGBM por quantis (mediana e intervalo de 80%),validacao_cruzada,3,acerto_balanceado,0.5537,0.5393,0.5682,-0.0085,-0.0116,-0.0054,100
-lightgbm_quantis,LightGBM por quantis (mediana e intervalo de 80%),validacao_cruzada,3,subidas_detectadas,0.3433,0.3228,0.3628,-0.0027,-0.0085,0.003,100
-lightgbm_quantis,LightGBM por quantis (mediana e intervalo de 80%),validacao_cruzada,3,alarmes_subida_corretos,0.6463,0.6205,0.6702,-0.004,-0.0111,0.0033,100
-lightgbm_quantis,LightGBM por quantis (mediana e intervalo de 80%),validacao_cruzada,3,quedas_detectadas,0.506,0.4783,0.5321,-0.0469,-0.0532,-0.041,100
-lightgbm_quantis,LightGBM por quantis (mediana e intervalo de 80%),validacao_cruzada,3,sentido_oposto,0.0307,0.0268,0.0349,-0.0054,-0.0066,-0.0042,100
-lightgbm_quantis,LightGBM por quantis (mediana e intervalo de 80%),validacao_cruzada,3,razao_mae,0.7215,0.6891,0.7613,-0.0065,-0.0146,0.0011,100
-lightgbm_quantis,LightGBM por quantis (mediana e intervalo de 80%),validacao_cruzada,3,cobertura_intervalo_80,0.7872,0.7794,0.7951,,,,100
-lightgbm_quantis,LightGBM por quantis (mediana e intervalo de 80%),validacao_cruzada,4,acerto,0.6182,0.5978,0.6388,-0.0004,-0.0033,0.0025,100
-lightgbm_quantis,LightGBM por quantis (mediana e intervalo de 80%),validacao_cruzada,4,acerto_balanceado,0.5865,0.5707,0.6013,-0.0054,-0.009,-0.002,100
-lightgbm_quantis,LightGBM por quantis (mediana e intervalo de 80%),validacao_cruzada,4,subidas_detectadas,0.412,0.3886,0.4337,-0.0044,-0.0108,0.0021,100
-lightgbm_quantis,LightGBM por quantis (mediana e intervalo de 80%),validacao_cruzada,4,alarmes_subida_corretos,0.6521,0.6263,0.6793,0.0012,-0.0045,0.0075,100
-lightgbm_quantis,LightGBM por quantis (mediana e intervalo de 80%),validacao_cruzada,4,quedas_detectadas,0.5689,0.5429,0.5942,-0.0379,-0.0437,-0.032,100
-lightgbm_quantis,LightGBM por quantis (mediana e intervalo de 80%),validacao_cruzada,4,sentido_oposto,0.0454,0.0401,0.0511,-0.0051,-0.0062,-0.004,100
-lightgbm_quantis,LightGBM por quantis (mediana e intervalo de 80%),validacao_cruzada,4,razao_mae,0.7009,0.6697,0.7377,-0.0165,-0.0281,-0.0033,100
-lightgbm_quantis,LightGBM por quantis (mediana e intervalo de 80%),validacao_cruzada,4,cobertura_intervalo_80,0.7833,0.7745,0.7918,,,,100
-lightgbm_quantis,LightGBM por quantis (mediana e intervalo de 80%),validacao_final,1,acerto,0.6394,0.6029,0.6812,0.0077,0.0032,0.0126,15
-lightgbm_quantis,LightGBM por quantis (mediana e intervalo de 80%),validacao_final,1,acerto_balanceado,0.3825,0.3707,0.3952,-0.0046,-0.0116,0.0018,15
-lightgbm_quantis,LightGBM por quantis (mediana e intervalo de 80%),validacao_final,1,subidas_detectadas,0.0763,0.0628,0.0905,0.0078,-0.0078,0.0224,15
+lightgbm_atual,LightGBM atual (hiperparâmetros fixos),validacao_final,4,quedas_detectadas,0.6685,0.6114,0.715,0.0,0.0,0.0,15
+lightgbm_atual,LightGBM atual (hiperparâmetros fixos),validacao_final,4,sentido_oposto,0.0475,0.0398,0.055,0.0,0.0,0.0,15
+lightgbm_atual,LightGBM atual (hiperparâmetros fixos),validacao_final,4,razao_mae,0.6615,0.6231,0.7051,0.0,0.0,0.0,15
+lightgbm_ajustado,"LightGBM com hiperparâmetros ajustados (busca em grade, 2015-2018)",validacao_cruzada,1,acerto,0.658,0.6391,0.6774,-0.0021,-0.0044,0.0001,100
+lightgbm_ajustado,"LightGBM com hiperparâmetros ajustados (busca em grade, 2015-2018)",validacao_cruzada,1,acerto_balanceado,0.3976,0.3914,0.404,0.0111,0.0076,0.0145,100
+lightgbm_ajustado,"LightGBM com hiperparâmetros ajustados (busca em grade, 2015-2018)",validacao_cruzada,1,subidas_detectadas,0.0955,0.0866,0.1044,0.0226,0.0162,0.0288,100
+lightgbm_ajustado,"LightGBM com hiperparâmetros ajustados (busca em grade, 2015-2018)",validacao_cruzada,1,alarmes_subida_corretos,0.5377,0.5065,0.5687,-0.0345,-0.0611,-0.0084,100
+lightgbm_ajustado,"LightGBM com hiperparâmetros ajustados (busca em grade, 2015-2018)",validacao_cruzada,1,quedas_detectadas,0.1571,0.1432,0.1709,0.0272,0.0204,0.0343,100
+lightgbm_ajustado,"LightGBM com hiperparâmetros ajustados (busca em grade, 2015-2018)",validacao_cruzada,1,sentido_oposto,0.0068,0.006,0.0077,0.0017,0.0011,0.0023,100
+lightgbm_ajustado,"LightGBM com hiperparâmetros ajustados (busca em grade, 2015-2018)",validacao_cruzada,1,razao_mae,0.8288,0.8008,0.8624,0.0058,0.0015,0.0096,100
+lightgbm_ajustado,"LightGBM com hiperparâmetros ajustados (busca em grade, 2015-2018)",validacao_cruzada,2,acerto,0.615,0.5945,0.6356,-0.0032,-0.0057,-0.0006,100
+lightgbm_ajustado,"LightGBM com hiperparâmetros ajustados (busca em grade, 2015-2018)",validacao_cruzada,2,acerto_balanceado,0.5071,0.4946,0.5188,-0.0024,-0.0053,0.0005,100
+lightgbm_ajustado,"LightGBM com hiperparâmetros ajustados (busca em grade, 2015-2018)",validacao_cruzada,2,subidas_detectadas,0.2548,0.2407,0.2682,0.0057,-0.0001,0.0114,100
+lightgbm_ajustado,"LightGBM com hiperparâmetros ajustados (busca em grade, 2015-2018)",validacao_cruzada,2,alarmes_subida_corretos,0.6238,0.6008,0.6451,-0.0169,-0.0265,-0.0071,100
+lightgbm_ajustado,"LightGBM com hiperparâmetros ajustados (busca em grade, 2015-2018)",validacao_cruzada,2,quedas_detectadas,0.4274,0.4006,0.4549,-0.008,-0.0136,-0.0023,100
+lightgbm_ajustado,"LightGBM com hiperparâmetros ajustados (busca em grade, 2015-2018)",validacao_cruzada,2,sentido_oposto,0.0218,0.0195,0.0242,0.0007,-0.0003,0.0017,100
+lightgbm_ajustado,"LightGBM com hiperparâmetros ajustados (busca em grade, 2015-2018)",validacao_cruzada,2,razao_mae,0.764,0.7287,0.8005,0.0064,0.0017,0.0107,100
+lightgbm_ajustado,"LightGBM com hiperparâmetros ajustados (busca em grade, 2015-2018)",validacao_cruzada,3,acerto,0.613,0.5919,0.6347,-0.0012,-0.0039,0.0016,100
+lightgbm_ajustado,"LightGBM com hiperparâmetros ajustados (busca em grade, 2015-2018)",validacao_cruzada,3,acerto_balanceado,0.5622,0.5478,0.576,-0.0003,-0.0032,0.0026,100
+lightgbm_ajustado,"LightGBM com hiperparâmetros ajustados (busca em grade, 2015-2018)",validacao_cruzada,3,subidas_detectadas,0.3494,0.3324,0.3658,0.0043,-0.0018,0.0105,100
+lightgbm_ajustado,"LightGBM com hiperparâmetros ajustados (busca em grade, 2015-2018)",validacao_cruzada,3,alarmes_subida_corretos,0.6416,0.6174,0.6652,-0.0094,-0.0171,-0.0017,100
+lightgbm_ajustado,"LightGBM com hiperparâmetros ajustados (busca em grade, 2015-2018)",validacao_cruzada,3,quedas_detectadas,0.5545,0.5282,0.5797,-0.0013,-0.0062,0.004,100
+lightgbm_ajustado,"LightGBM com hiperparâmetros ajustados (busca em grade, 2015-2018)",validacao_cruzada,3,sentido_oposto,0.0371,0.0329,0.0413,0.0009,-0.0002,0.002,100
+lightgbm_ajustado,"LightGBM com hiperparâmetros ajustados (busca em grade, 2015-2018)",validacao_cruzada,3,razao_mae,0.7326,0.7037,0.7694,0.0044,-0.0048,0.0121,100
+lightgbm_ajustado,"LightGBM com hiperparâmetros ajustados (busca em grade, 2015-2018)",validacao_cruzada,4,acerto,0.6153,0.5947,0.6365,-0.0035,-0.0061,-0.001,100
+lightgbm_ajustado,"LightGBM com hiperparâmetros ajustados (busca em grade, 2015-2018)",validacao_cruzada,4,acerto_balanceado,0.589,0.5736,0.6035,-0.0032,-0.0059,-0.0003,100
+lightgbm_ajustado,"LightGBM com hiperparâmetros ajustados (busca em grade, 2015-2018)",validacao_cruzada,4,subidas_detectadas,0.4108,0.3911,0.4293,-0.0049,-0.0109,0.001,100
+lightgbm_ajustado,"LightGBM com hiperparâmetros ajustados (busca em grade, 2015-2018)",validacao_cruzada,4,alarmes_subida_corretos,0.6433,0.6194,0.6677,-0.008,-0.0142,-0.0021,100
+lightgbm_ajustado,"LightGBM com hiperparâmetros ajustados (busca em grade, 2015-2018)",validacao_cruzada,4,quedas_detectadas,0.6103,0.5859,0.6331,0.0007,-0.0044,0.006,100
+lightgbm_ajustado,"LightGBM com hiperparâmetros ajustados (busca em grade, 2015-2018)",validacao_cruzada,4,sentido_oposto,0.0508,0.0453,0.0564,0.0002,-0.0011,0.0016,100
+lightgbm_ajustado,"LightGBM com hiperparâmetros ajustados (busca em grade, 2015-2018)",validacao_cruzada,4,razao_mae,0.7138,0.6849,0.7487,-0.0036,-0.0093,0.0022,100
+lightgbm_ajustado,"LightGBM com hiperparâmetros ajustados (busca em grade, 2015-2018)",validacao_final,1,acerto,0.6314,0.5942,0.6747,-0.0005,-0.0053,0.0041,15
+lightgbm_ajustado,"LightGBM com hiperparâmetros ajustados (busca em grade, 2015-2018)",validacao_final,1,acerto_balanceado,0.3975,0.3816,0.4137,0.0106,0.0036,0.0171,15
+lightgbm_ajustado,"LightGBM com hiperparâmetros ajustados (busca em grade, 2015-2018)",validacao_final,1,subidas_detectadas,0.0975,0.0739,0.1207,0.0293,0.0174,0.0399,15
+lightgbm_ajustado,"LightGBM com hiperparâmetros ajustados (busca em grade, 2015-2018)",validacao_final,1,alarmes_subida_corretos,0.5594,0.4698,0.625,-0.0215,-0.0642,0.0254,15
+lightgbm_ajustado,"LightGBM com hiperparâmetros ajustados (busca em grade, 2015-2018)",validacao_final,1,quedas_detectadas,0.1659,0.135,0.1976,0.0174,0.001,0.033,15
+lightgbm_ajustado,"LightGBM com hiperparâmetros ajustados (busca em grade, 2015-2018)",validacao_final,1,sentido_oposto,0.0083,0.0063,0.0103,0.0025,0.0008,0.0041,15
+lightgbm_ajustado,"LightGBM com hiperparâmetros ajustados (busca em grade, 2015-2018)",validacao_final,1,razao_mae,0.7975,0.7619,0.8336,0.0136,0.0067,0.021,15
+lightgbm_ajustado,"LightGBM com hiperparâmetros ajustados (busca em grade, 2015-2018)",validacao_final,2,acerto,0.5842,0.5417,0.633,0.0002,-0.006,0.006,15
+lightgbm_ajustado,"LightGBM com hiperparâmetros ajustados (busca em grade, 2015-2018)",validacao_final,2,acerto_balanceado,0.5192,0.4866,0.5513,0.0009,-0.0058,0.008,15
+lightgbm_ajustado,"LightGBM com hiperparâmetros ajustados (busca em grade, 2015-2018)",validacao_final,2,subidas_detectadas,0.2801,0.247,0.3146,0.0153,0.0,0.0309,15
+lightgbm_ajustado,"LightGBM com hiperparâmetros ajustados (busca em grade, 2015-2018)",validacao_final,2,alarmes_subida_corretos,0.6693,0.6067,0.7244,0.0026,-0.0135,0.0211,15
+lightgbm_ajustado,"LightGBM com hiperparâmetros ajustados (busca em grade, 2015-2018)",validacao_final,2,quedas_detectadas,0.4864,0.4204,0.5535,-0.0102,-0.0184,-0.0007,15
+lightgbm_ajustado,"LightGBM com hiperparâmetros ajustados (busca em grade, 2015-2018)",validacao_final,2,sentido_oposto,0.0223,0.016,0.0289,-0.0007,-0.0022,0.001,15
+lightgbm_ajustado,"LightGBM com hiperparâmetros ajustados (busca em grade, 2015-2018)",validacao_final,2,razao_mae,0.7223,0.6823,0.7655,0.0092,-0.0009,0.0195,15
+lightgbm_ajustado,"LightGBM com hiperparâmetros ajustados (busca em grade, 2015-2018)",validacao_final,3,acerto,0.5896,0.5528,0.6315,-0.0029,-0.0095,0.0041,15
+lightgbm_ajustado,"LightGBM com hiperparâmetros ajustados (busca em grade, 2015-2018)",validacao_final,3,acerto_balanceado,0.5698,0.54,0.5979,-0.0024,-0.0091,0.0048,15
+lightgbm_ajustado,"LightGBM com hiperparâmetros ajustados (busca em grade, 2015-2018)",validacao_final,3,subidas_detectadas,0.3827,0.3503,0.4128,0.0054,-0.0084,0.0205,15
+lightgbm_ajustado,"LightGBM com hiperparâmetros ajustados (busca em grade, 2015-2018)",validacao_final,3,alarmes_subida_corretos,0.6814,0.6234,0.7339,-0.0006,-0.0147,0.0166,15
+lightgbm_ajustado,"LightGBM com hiperparâmetros ajustados (busca em grade, 2015-2018)",validacao_final,3,quedas_detectadas,0.6257,0.5706,0.6802,-0.0071,-0.018,0.0037,15
+lightgbm_ajustado,"LightGBM com hiperparâmetros ajustados (busca em grade, 2015-2018)",validacao_final,3,sentido_oposto,0.0375,0.0295,0.0454,0.0017,-0.0012,0.0046,15
+lightgbm_ajustado,"LightGBM com hiperparâmetros ajustados (busca em grade, 2015-2018)",validacao_final,3,razao_mae,0.6902,0.648,0.7358,0.0063,-0.0042,0.019,15
+lightgbm_ajustado,"LightGBM com hiperparâmetros ajustados (busca em grade, 2015-2018)",validacao_final,4,acerto,0.5981,0.5629,0.6361,-0.0012,-0.0051,0.0024,15
+lightgbm_ajustado,"LightGBM com hiperparâmetros ajustados (busca em grade, 2015-2018)",validacao_final,4,acerto_balanceado,0.5927,0.5604,0.6214,-0.0011,-0.0052,0.0026,15
+lightgbm_ajustado,"LightGBM com hiperparâmetros ajustados (busca em grade, 2015-2018)",validacao_final,4,subidas_detectadas,0.4523,0.4251,0.4772,-0.0039,-0.0141,0.0062,15
+lightgbm_ajustado,"LightGBM com hiperparâmetros ajustados (busca em grade, 2015-2018)",validacao_final,4,alarmes_subida_corretos,0.6773,0.6282,0.7153,-0.0128,-0.0221,-0.0031,15
+lightgbm_ajustado,"LightGBM com hiperparâmetros ajustados (busca em grade, 2015-2018)",validacao_final,4,quedas_detectadas,0.6733,0.6185,0.7211,0.0048,-0.0041,0.0139,15
+lightgbm_ajustado,"LightGBM com hiperparâmetros ajustados (busca em grade, 2015-2018)",validacao_final,4,sentido_oposto,0.0499,0.0414,0.0586,0.0024,-0.0009,0.0056,15
+lightgbm_ajustado,"LightGBM com hiperparâmetros ajustados (busca em grade, 2015-2018)",validacao_final,4,razao_mae,0.6695,0.6199,0.7276,0.008,-0.007,0.0257,15
+lightgbm_quantis,LightGBM por quantis (mediana e intervalo de 80%),validacao_cruzada,1,acerto,0.6599,0.6411,0.6793,-0.0002,-0.002,0.0016,100
+lightgbm_quantis,LightGBM por quantis (mediana e intervalo de 80%),validacao_cruzada,1,acerto_balanceado,0.3734,0.3692,0.3777,-0.0131,-0.0163,-0.0099,100
+lightgbm_quantis,LightGBM por quantis (mediana e intervalo de 80%),validacao_cruzada,1,subidas_detectadas,0.07,0.0627,0.0773,-0.0029,-0.0087,0.003,100
+lightgbm_quantis,LightGBM por quantis (mediana e intervalo de 80%),validacao_cruzada,1,alarmes_subida_corretos,0.5386,0.5006,0.5732,-0.0336,-0.0653,-0.0007,100
+lightgbm_quantis,LightGBM por quantis (mediana e intervalo de 80%),validacao_cruzada,1,quedas_detectadas,0.0809,0.0698,0.0926,-0.049,-0.0566,-0.0418,100
+lightgbm_quantis,LightGBM por quantis (mediana e intervalo de 80%),validacao_cruzada,1,sentido_oposto,0.004,0.0033,0.0048,-0.0011,-0.0017,-0.0006,100
+lightgbm_quantis,LightGBM por quantis (mediana e intervalo de 80%),validacao_cruzada,1,razao_mae,0.8127,0.7799,0.8497,-0.0102,-0.0155,-0.0049,100
+lightgbm_quantis,LightGBM por quantis (mediana e intervalo de 80%),validacao_cruzada,1,cobertura_intervalo_80,0.7956,0.7892,0.802,,,,100
+lightgbm_quantis,LightGBM por quantis (mediana e intervalo de 80%),validacao_cruzada,2,acerto,0.6197,0.5999,0.6398,0.0015,-0.0014,0.0042,100
+lightgbm_quantis,LightGBM por quantis (mediana e intervalo de 80%),validacao_cruzada,2,acerto_balanceado,0.4992,0.487,0.5109,-0.0103,-0.014,-0.0068,100
+lightgbm_quantis,LightGBM por quantis (mediana e intervalo de 80%),validacao_cruzada,2,subidas_detectadas,0.2536,0.2385,0.2686,0.0045,-0.001,0.0097,100
+lightgbm_quantis,LightGBM por quantis (mediana e intervalo de 80%),validacao_cruzada,2,alarmes_subida_corretos,0.6299,0.6065,0.6534,-0.0108,-0.0216,-0.0002,100
+lightgbm_quantis,LightGBM por quantis (mediana e intervalo de 80%),validacao_cruzada,2,quedas_detectadas,0.3753,0.3474,0.4042,-0.0601,-0.0674,-0.0531,100
+lightgbm_quantis,LightGBM por quantis (mediana e intervalo de 80%),validacao_cruzada,2,sentido_oposto,0.0172,0.015,0.0195,-0.0038,-0.0047,-0.0029,100
+lightgbm_quantis,LightGBM por quantis (mediana e intervalo de 80%),validacao_cruzada,2,razao_mae,0.7515,0.7147,0.79,-0.0061,-0.0142,0.0024,100
+lightgbm_quantis,LightGBM por quantis (mediana e intervalo de 80%),validacao_cruzada,2,cobertura_intervalo_80,0.7916,0.7846,0.7982,,,,100
+lightgbm_quantis,LightGBM por quantis (mediana e intervalo de 80%),validacao_cruzada,3,acerto,0.6136,0.5917,0.6351,-0.0007,-0.0032,0.002,100
+lightgbm_quantis,LightGBM por quantis (mediana e intervalo de 80%),validacao_cruzada,3,acerto_balanceado,0.5544,0.5398,0.569,-0.0082,-0.0112,-0.0052,100
+lightgbm_quantis,LightGBM por quantis (mediana e intervalo de 80%),validacao_cruzada,3,subidas_detectadas,0.3426,0.322,0.3621,-0.0025,-0.0083,0.0031,100
+lightgbm_quantis,LightGBM por quantis (mediana e intervalo de 80%),validacao_cruzada,3,alarmes_subida_corretos,0.6466,0.621,0.6707,-0.0043,-0.011,0.0022,100
+lightgbm_quantis,LightGBM por quantis (mediana e intervalo de 80%),validacao_cruzada,3,quedas_detectadas,0.5096,0.4818,0.536,-0.0462,-0.0521,-0.0405,100
+lightgbm_quantis,LightGBM por quantis (mediana e intervalo de 80%),validacao_cruzada,3,sentido_oposto,0.0309,0.0269,0.0352,-0.0053,-0.0064,-0.0041,100
+lightgbm_quantis,LightGBM por quantis (mediana e intervalo de 80%),validacao_cruzada,3,razao_mae,0.7217,0.6892,0.7616,-0.0065,-0.0147,0.0011,100
+lightgbm_quantis,LightGBM por quantis (mediana e intervalo de 80%),validacao_cruzada,3,cobertura_intervalo_80,0.7871,0.7792,0.7949,,,,100
+lightgbm_quantis,LightGBM por quantis (mediana e intervalo de 80%),validacao_cruzada,4,acerto,0.6182,0.5979,0.6389,-0.0006,-0.0035,0.0022,100
+lightgbm_quantis,LightGBM por quantis (mediana e intervalo de 80%),validacao_cruzada,4,acerto_balanceado,0.5866,0.5708,0.6014,-0.0056,-0.0091,-0.0023,100
+lightgbm_quantis,LightGBM por quantis (mediana e intervalo de 80%),validacao_cruzada,4,subidas_detectadas,0.4114,0.3878,0.4331,-0.0044,-0.0107,0.0021,100
+lightgbm_quantis,LightGBM por quantis (mediana e intervalo de 80%),validacao_cruzada,4,alarmes_subida_corretos,0.6525,0.6267,0.6796,0.0012,-0.0046,0.0076,100
+lightgbm_quantis,LightGBM por quantis (mediana e intervalo de 80%),validacao_cruzada,4,quedas_detectadas,0.5714,0.5458,0.597,-0.0381,-0.0439,-0.0324,100
+lightgbm_quantis,LightGBM por quantis (mediana e intervalo de 80%),validacao_cruzada,4,sentido_oposto,0.0455,0.0402,0.0514,-0.005,-0.0062,-0.0039,100
+lightgbm_quantis,LightGBM por quantis (mediana e intervalo de 80%),validacao_cruzada,4,razao_mae,0.7009,0.6699,0.7379,-0.0165,-0.028,-0.0036,100
+lightgbm_quantis,LightGBM por quantis (mediana e intervalo de 80%),validacao_cruzada,4,cobertura_intervalo_80,0.7834,0.7747,0.792,,,,100
+lightgbm_quantis,LightGBM por quantis (mediana e intervalo de 80%),validacao_final,1,acerto,0.6392,0.6027,0.6814,0.0073,0.0025,0.0126,15
+lightgbm_quantis,LightGBM por quantis (mediana e intervalo de 80%),validacao_final,1,acerto_balanceado,0.3821,0.3705,0.3948,-0.0048,-0.0118,0.0017,15
+lightgbm_quantis,LightGBM por quantis (mediana e intervalo de 80%),validacao_final,1,subidas_detectadas,0.0759,0.0625,0.0901,0.0078,-0.0078,0.0222,15
 lightgbm_quantis,LightGBM por quantis (mediana e intervalo de 80%),validacao_final,1,alarmes_subida_corretos,0.5641,0.4873,0.6443,-0.0168,-0.071,0.0566,15
-lightgbm_quantis,LightGBM por quantis (mediana e intervalo de 80%),validacao_final,1,quedas_detectadas,0.1057,0.0757,0.1392,-0.0436,-0.0583,-0.0292,15
-lightgbm_quantis,LightGBM por quantis (mediana e intervalo de 80%),validacao_final,1,sentido_oposto,0.0051,0.0036,0.0065,-0.0007,-0.0022,0.0009,15
-lightgbm_quantis,LightGBM por quantis (mediana e intervalo de 80%),validacao_final,1,razao_mae,0.7797,0.7503,0.8143,-0.0039,-0.011,0.0039,15
-lightgbm_quantis,LightGBM por quantis (mediana e intervalo de 80%),validacao_final,1,cobertura_intervalo_80,0.8147,0.8009,0.8286,,,,15
-lightgbm_quantis,LightGBM por quantis (mediana e intervalo de 80%),validacao_final,2,acerto,0.5904,0.547,0.6385,0.0068,0.001,0.0128,15
-lightgbm_quantis,LightGBM por quantis (mediana e intervalo de 80%),validacao_final,2,acerto_balanceado,0.5192,0.4842,0.5518,0.0014,-0.0042,0.0073,15
-lightgbm_quantis,LightGBM por quantis (mediana e intervalo de 80%),validacao_final,2,subidas_detectadas,0.2929,0.2579,0.3255,0.028,0.0153,0.0412,15
-lightgbm_quantis,LightGBM por quantis (mediana e intervalo de 80%),validacao_final,2,alarmes_subida_corretos,0.6677,0.6016,0.7285,0.0021,-0.0178,0.0236,15
-lightgbm_quantis,LightGBM por quantis (mediana e intervalo de 80%),validacao_final,2,quedas_detectadas,0.4476,0.3735,0.5222,-0.0466,-0.0663,-0.0287,15
-lightgbm_quantis,LightGBM por quantis (mediana e intervalo de 80%),validacao_final,2,sentido_oposto,0.0207,0.0149,0.027,-0.0026,-0.0055,0.0003,15
-lightgbm_quantis,LightGBM por quantis (mediana e intervalo de 80%),validacao_final,2,razao_mae,0.7077,0.6695,0.7486,-0.0055,-0.0098,-0.0012,15
-lightgbm_quantis,LightGBM por quantis (mediana e intervalo de 80%),validacao_final,2,cobertura_intervalo_80,0.8161,0.8003,0.8332,,,,15
-lightgbm_quantis,LightGBM por quantis (mediana e intervalo de 80%),validacao_final,3,acerto,0.5899,0.5554,0.63,-0.0022,-0.0091,0.0057,15
-lightgbm_quantis,LightGBM por quantis (mediana e intervalo de 80%),validacao_final,3,acerto_balanceado,0.5641,0.5331,0.5925,-0.0077,-0.0171,0.0019,15
-lightgbm_quantis,LightGBM por quantis (mediana e intervalo de 80%),validacao_final,3,subidas_detectadas,0.3727,0.3374,0.4017,-0.0042,-0.0166,0.0081,15
-lightgbm_quantis,LightGBM por quantis (mediana e intervalo de 80%),validacao_final,3,alarmes_subida_corretos,0.6852,0.6254,0.7393,0.0066,-0.009,0.0234,15
-lightgbm_quantis,LightGBM por quantis (mediana e intervalo de 80%),validacao_final,3,quedas_detectadas,0.5812,0.5107,0.65,-0.0491,-0.0699,-0.0304,15
-lightgbm_quantis,LightGBM por quantis (mediana e intervalo de 80%),validacao_final,3,sentido_oposto,0.0293,0.0218,0.0374,-0.0067,-0.0093,-0.0041,15
-lightgbm_quantis,LightGBM por quantis (mediana e intervalo de 80%),validacao_final,3,razao_mae,0.6824,0.6442,0.7258,-0.0017,-0.0105,0.007,15
-lightgbm_quantis,LightGBM por quantis (mediana e intervalo de 80%),validacao_final,3,cobertura_intervalo_80,0.8089,0.794,0.8247,,,,15
-lightgbm_quantis,LightGBM por quantis (mediana e intervalo de 80%),validacao_final,4,acerto,0.5969,0.5589,0.6361,-0.0024,-0.0095,0.0031,15
-lightgbm_quantis,LightGBM por quantis (mediana e intervalo de 80%),validacao_final,4,acerto_balanceado,0.5896,0.5546,0.62,-0.0042,-0.0125,0.002,15
-lightgbm_quantis,LightGBM por quantis (mediana e intervalo de 80%),validacao_final,4,subidas_detectadas,0.4494,0.4144,0.4781,-0.0073,-0.0234,0.0049,15
+lightgbm_quantis,LightGBM por quantis (mediana e intervalo de 80%),validacao_final,1,quedas_detectadas,0.1051,0.0752,0.1383,-0.0434,-0.0579,-0.029,15
+lightgbm_quantis,LightGBM por quantis (mediana e intervalo de 80%),validacao_final,1,sentido_oposto,0.0051,0.0036,0.0064,-0.0007,-0.0022,0.0008,15
+lightgbm_quantis,LightGBM por quantis (mediana e intervalo de 80%),validacao_final,1,razao_mae,0.7797,0.7504,0.8143,-0.0042,-0.0114,0.0037,15
+lightgbm_quantis,LightGBM por quantis (mediana e intervalo de 80%),validacao_final,1,cobertura_intervalo_80,0.8151,0.8014,0.8294,,,,15
+lightgbm_quantis,LightGBM por quantis (mediana e intervalo de 80%),validacao_final,2,acerto,0.59,0.5468,0.6381,0.006,-0.001,0.0126,15
+lightgbm_quantis,LightGBM por quantis (mediana e intervalo de 80%),validacao_final,2,acerto_balanceado,0.5189,0.4842,0.5518,0.0006,-0.0058,0.0074,15
+lightgbm_quantis,LightGBM por quantis (mediana e intervalo de 80%),validacao_final,2,subidas_detectadas,0.2927,0.2579,0.3252,0.0279,0.0153,0.0412,15
+lightgbm_quantis,LightGBM por quantis (mediana e intervalo de 80%),validacao_final,2,alarmes_subida_corretos,0.6647,0.5996,0.7249,-0.002,-0.0229,0.021,15
+lightgbm_quantis,LightGBM por quantis (mediana e intervalo de 80%),validacao_final,2,quedas_detectadas,0.4484,0.3767,0.5216,-0.0482,-0.0661,-0.0311,15
+lightgbm_quantis,LightGBM por quantis (mediana e intervalo de 80%),validacao_final,2,sentido_oposto,0.0206,0.0146,0.0269,-0.0024,-0.0044,-0.0002,15
+lightgbm_quantis,LightGBM por quantis (mediana e intervalo de 80%),validacao_final,2,razao_mae,0.7075,0.6693,0.7482,-0.0056,-0.0098,-0.0013,15
+lightgbm_quantis,LightGBM por quantis (mediana e intervalo de 80%),validacao_final,2,cobertura_intervalo_80,0.816,0.8,0.8335,,,,15
+lightgbm_quantis,LightGBM por quantis (mediana e intervalo de 80%),validacao_final,3,acerto,0.5893,0.554,0.63,-0.0032,-0.0104,0.0049,15
+lightgbm_quantis,LightGBM por quantis (mediana e intervalo de 80%),validacao_final,3,acerto_balanceado,0.5636,0.5326,0.592,-0.0086,-0.018,0.0012,15
+lightgbm_quantis,LightGBM por quantis (mediana e intervalo de 80%),validacao_final,3,subidas_detectadas,0.3718,0.3369,0.4012,-0.0054,-0.0176,0.0072,15
+lightgbm_quantis,LightGBM por quantis (mediana e intervalo de 80%),validacao_final,3,alarmes_subida_corretos,0.6841,0.6246,0.7383,0.0021,-0.0138,0.0186,15
+lightgbm_quantis,LightGBM por quantis (mediana e intervalo de 80%),validacao_final,3,quedas_detectadas,0.5835,0.514,0.6526,-0.0493,-0.0699,-0.0308,15
+lightgbm_quantis,LightGBM por quantis (mediana e intervalo de 80%),validacao_final,3,sentido_oposto,0.0293,0.0217,0.0377,-0.0065,-0.0092,-0.0038,15
+lightgbm_quantis,LightGBM por quantis (mediana e intervalo de 80%),validacao_final,3,razao_mae,0.6823,0.6442,0.7257,-0.0016,-0.0102,0.0073,15
+lightgbm_quantis,LightGBM por quantis (mediana e intervalo de 80%),validacao_final,3,cobertura_intervalo_80,0.8095,0.7949,0.8252,,,,15
+lightgbm_quantis,LightGBM por quantis (mediana e intervalo de 80%),validacao_final,4,acerto,0.5971,0.559,0.6362,-0.0022,-0.0092,0.0032,15
+lightgbm_quantis,LightGBM por quantis (mediana e intervalo de 80%),validacao_final,4,acerto_balanceado,0.5897,0.5549,0.6197,-0.004,-0.0121,0.0022,15
+lightgbm_quantis,LightGBM por quantis (mediana e intervalo de 80%),validacao_final,4,subidas_detectadas,0.4489,0.4139,0.4777,-0.0073,-0.0233,0.0049,15
 lightgbm_quantis,LightGBM por quantis (mediana e intervalo de 80%),validacao_final,4,alarmes_subida_corretos,0.6832,0.6283,0.7273,-0.007,-0.0246,0.0087,15
-lightgbm_quantis,LightGBM por quantis (mediana e intervalo de 80%),validacao_final,4,quedas_detectadas,0.6347,0.5679,0.693,-0.0314,-0.0445,-0.0194,15
-lightgbm_quantis,LightGBM por quantis (mediana e intervalo de 80%),validacao_final,4,sentido_oposto,0.0421,0.0344,0.05,-0.0053,-0.0079,-0.0026,15
-lightgbm_quantis,LightGBM por quantis (mediana e intervalo de 80%),validacao_final,4,razao_mae,0.6583,0.6221,0.7026,-0.0032,-0.0125,0.0057,15
-lightgbm_quantis,LightGBM por quantis (mediana e intervalo de 80%),validacao_final,4,cobertura_intervalo_80,0.8079,0.7935,0.8225,,,,15
-lightgbm_classificador,LightGBM classificador (prevê a tendência diretamente),validacao_cruzada,1,acerto,0.6607,0.642,0.6802,0.0009,-0.0014,0.0034,100
-lightgbm_classificador,LightGBM classificador (prevê a tendência diretamente),validacao_cruzada,1,acerto_balanceado,0.4194,0.4131,0.4259,0.0328,0.0288,0.0367,100
-lightgbm_classificador,LightGBM classificador (prevê a tendência diretamente),validacao_cruzada,1,subidas_detectadas,0.1737,0.1638,0.1841,0.1006,0.0921,0.1096,100
-lightgbm_classificador,LightGBM classificador (prevê a tendência diretamente),validacao_cruzada,1,alarmes_subida_corretos,0.5,0.4796,0.5206,-0.0703,-0.0965,-0.043,100
-lightgbm_classificador,LightGBM classificador (prevê a tendência diretamente),validacao_cruzada,1,quedas_detectadas,0.1631,0.1484,0.1779,0.0327,0.0244,0.041,100
-lightgbm_classificador,LightGBM classificador (prevê a tendência diretamente),validacao_cruzada,1,sentido_oposto,0.013,0.0113,0.0147,0.0078,0.0064,0.0092,100
-lightgbm_classificador,LightGBM classificador (prevê a tendência diretamente),validacao_cruzada,2,acerto,0.6228,0.6023,0.6436,0.0043,0.0001,0.0085,100
-lightgbm_classificador,LightGBM classificador (prevê a tendência diretamente),validacao_cruzada,2,acerto_balanceado,0.5536,0.5402,0.5663,0.0443,0.039,0.0495,100
-lightgbm_classificador,LightGBM classificador (prevê a tendência diretamente),validacao_cruzada,2,subidas_detectadas,0.4097,0.3909,0.4285,0.16,0.15,0.1705,100
-lightgbm_classificador,LightGBM classificador (prevê a tendência diretamente),validacao_cruzada,2,alarmes_subida_corretos,0.5501,0.5308,0.5697,-0.0903,-0.1035,-0.0773,100
-lightgbm_classificador,LightGBM classificador (prevê a tendência diretamente),validacao_cruzada,2,quedas_detectadas,0.485,0.4602,0.5106,0.0521,0.0435,0.0607,100
-lightgbm_classificador,LightGBM classificador (prevê a tendência diretamente),validacao_cruzada,2,sentido_oposto,0.0424,0.0385,0.0464,0.0215,0.0193,0.0238,100
-lightgbm_classificador,LightGBM classificador (prevê a tendência diretamente),validacao_cruzada,3,acerto,0.6213,0.6,0.6427,0.007,0.0013,0.0123,100
-lightgbm_classificador,LightGBM classificador (prevê a tendência diretamente),validacao_cruzada,3,acerto_balanceado,0.605,0.589,0.6199,0.0427,0.0367,0.0483,100
-lightgbm_classificador,LightGBM classificador (prevê a tendência diretamente),validacao_cruzada,3,subidas_detectadas,0.508,0.4873,0.5278,0.162,0.1507,0.1726,100
-lightgbm_classificador,LightGBM classificador (prevê a tendência diretamente),validacao_cruzada,3,alarmes_subida_corretos,0.5607,0.5397,0.5818,-0.0896,-0.1004,-0.0789,100
-lightgbm_classificador,LightGBM classificador (prevê a tendência diretamente),validacao_cruzada,3,quedas_detectadas,0.631,0.6083,0.652,0.0781,0.0685,0.0876,100
-lightgbm_classificador,LightGBM classificador (prevê a tendência diretamente),validacao_cruzada,3,sentido_oposto,0.0702,0.0636,0.0773,0.0341,0.0309,0.0374,100
-lightgbm_classificador,LightGBM classificador (prevê a tendência diretamente),validacao_cruzada,4,acerto,0.626,0.6049,0.6469,0.0074,0.0027,0.0119,100
-lightgbm_classificador,LightGBM classificador (prevê a tendência diretamente),validacao_cruzada,4,acerto_balanceado,0.623,0.6068,0.6374,0.0311,0.025,0.0365,100
-lightgbm_classificador,LightGBM classificador (prevê a tendência diretamente),validacao_cruzada,4,subidas_detectadas,0.5476,0.5227,0.5698,0.1312,0.1202,0.1416,100
-lightgbm_classificador,LightGBM classificador (prevê a tendência diretamente),validacao_cruzada,4,alarmes_subida_corretos,0.5691,0.5488,0.5893,-0.0818,-0.0914,-0.0724,100
-lightgbm_classificador,LightGBM classificador (prevê a tendência diretamente),validacao_cruzada,4,quedas_detectadas,0.6816,0.6606,0.7016,0.0749,0.0663,0.0839,100
-lightgbm_classificador,LightGBM classificador (prevê a tendência diretamente),validacao_cruzada,4,sentido_oposto,0.089,0.0806,0.0976,0.0386,0.0348,0.0422,100
-lightgbm_classificador,LightGBM classificador (prevê a tendência diretamente),validacao_final,1,acerto,0.6344,0.5951,0.6793,0.0027,-0.0044,0.0099,15
-lightgbm_classificador,LightGBM classificador (prevê a tendência diretamente),validacao_final,1,acerto_balanceado,0.4156,0.398,0.4329,0.0285,0.0202,0.0363,15
-lightgbm_classificador,LightGBM classificador (prevê a tendência diretamente),validacao_final,1,subidas_detectadas,0.1733,0.1489,0.1966,0.1049,0.0882,0.1208,15
-lightgbm_classificador,LightGBM classificador (prevê a tendência diretamente),validacao_final,1,alarmes_subida_corretos,0.542,0.4761,0.6093,-0.0389,-0.089,0.0345,15
-lightgbm_classificador,LightGBM classificador (prevê a tendência diretamente),validacao_final,1,quedas_detectadas,0.162,0.1297,0.1955,0.0126,-0.0061,0.0305,15
-lightgbm_classificador,LightGBM classificador (prevê a tendência diretamente),validacao_final,1,sentido_oposto,0.0124,0.0084,0.0176,0.0066,0.0032,0.0109,15
-lightgbm_classificador,LightGBM classificador (prevê a tendência diretamente),validacao_final,2,acerto,0.5844,0.5424,0.6291,0.0009,-0.0094,0.0109,15
-lightgbm_classificador,LightGBM classificador (prevê a tendência diretamente),validacao_final,2,acerto_balanceado,0.5503,0.5166,0.5803,0.0325,0.0214,0.0418,15
-lightgbm_classificador,LightGBM classificador (prevê a tendência diretamente),validacao_final,2,subidas_detectadas,0.4128,0.3756,0.444,0.1478,0.1241,0.1707,15
-lightgbm_classificador,LightGBM classificador (prevê a tendência diretamente),validacao_final,2,alarmes_subida_corretos,0.5735,0.512,0.6325,-0.092,-0.1176,-0.064,15
-lightgbm_classificador,LightGBM classificador (prevê a tendência diretamente),validacao_final,2,quedas_detectadas,0.5442,0.4918,0.5954,0.05,0.0301,0.0706,15
-lightgbm_classificador,LightGBM classificador (prevê a tendência diretamente),validacao_final,2,sentido_oposto,0.0431,0.0333,0.0538,0.0198,0.0149,0.0253,15
-lightgbm_classificador,LightGBM classificador (prevê a tendência diretamente),validacao_final,3,acerto,0.5966,0.5597,0.6365,0.0045,-0.0086,0.019,15
-lightgbm_classificador,LightGBM classificador (prevê a tendência diretamente),validacao_final,3,acerto_balanceado,0.6029,0.568,0.6352,0.031,0.0196,0.0434,15
-lightgbm_classificador,LightGBM classificador (prevê a tendência diretamente),validacao_final,3,subidas_detectadas,0.5662,0.521,0.6029,0.1894,0.1626,0.2122,15
-lightgbm_classificador,LightGBM classificador (prevê a tendência diretamente),validacao_final,3,alarmes_subida_corretos,0.5939,0.5397,0.6438,-0.0847,-0.1093,-0.063,15
-lightgbm_classificador,LightGBM classificador (prevê a tendência diretamente),validacao_final,3,quedas_detectadas,0.6836,0.6315,0.7345,0.0533,0.0381,0.0692,15
-lightgbm_classificador,LightGBM classificador (prevê a tendência diretamente),validacao_final,3,sentido_oposto,0.0643,0.0516,0.0761,0.0283,0.0218,0.0348,15
-lightgbm_classificador,LightGBM classificador (prevê a tendência diretamente),validacao_final,4,acerto,0.6027,0.5655,0.6431,0.0034,-0.0113,0.0172,15
-lightgbm_classificador,LightGBM classificador (prevê a tendência diretamente),validacao_final,4,acerto_balanceado,0.6112,0.5716,0.6497,0.0174,0.0015,0.0335,15
-lightgbm_classificador,LightGBM classificador (prevê a tendência diretamente),validacao_final,4,subidas_detectadas,0.6303,0.5799,0.6722,0.1736,0.1367,0.2086,15
-lightgbm_classificador,LightGBM classificador (prevê a tendência diretamente),validacao_final,4,alarmes_subida_corretos,0.5943,0.5447,0.635,-0.0959,-0.1097,-0.0808,15
-lightgbm_classificador,LightGBM classificador (prevê a tendência diretamente),validacao_final,4,quedas_detectadas,0.7321,0.6808,0.7767,0.066,0.053,0.0797,15
-lightgbm_classificador,LightGBM classificador (prevê a tendência diretamente),validacao_final,4,sentido_oposto,0.0959,0.0814,0.1103,0.0485,0.04,0.057,15
-ensemble,"Média da regressão linear, binomial negativa e LightGBM atual",validacao_cruzada,1,acerto,0.6551,0.6354,0.6755,-0.0046,-0.0077,-0.0018,100
-ensemble,"Média da regressão linear, binomial negativa e LightGBM atual",validacao_cruzada,1,acerto_balanceado,0.3627,0.3601,0.3656,-0.0239,-0.0305,-0.0175,100
-ensemble,"Média da regressão linear, binomial negativa e LightGBM atual",validacao_cruzada,1,subidas_detectadas,0.0592,0.0534,0.0652,-0.014,-0.0224,-0.0059,100
-ensemble,"Média da regressão linear, binomial negativa e LightGBM atual",validacao_cruzada,1,alarmes_subida_corretos,0.5084,0.4789,0.5392,-0.0619,-0.0945,-0.0273,100
-ensemble,"Média da regressão linear, binomial negativa e LightGBM atual",validacao_cruzada,1,quedas_detectadas,0.0576,0.0504,0.065,-0.0729,-0.091,-0.0554,100
-ensemble,"Média da regressão linear, binomial negativa e LightGBM atual",validacao_cruzada,1,sentido_oposto,0.0064,0.0054,0.0076,0.0012,0.0003,0.0021,100
-ensemble,"Média da regressão linear, binomial negativa e LightGBM atual",validacao_cruzada,1,razao_mae,0.942,0.9285,0.9574,0.1192,0.09,0.1453,100
-ensemble,"Média da regressão linear, binomial negativa e LightGBM atual",validacao_cruzada,2,acerto,0.5904,0.5693,0.6123,-0.0281,-0.0338,-0.0225,100
-ensemble,"Média da regressão linear, binomial negativa e LightGBM atual",validacao_cruzada,2,acerto_balanceado,0.4616,0.4537,0.4691,-0.0476,-0.0555,-0.0395,100
-ensemble,"Média da regressão linear, binomial negativa e LightGBM atual",validacao_cruzada,2,subidas_detectadas,0.1895,0.1785,0.2,-0.0602,-0.0749,-0.046,100
-ensemble,"Média da regressão linear, binomial negativa e LightGBM atual",validacao_cruzada,2,alarmes_subida_corretos,0.5415,0.5169,0.5643,-0.0989,-0.1159,-0.0816,100
-ensemble,"Média da regressão linear, binomial negativa e LightGBM atual",validacao_cruzada,2,quedas_detectadas,0.3387,0.316,0.3628,-0.0943,-0.1116,-0.0762,100
-ensemble,"Média da regressão linear, binomial negativa e LightGBM atual",validacao_cruzada,2,sentido_oposto,0.0218,0.019,0.0248,0.001,-0.0008,0.0027,100
-ensemble,"Média da regressão linear, binomial negativa e LightGBM atual",validacao_cruzada,2,razao_mae,0.8426,0.8253,0.8637,0.0848,0.059,0.1114,100
-ensemble,"Média da regressão linear, binomial negativa e LightGBM atual",validacao_cruzada,3,acerto,0.5963,0.5741,0.6185,-0.018,-0.0222,-0.0137,100
-ensemble,"Média da regressão linear, binomial negativa e LightGBM atual",validacao_cruzada,3,acerto_balanceado,0.5453,0.532,0.5581,-0.017,-0.0217,-0.0122,100
-ensemble,"Média da regressão linear, binomial negativa e LightGBM atual",validacao_cruzada,3,subidas_detectadas,0.3558,0.3391,0.3712,0.0098,-0.0014,0.0205,100
-ensemble,"Média da regressão linear, binomial negativa e LightGBM atual",validacao_cruzada,3,alarmes_subida_corretos,0.5711,0.5461,0.5965,-0.0792,-0.0914,-0.0676,100
-ensemble,"Média da regressão linear, binomial negativa e LightGBM atual",validacao_cruzada,3,quedas_detectadas,0.5137,0.4876,0.5402,-0.0392,-0.0493,-0.0291,100
-ensemble,"Média da regressão linear, binomial negativa e LightGBM atual",validacao_cruzada,3,sentido_oposto,0.0436,0.0385,0.0493,0.0075,0.0052,0.0099,100
-ensemble,"Média da regressão linear, binomial negativa e LightGBM atual",validacao_cruzada,3,razao_mae,0.7903,0.7731,0.8138,0.0623,0.0395,0.0818,100
-ensemble,"Média da regressão linear, binomial negativa e LightGBM atual",validacao_cruzada,4,acerto,0.6076,0.5872,0.6295,-0.011,-0.0148,-0.0074,100
-ensemble,"Média da regressão linear, binomial negativa e LightGBM atual",validacao_cruzada,4,acerto_balanceado,0.5863,0.571,0.6005,-0.0056,-0.0096,-0.0017,100
-ensemble,"Média da regressão linear, binomial negativa e LightGBM atual",validacao_cruzada,4,subidas_detectadas,0.4605,0.4385,0.4799,0.0441,0.0352,0.0533,100
-ensemble,"Média da regressão linear, binomial negativa e LightGBM atual",validacao_cruzada,4,alarmes_subida_corretos,0.578,0.5531,0.6029,-0.0729,-0.0817,-0.0637,100
-ensemble,"Média da regressão linear, binomial negativa e LightGBM atual",validacao_cruzada,4,quedas_detectadas,0.5839,0.5592,0.6089,-0.0228,-0.0317,-0.0143,100
-ensemble,"Média da regressão linear, binomial negativa e LightGBM atual",validacao_cruzada,4,sentido_oposto,0.0618,0.0549,0.0688,0.0113,0.0087,0.014,100
-ensemble,"Média da regressão linear, binomial negativa e LightGBM atual",validacao_cruzada,4,razao_mae,0.754,0.737,0.7773,0.0367,0.0194,0.0516,100
-ensemble,"Média da regressão linear, binomial negativa e LightGBM atual",validacao_final,1,acerto,0.6288,0.5916,0.6721,-0.0029,-0.0107,0.0048,15
-ensemble,"Média da regressão linear, binomial negativa e LightGBM atual",validacao_final,1,acerto_balanceado,0.358,0.3536,0.3621,-0.0291,-0.047,-0.0128,15
-ensemble,"Média da regressão linear, binomial negativa e LightGBM atual",validacao_final,1,subidas_detectadas,0.0581,0.0466,0.0673,-0.0104,-0.0302,0.0063,15
-ensemble,"Média da regressão linear, binomial negativa e LightGBM atual",validacao_final,1,alarmes_subida_corretos,0.5038,0.4261,0.5865,-0.0771,-0.1538,0.0116,15
-ensemble,"Média da regressão linear, binomial negativa e LightGBM atual",validacao_final,1,quedas_detectadas,0.0446,0.0283,0.0635,-0.1048,-0.1544,-0.0596,15
-ensemble,"Média da regressão linear, binomial negativa e LightGBM atual",validacao_final,1,sentido_oposto,0.0072,0.0053,0.009,0.0014,-0.0007,0.0032,15
-ensemble,"Média da regressão linear, binomial negativa e LightGBM atual",validacao_final,1,razao_mae,0.9136,0.8906,0.9396,0.1299,0.0957,0.1585,15
-ensemble,"Média da regressão linear, binomial negativa e LightGBM atual",validacao_final,2,acerto,0.5477,0.5092,0.5954,-0.0359,-0.0511,-0.0205,15
-ensemble,"Média da regressão linear, binomial negativa e LightGBM atual",validacao_final,2,acerto_balanceado,0.472,0.4508,0.4905,-0.0459,-0.0617,-0.0289,15
-ensemble,"Média da regressão linear, binomial negativa e LightGBM atual",validacao_final,2,subidas_detectadas,0.2024,0.1806,0.2207,-0.0626,-0.0968,-0.0265,15
-ensemble,"Média da regressão linear, binomial negativa e LightGBM atual",validacao_final,2,alarmes_subida_corretos,0.5477,0.4925,0.5989,-0.1178,-0.1673,-0.0669,15
-ensemble,"Média da regressão linear, binomial negativa e LightGBM atual",validacao_final,2,quedas_detectadas,0.4236,0.3623,0.4863,-0.0706,-0.0902,-0.0503,15
-ensemble,"Média da regressão linear, binomial negativa e LightGBM atual",validacao_final,2,sentido_oposto,0.0246,0.02,0.0294,0.0014,-0.0026,0.0055,15
-ensemble,"Média da regressão linear, binomial negativa e LightGBM atual",validacao_final,2,razao_mae,0.8134,0.7905,0.8423,0.1001,0.0754,0.1211,15
-ensemble,"Média da regressão linear, binomial negativa e LightGBM atual",validacao_final,3,acerto,0.5753,0.5438,0.6149,-0.0168,-0.0247,-0.0091,15
-ensemble,"Média da regressão linear, binomial negativa e LightGBM atual",validacao_final,3,acerto_balanceado,0.5587,0.5334,0.5813,-0.0132,-0.0215,-0.0053,15
-ensemble,"Média da regressão linear, binomial negativa e LightGBM atual",validacao_final,3,subidas_detectadas,0.4071,0.38,0.4334,0.0302,0.0076,0.0538,15
-ensemble,"Média da regressão linear, binomial negativa e LightGBM atual",validacao_final,3,alarmes_subida_corretos,0.6141,0.5642,0.6583,-0.0646,-0.0875,-0.036,15
-ensemble,"Média da regressão linear, binomial negativa e LightGBM atual",validacao_final,3,quedas_detectadas,0.598,0.5361,0.6545,-0.0324,-0.0525,-0.0149,15
-ensemble,"Média da regressão linear, binomial negativa e LightGBM atual",validacao_final,3,sentido_oposto,0.0451,0.0374,0.0519,0.0091,0.0031,0.0156,15
-ensemble,"Média da regressão linear, binomial negativa e LightGBM atual",validacao_final,3,razao_mae,0.756,0.7346,0.7821,0.0719,0.0511,0.0932,15
-ensemble,"Média da regressão linear, binomial negativa e LightGBM atual",validacao_final,4,acerto,0.5801,0.5467,0.617,-0.0192,-0.0308,-0.0089,15
-ensemble,"Média da regressão linear, binomial negativa e LightGBM atual",validacao_final,4,acerto_balanceado,0.579,0.5466,0.6065,-0.0149,-0.0267,-0.0035,15
-ensemble,"Média da regressão linear, binomial negativa e LightGBM atual",validacao_final,4,subidas_detectadas,0.5017,0.4788,0.5243,0.0449,0.0255,0.0634,15
+lightgbm_quantis,LightGBM por quantis (mediana e intervalo de 80%),validacao_final,4,quedas_detectadas,0.6379,0.5712,0.696,-0.0306,-0.044,-0.0185,15
+lightgbm_quantis,LightGBM por quantis (mediana e intervalo de 80%),validacao_final,4,sentido_oposto,0.0422,0.0345,0.0503,-0.0053,-0.0079,-0.0026,15
+lightgbm_quantis,LightGBM por quantis (mediana e intervalo de 80%),validacao_final,4,razao_mae,0.6583,0.622,0.7024,-0.0032,-0.0125,0.0058,15
+lightgbm_quantis,LightGBM por quantis (mediana e intervalo de 80%),validacao_final,4,cobertura_intervalo_80,0.808,0.7935,0.8227,,,,15
+lightgbm_classificador,LightGBM classificador (prevê a tendência diretamente),validacao_cruzada,1,acerto,0.6609,0.6423,0.6802,0.0008,-0.0015,0.0032,100
+lightgbm_classificador,LightGBM classificador (prevê a tendência diretamente),validacao_cruzada,1,acerto_balanceado,0.4192,0.4128,0.4255,0.0327,0.0288,0.0366,100
+lightgbm_classificador,LightGBM classificador (prevê a tendência diretamente),validacao_cruzada,1,subidas_detectadas,0.1733,0.1634,0.1837,0.1004,0.0918,0.1095,100
+lightgbm_classificador,LightGBM classificador (prevê a tendência diretamente),validacao_cruzada,1,alarmes_subida_corretos,0.501,0.4809,0.5213,-0.0712,-0.0976,-0.0439,100
+lightgbm_classificador,LightGBM classificador (prevê a tendência diretamente),validacao_cruzada,1,quedas_detectadas,0.1626,0.1479,0.177,0.0327,0.0242,0.041,100
+lightgbm_classificador,LightGBM classificador (prevê a tendência diretamente),validacao_cruzada,1,sentido_oposto,0.0131,0.0114,0.0147,0.0079,0.0066,0.0093,100
+lightgbm_classificador,LightGBM classificador (prevê a tendência diretamente),validacao_cruzada,2,acerto,0.6228,0.6024,0.6436,0.0047,0.0004,0.0088,100
+lightgbm_classificador,LightGBM classificador (prevê a tendência diretamente),validacao_cruzada,2,acerto_balanceado,0.5536,0.5404,0.5663,0.0442,0.0389,0.0495,100
+lightgbm_classificador,LightGBM classificador (prevê a tendência diretamente),validacao_cruzada,2,subidas_detectadas,0.4091,0.3902,0.4279,0.1599,0.15,0.1703,100
+lightgbm_classificador,LightGBM classificador (prevê a tendência diretamente),validacao_cruzada,2,alarmes_subida_corretos,0.55,0.531,0.5696,-0.0907,-0.1038,-0.0775,100
+lightgbm_classificador,LightGBM classificador (prevê a tendência diretamente),validacao_cruzada,2,quedas_detectadas,0.4858,0.4612,0.5108,0.0504,0.0414,0.0593,100
+lightgbm_classificador,LightGBM classificador (prevê a tendência diretamente),validacao_cruzada,2,sentido_oposto,0.0424,0.0386,0.0465,0.0214,0.0192,0.0237,100
+lightgbm_classificador,LightGBM classificador (prevê a tendência diretamente),validacao_cruzada,3,acerto,0.6213,0.6002,0.6428,0.007,0.0012,0.0123,100
+lightgbm_classificador,LightGBM classificador (prevê a tendência diretamente),validacao_cruzada,3,acerto_balanceado,0.6051,0.5893,0.6201,0.0426,0.0366,0.0483,100
+lightgbm_classificador,LightGBM classificador (prevê a tendência diretamente),validacao_cruzada,3,subidas_detectadas,0.5068,0.4858,0.5268,0.1617,0.1505,0.1721,100
+lightgbm_classificador,LightGBM classificador (prevê a tendência diretamente),validacao_cruzada,3,alarmes_subida_corretos,0.5604,0.5394,0.5814,-0.0906,-0.1019,-0.0796,100
+lightgbm_classificador,LightGBM classificador (prevê a tendência diretamente),validacao_cruzada,3,quedas_detectadas,0.6334,0.611,0.6546,0.0776,0.0683,0.0869,100
+lightgbm_classificador,LightGBM classificador (prevê a tendência diretamente),validacao_cruzada,3,sentido_oposto,0.0703,0.0637,0.0775,0.0341,0.031,0.0375,100
+lightgbm_classificador,LightGBM classificador (prevê a tendência diretamente),validacao_cruzada,4,acerto,0.6261,0.6052,0.6469,0.0073,0.0026,0.0117,100
+lightgbm_classificador,LightGBM classificador (prevê a tendência diretamente),validacao_cruzada,4,acerto_balanceado,0.6231,0.6068,0.6377,0.0308,0.0246,0.0362,100
+lightgbm_classificador,LightGBM classificador (prevê a tendência diretamente),validacao_cruzada,4,subidas_detectadas,0.5466,0.5218,0.5687,0.1309,0.12,0.141,100
+lightgbm_classificador,LightGBM classificador (prevê a tendência diretamente),validacao_cruzada,4,alarmes_subida_corretos,0.5697,0.5492,0.5899,-0.0816,-0.0914,-0.0721,100
+lightgbm_classificador,LightGBM classificador (prevê a tendência diretamente),validacao_cruzada,4,quedas_detectadas,0.6831,0.6623,0.703,0.0736,0.065,0.0824,100
+lightgbm_classificador,LightGBM classificador (prevê a tendência diretamente),validacao_cruzada,4,sentido_oposto,0.0891,0.0806,0.0977,0.0386,0.0349,0.0421,100
+lightgbm_classificador,LightGBM classificador (prevê a tendência diretamente),validacao_final,1,acerto,0.6351,0.5963,0.6799,0.0032,-0.0046,0.0112,15
+lightgbm_classificador,LightGBM classificador (prevê a tendência diretamente),validacao_final,1,acerto_balanceado,0.4159,0.3985,0.4333,0.029,0.0206,0.0373,15
+lightgbm_classificador,LightGBM classificador (prevê a tendência diretamente),validacao_final,1,subidas_detectadas,0.1734,0.1486,0.1977,0.1053,0.0884,0.121,15
+lightgbm_classificador,LightGBM classificador (prevê a tendência diretamente),validacao_final,1,alarmes_subida_corretos,0.5432,0.4737,0.6118,-0.0376,-0.0866,0.0334,15
+lightgbm_classificador,LightGBM classificador (prevê a tendência diretamente),validacao_final,1,quedas_detectadas,0.162,0.1303,0.1948,0.0135,-0.0051,0.0312,15
+lightgbm_classificador,LightGBM classificador (prevê a tendência diretamente),validacao_final,1,sentido_oposto,0.0129,0.0085,0.0183,0.0071,0.0034,0.0119,15
+lightgbm_classificador,LightGBM classificador (prevê a tendência diretamente),validacao_final,2,acerto,0.583,0.5403,0.6284,-0.001,-0.0117,0.009,15
+lightgbm_classificador,LightGBM classificador (prevê a tendência diretamente),validacao_final,2,acerto_balanceado,0.5486,0.5139,0.5789,0.0303,0.0188,0.0401,15
+lightgbm_classificador,LightGBM classificador (prevê a tendência diretamente),validacao_final,2,subidas_detectadas,0.4118,0.3748,0.4434,0.147,0.1225,0.1703,15
+lightgbm_classificador,LightGBM classificador (prevê a tendência diretamente),validacao_final,2,alarmes_subida_corretos,0.5731,0.5111,0.632,-0.0935,-0.1202,-0.0664,15
+lightgbm_classificador,LightGBM classificador (prevê a tendência diretamente),validacao_final,2,quedas_detectadas,0.5414,0.489,0.5942,0.0448,0.0241,0.0683,15
+lightgbm_classificador,LightGBM classificador (prevê a tendência diretamente),validacao_final,2,sentido_oposto,0.0423,0.0325,0.0532,0.0194,0.0145,0.025,15
+lightgbm_classificador,LightGBM classificador (prevê a tendência diretamente),validacao_final,3,acerto,0.5966,0.5594,0.6367,0.0041,-0.0085,0.0184,15
+lightgbm_classificador,LightGBM classificador (prevê a tendência diretamente),validacao_final,3,acerto_balanceado,0.6032,0.5688,0.6349,0.031,0.0197,0.043,15
+lightgbm_classificador,LightGBM classificador (prevê a tendência diretamente),validacao_final,3,subidas_detectadas,0.5677,0.5238,0.6039,0.1904,0.1646,0.2127,15
+lightgbm_classificador,LightGBM classificador (prevê a tendência diretamente),validacao_final,3,alarmes_subida_corretos,0.5943,0.5408,0.6437,-0.0877,-0.1144,-0.0648,15
+lightgbm_classificador,LightGBM classificador (prevê a tendência diretamente),validacao_final,3,quedas_detectadas,0.6857,0.6339,0.7366,0.0529,0.0375,0.0695,15
+lightgbm_classificador,LightGBM classificador (prevê a tendência diretamente),validacao_final,3,sentido_oposto,0.0643,0.0517,0.076,0.0285,0.0222,0.035,15
+lightgbm_classificador,LightGBM classificador (prevê a tendência diretamente),validacao_final,4,acerto,0.6022,0.5656,0.6426,0.0029,-0.0115,0.0162,15
+lightgbm_classificador,LightGBM classificador (prevê a tendência diretamente),validacao_final,4,acerto_balanceado,0.6106,0.571,0.6491,0.0169,0.001,0.0327,15
+lightgbm_classificador,LightGBM classificador (prevê a tendência diretamente),validacao_final,4,subidas_detectadas,0.6285,0.5776,0.6701,0.1723,0.1349,0.2073,15
+lightgbm_classificador,LightGBM classificador (prevê a tendência diretamente),validacao_final,4,alarmes_subida_corretos,0.5948,0.5442,0.6358,-0.0954,-0.1089,-0.0809,15
+lightgbm_classificador,LightGBM classificador (prevê a tendência diretamente),validacao_final,4,quedas_detectadas,0.7334,0.6831,0.7774,0.0649,0.0523,0.0788,15
+lightgbm_classificador,LightGBM classificador (prevê a tendência diretamente),validacao_final,4,sentido_oposto,0.0954,0.0805,0.1099,0.0479,0.0393,0.0566,15
+ensemble,"Média da regressão linear, binomial negativa e LightGBM atual",validacao_cruzada,1,acerto,0.6555,0.6359,0.6757,-0.0047,-0.0077,-0.0019,100
+ensemble,"Média da regressão linear, binomial negativa e LightGBM atual",validacao_cruzada,1,acerto_balanceado,0.3628,0.3603,0.3656,-0.0237,-0.0302,-0.0174,100
+ensemble,"Média da regressão linear, binomial negativa e LightGBM atual",validacao_cruzada,1,subidas_detectadas,0.059,0.0533,0.065,-0.0139,-0.0222,-0.006,100
+ensemble,"Média da regressão linear, binomial negativa e LightGBM atual",validacao_cruzada,1,alarmes_subida_corretos,0.5078,0.478,0.5386,-0.0644,-0.0964,-0.03,100
+ensemble,"Média da regressão linear, binomial negativa e LightGBM atual",validacao_cruzada,1,quedas_detectadas,0.0582,0.0511,0.0658,-0.0717,-0.0896,-0.0543,100
+ensemble,"Média da regressão linear, binomial negativa e LightGBM atual",validacao_cruzada,1,sentido_oposto,0.0065,0.0054,0.0076,0.0013,0.0005,0.0023,100
+ensemble,"Média da regressão linear, binomial negativa e LightGBM atual",validacao_cruzada,1,razao_mae,0.9419,0.9285,0.9574,0.119,0.0898,0.1451,100
+ensemble,"Média da regressão linear, binomial negativa e LightGBM atual",validacao_cruzada,2,acerto,0.5906,0.5693,0.6125,-0.0276,-0.0331,-0.0219,100
+ensemble,"Média da regressão linear, binomial negativa e LightGBM atual",validacao_cruzada,2,acerto_balanceado,0.4625,0.4543,0.47,-0.047,-0.0548,-0.039,100
+ensemble,"Média da regressão linear, binomial negativa e LightGBM atual",validacao_cruzada,2,subidas_detectadas,0.1889,0.1779,0.1995,-0.0602,-0.0749,-0.0462,100
+ensemble,"Média da regressão linear, binomial negativa e LightGBM atual",validacao_cruzada,2,alarmes_subida_corretos,0.5411,0.5162,0.5643,-0.0996,-0.1164,-0.0823,100
+ensemble,"Média da regressão linear, binomial negativa e LightGBM atual",validacao_cruzada,2,quedas_detectadas,0.3428,0.3199,0.3673,-0.0927,-0.1101,-0.0744,100
+ensemble,"Média da regressão linear, binomial negativa e LightGBM atual",validacao_cruzada,2,sentido_oposto,0.0221,0.0192,0.0251,0.001,-0.0007,0.0027,100
+ensemble,"Média da regressão linear, binomial negativa e LightGBM atual",validacao_cruzada,2,razao_mae,0.8424,0.8249,0.8634,0.0847,0.0588,0.1114,100
+ensemble,"Média da regressão linear, binomial negativa e LightGBM atual",validacao_cruzada,3,acerto,0.5963,0.5741,0.6185,-0.0179,-0.0222,-0.0137,100
+ensemble,"Média da regressão linear, binomial negativa e LightGBM atual",validacao_cruzada,3,acerto_balanceado,0.5456,0.5322,0.5584,-0.0169,-0.0217,-0.0122,100
+ensemble,"Média da regressão linear, binomial negativa e LightGBM atual",validacao_cruzada,3,subidas_detectadas,0.3545,0.3377,0.37,0.0094,-0.0018,0.0203,100
+ensemble,"Média da regressão linear, binomial negativa e LightGBM atual",validacao_cruzada,3,alarmes_subida_corretos,0.5712,0.5462,0.5967,-0.0798,-0.0922,-0.0677,100
+ensemble,"Média da regressão linear, binomial negativa e LightGBM atual",validacao_cruzada,3,quedas_detectadas,0.5167,0.4907,0.5429,-0.0391,-0.0494,-0.0291,100
+ensemble,"Média da regressão linear, binomial negativa e LightGBM atual",validacao_cruzada,3,sentido_oposto,0.0437,0.0385,0.0496,0.0076,0.0053,0.01,100
+ensemble,"Média da regressão linear, binomial negativa e LightGBM atual",validacao_cruzada,3,razao_mae,0.7903,0.7729,0.8138,0.0622,0.0395,0.0817,100
+ensemble,"Média da regressão linear, binomial negativa e LightGBM atual",validacao_cruzada,4,acerto,0.6074,0.5872,0.6293,-0.0114,-0.0152,-0.0078,100
+ensemble,"Média da regressão linear, binomial negativa e LightGBM atual",validacao_cruzada,4,acerto_balanceado,0.5863,0.5709,0.6006,-0.0059,-0.01,-0.0021,100
+ensemble,"Média da regressão linear, binomial negativa e LightGBM atual",validacao_cruzada,4,subidas_detectadas,0.4594,0.4374,0.4785,0.0437,0.0348,0.0529,100
+ensemble,"Média da regressão linear, binomial negativa e LightGBM atual",validacao_cruzada,4,alarmes_subida_corretos,0.5782,0.5531,0.6032,-0.0731,-0.0819,-0.064,100
+ensemble,"Média da regressão linear, binomial negativa e LightGBM atual",validacao_cruzada,4,quedas_detectadas,0.5864,0.5618,0.6112,-0.0232,-0.0321,-0.0145,100
+ensemble,"Média da regressão linear, binomial negativa e LightGBM atual",validacao_cruzada,4,sentido_oposto,0.0619,0.0549,0.0689,0.0113,0.0087,0.014,100
+ensemble,"Média da regressão linear, binomial negativa e LightGBM atual",validacao_cruzada,4,razao_mae,0.754,0.7369,0.7776,0.0366,0.0194,0.0516,100
+ensemble,"Média da regressão linear, binomial negativa e LightGBM atual",validacao_final,1,acerto,0.6293,0.592,0.6726,-0.0025,-0.0105,0.0049,15
+ensemble,"Média da regressão linear, binomial negativa e LightGBM atual",validacao_final,1,acerto_balanceado,0.3586,0.3538,0.3631,-0.0283,-0.0462,-0.0116,15
+ensemble,"Média da regressão linear, binomial negativa e LightGBM atual",validacao_final,1,subidas_detectadas,0.0587,0.047,0.0678,-0.0095,-0.0291,0.0071,15
+ensemble,"Média da regressão linear, binomial negativa e LightGBM atual",validacao_final,1,alarmes_subida_corretos,0.5075,0.4307,0.5877,-0.0734,-0.1493,0.013,15
+ensemble,"Média da regressão linear, binomial negativa e LightGBM atual",validacao_final,1,quedas_detectadas,0.0453,0.0284,0.0661,-0.1032,-0.153,-0.0578,15
+ensemble,"Média da regressão linear, binomial negativa e LightGBM atual",validacao_final,1,sentido_oposto,0.0073,0.0054,0.0093,0.0015,-0.0007,0.0036,15
+ensemble,"Média da regressão linear, binomial negativa e LightGBM atual",validacao_final,1,razao_mae,0.9135,0.8904,0.9396,0.1296,0.0953,0.1582,15
+ensemble,"Média da regressão linear, binomial negativa e LightGBM atual",validacao_final,2,acerto,0.5481,0.5097,0.5956,-0.0359,-0.0509,-0.0207,15
+ensemble,"Média da regressão linear, binomial negativa e LightGBM atual",validacao_final,2,acerto_balanceado,0.4727,0.4519,0.4914,-0.0455,-0.0609,-0.0291,15
+ensemble,"Média da regressão linear, binomial negativa e LightGBM atual",validacao_final,2,subidas_detectadas,0.2016,0.1804,0.2197,-0.0632,-0.0972,-0.0276,15
+ensemble,"Média da regressão linear, binomial negativa e LightGBM atual",validacao_final,2,alarmes_subida_corretos,0.5469,0.4918,0.5982,-0.1197,-0.1693,-0.0686,15
+ensemble,"Média da regressão linear, binomial negativa e LightGBM atual",validacao_final,2,quedas_detectadas,0.4287,0.366,0.492,-0.0679,-0.0863,-0.0482,15
+ensemble,"Média da regressão linear, binomial negativa e LightGBM atual",validacao_final,2,sentido_oposto,0.0245,0.0199,0.0293,0.0015,-0.0024,0.0054,15
+ensemble,"Média da regressão linear, binomial negativa e LightGBM atual",validacao_final,2,razao_mae,0.813,0.7901,0.842,0.0999,0.0751,0.1208,15
+ensemble,"Média da regressão linear, binomial negativa e LightGBM atual",validacao_final,3,acerto,0.5756,0.5441,0.6154,-0.0169,-0.0251,-0.0089,15
+ensemble,"Média da regressão linear, binomial negativa e LightGBM atual",validacao_final,3,acerto_balanceado,0.559,0.5337,0.5816,-0.0131,-0.0217,-0.0048,15
+ensemble,"Média da regressão linear, binomial negativa e LightGBM atual",validacao_final,3,subidas_detectadas,0.4075,0.3799,0.4344,0.0302,0.0067,0.0544,15
+ensemble,"Média da regressão linear, binomial negativa e LightGBM atual",validacao_final,3,alarmes_subida_corretos,0.6144,0.5645,0.6582,-0.0676,-0.0911,-0.0377,15
+ensemble,"Média da regressão linear, binomial negativa e LightGBM atual",validacao_final,3,quedas_detectadas,0.6007,0.5397,0.6574,-0.0321,-0.0519,-0.0147,15
+ensemble,"Média da regressão linear, binomial negativa e LightGBM atual",validacao_final,3,sentido_oposto,0.045,0.0372,0.052,0.0092,0.0032,0.0157,15
+ensemble,"Média da regressão linear, binomial negativa e LightGBM atual",validacao_final,3,razao_mae,0.7557,0.7343,0.7818,0.0718,0.0511,0.0931,15
+ensemble,"Média da regressão linear, binomial negativa e LightGBM atual",validacao_final,4,acerto,0.5803,0.5472,0.6171,-0.019,-0.0299,-0.0091,15
+ensemble,"Média da regressão linear, binomial negativa e LightGBM atual",validacao_final,4,acerto_balanceado,0.5792,0.5469,0.6071,-0.0146,-0.0261,-0.0034,15
+ensemble,"Média da regressão linear, binomial negativa e LightGBM atual",validacao_final,4,subidas_detectadas,0.5011,0.4785,0.5237,0.0449,0.0255,0.0633,15
 ensemble,"Média da regressão linear, binomial negativa e LightGBM atual",validacao_final,4,alarmes_subida_corretos,0.603,0.5565,0.6418,-0.0872,-0.1039,-0.071,15
-ensemble,"Média da regressão linear, binomial negativa e LightGBM atual",validacao_final,4,quedas_detectadas,0.6531,0.5937,0.7011,-0.013,-0.0281,0.0011,15
-ensemble,"Média da regressão linear, binomial negativa e LightGBM atual",validacao_final,4,sentido_oposto,0.0689,0.0593,0.0778,0.0215,0.0165,0.0268,15
-ensemble,"Média da regressão linear, binomial negativa e LightGBM atual",validacao_final,4,razao_mae,0.7099,0.6873,0.7392,0.0484,0.0263,0.0704,15
+ensemble,"Média da regressão linear, binomial negativa e LightGBM atual",validacao_final,4,quedas_detectadas,0.6561,0.5976,0.7039,-0.0123,-0.0273,0.0017,15
+ensemble,"Média da regressão linear, binomial negativa e LightGBM atual",validacao_final,4,sentido_oposto,0.0689,0.0593,0.0779,0.0214,0.0164,0.0267,15
+ensemble,"Média da regressão linear, binomial negativa e LightGBM atual",validacao_final,4,razao_mae,0.7098,0.6874,0.7392,0.0483,0.0263,0.0704,15

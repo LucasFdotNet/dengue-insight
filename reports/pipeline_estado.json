@@ -1,0 +1,37 @@
+{
+  "id_dados": "098870c94e67",
+  "passos": {
+    "experimento_classificadores": {
+      "concluido": "2026-10-10T02:51:21",
+      "minutos": 222.4
+    },
+    "train": {
+      "concluido": "2026-10-10T03:10:08",
+      "minutos": 18.8
+    },
+    "eda": {
+      "concluido": "2026-10-10T03:10:57",
+      "minutos": 0.8
+    },
+    "experimento_modelos": {
+      "concluido": "2026-10-10T03:53:07",
+      "minutos": 42.2
+    },
+    "experimento_clima_classificador": {
+      "concluido": "2026-10-10T04:15:04",
+      "minutos": 22.0
+    },
+    "experimento_rt": {
+      "concluido": "2026-10-10T04:22:32",
+      "minutos": 7.5
+    },
+    "experimento_generalizacao": {
+      "concluido": "2026-10-10T04:58:10",
+      "minutos": 35.6
+    },
+    "experimento_atraso": {
+      "concluido": "2026-10-10T05:04:19",
+      "minutos": 6.2
+    }
+  }
+}

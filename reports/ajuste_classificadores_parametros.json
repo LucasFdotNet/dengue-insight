@@ -1,0 +1,44 @@
+{
+  "id_dados": "098870c94e67",
+  "periodo_ajuste": [
+    "2015-01",
+    "2018-12"
+  ],
+  "criterio": "acerto balanceado médio (H+1 a H+4), validação cruzada por município",
+  "modelos": {
+    "lightgbm_classificador_clima_s1_s4": {
+      "num_leaves": 15,
+      "min_child_samples": 200,
+      "n_estimators": 400
+    },
+    "lightgbm_classificador_clima_balanceado": {
+      "num_leaves": 15,
+      "min_child_samples": 200,
+      "n_estimators": 150
+    },
+    "lightgbm_classificador_janela12": {
+      "num_leaves": 63,
+      "min_child_samples": 200,
+      "n_estimators": 150
+    },
+    "xgboost_classificador": {},
+    "random_forest_classificador": {
+      "min_samples_leaf": 5,
+      "max_features": 0.5,
+      "max_depth": null
+    },
+    "mlp_classificador": {
+      "hidden_layer_sizes": [
+        128,
+        64
+      ],
+      "alpha": 0.01,
+      "learning_rate_init": 0.001
+    },
+    "lstm_classificador": {
+      "oculto": 16,
+      "dropout": 0.0,
+      "taxa": 0.003
+    }
+  }
+}
