@@ -42,20 +42,24 @@ São 115 municípios, listados em [`data/config/cidades.csv`](data/config/cidade
 1. **Ingestão**
    * **Casos (`src/ingestion.py`):** baixa da API do InfoDengue (Fiocruz/FGV) a série semanal de cada município, desde 2010.
    * **Clima (`src/ingestion_clima.py`):** baixa temperatura, chuva e umidade diárias da reanálise ERA5 (Open-Meteo) e agrega por semana epidemiológica.
+   * **Fotos dos dados (`src/snapshot.py`):** ao fim de cada ingestão, guarda uma cópia compactada dos dados baixados em `data/snapshots/AAAA-MM-DD/`, com um manifesto (linhas, primeira e última semana e SHA-256 de cada município). Os dados do InfoDengue mudam de uma coleta para outra; as fotos permitem reproduzir resultados antigos e medir essas mudanças (`src/revisao_dados.py`, decisão 3).
 2. **Pré-processamento (`src/preprocessing.py`):** une casos e clima por semana, interpola valores faltantes apenas entre valores conhecidos e calcula as variáveis do modelo.
 3. **Treinamento e avaliação (`src/train.py`):** treina os dois modelos de produção, cada um único para todos os municípios de treino e com uma versão por antecedência (1 a 4 semanas): o **LightGBM classificador com clima**, para a tendência, e o **LightGBM por quantis**, para o número de casos com intervalo de 80%. Avalia os dois com validação *walk-forward* com retreino mensal contra o baseline de persistência e salva os modelos usados pelo painel (cerca de 20 minutos).
 4. **Análise exploratória (`src/eda.py`):** gera matrizes de correlação e gráficos de casos contra clima.
-5. **Painel (`app.py` e `painel/`):** aviso de uso acadêmico na entrada; seção **Indicadores**, com a tendência e os casos previstos para as próximas 4 semanas e o gráfico de projeções; seção **Detalhes do Modelo**, com a explicação dos modelos, a comparação com as alternativas, o mapa dos municípios e os dados de cada município.
+5. **Pipeline completo (`src/pipeline_completo.py`):** refaz, na ordem, tudo o que depende dos dados (pré-processamento, modelos de produção, análise exploratória, experimentos, comparação entre fotos e os números do relatório em `reports/relatorio/`, por `src/numeros_relatorio.py`). Retoma de onde parou se for interrompido (decisão 14).
+6. **Painel (`app.py` e `painel/`):** aviso de uso acadêmico na entrada; seção **Indicadores**, com a tendência e os casos previstos para as próximas 4 semanas e o gráfico de projeções; seção **Detalhes do Modelo**, com a explicação dos modelos, a comparação com as alternativas, o mapa dos municípios e os dados de cada município.
 
 **Experimentos** (cada um grava seus resultados em `reports/`; detalhes na seção "Decisões de Projeto"):
 
 | Script | Pergunta |
 |---|---|
 | `src/experimento_modelos.py` | Qual modelo prevê melhor a tendência? (8 modelos, um arquivo cada em `src/modelos/`) |
+| `src/experimento_classificadores.py` | Outros classificadores (XGBoost, Random Forest, redes neurais MLP e LSTM) ou outra regra de decisão superam o classificador em produção? (decisão 15) |
+| `src/experimento_clima_classificador.py` | O clima melhora o classificador de tendência? |
 | `src/experimento_rt.py` | O melhor modelo é mais útil que o Rt do InfoDengue? |
 | `src/experimento_generalizacao.py` | O modelo generaliza para municípios não vistos? Mais municípios ajudam? O clima ajuda? |
 | `src/experimento_atraso.py` | Quanto o modelo piora se os dados recentes ainda não estiverem disponíveis? |
-| `src/experimento_clima_semanal.py` | Treino só com SP contra treino nacional; clima de semanas específicas |
+| `src/experimento_clima_semanal.py` | Treino só com SP contra treino nacional; clima de semanas específicas (base de 63 municípios; histórico) |
 | `src/experimento_variaveis.py` | Rt e clima no modelo (teste feito com a base de SP; histórico) |
 
 ---
@@ -67,7 +71,7 @@ São 115 municípios, listados em [`data/config/cidades.csv`](data/config/cidade
 * **Modelagem:** `lightgbm`, `scikit-learn`, `statsmodels`, `scipy`, `joblib`
 * **Painel e gráficos:** `streamlit`, `plotly`, `matplotlib`, `seaborn`
 
-As versões estão fixadas em `requirements.txt`.
+As versões estão fixadas em `requirements.txt`. O experimento de classificadores (decisão 15) usa também `xgboost`, `torch` e `pyarrow`, em `requirements-experimentos.txt`; o painel não precisa deles.
 
 ---
 
@@ -103,6 +107,9 @@ As versões estão fixadas em `requirements.txt`.
 
    Os experimentos são opcionais e rodam da mesma forma, por exemplo `python -m src.experimento_modelos` (cerca de 45 minutos).
 
+   **Tudo de uma vez (para atualizar os números com dados novos):** `python -m src.pipeline_completo --baixar` baixa os dados (com foto), refaz os modelos de produção, a análise exploratória, todos os experimentos e os números do relatório. Leva cerca de 7 horas, a maior parte no experimento de classificadores; precisa de `requirements-experimentos.txt`. Se for interrompido, rodar de novo continua do passo onde parou (sem `--baixar`, para não trocar os dados no meio). No Windows, `powershell -ExecutionPolicy Bypass -File scripts
+odar_pipeline.ps1 --baixar` roda o pipeline em segundo plano e impede que o computador suspenda até ele terminar; o andamento fica em `reports/logs/`.
+
    **Sobre a ingestão de clima:** a Open-Meteo limita o uso gratuito por minuto, por hora e por dia, e a série de 16 anos de cada município consome boa parte desses limites. O script espera sozinho nos limites por minuto e por hora, então a primeira execução completa (115 municípios) leva algumas horas e pode atingir o limite diário. Nesse caso, ele para, mantém o que já foi salvo e avisa para rodar de novo mais tarde; a nova execução continua de onde parou. Nas execuções seguintes, só as últimas 12 semanas de cada município são baixadas. Para baixar tudo de novo: `python -m src.ingestion_clima --completo`.
 
    **Sem os dados de clima:** `python -m src.preprocessing --sem-clima` processa com as colunas de clima vazias, o que permite rodar o pipeline enquanto a ingestão de clima não termina. Nesse modo, o classificador de tendência é treinado sem clima e **não reproduz o modelo em produção** (que usa o clima de S-1 a S-4, decisão 9); o modelo de quantis não é afetado. Para os resultados oficiais, o painel e a análise exploratória, rode o processamento completo.
@@ -123,13 +130,13 @@ Os resultados usam três tipos de número. Cada tabela abaixo indica qual está 
 
 **Baseline de persistência:** a previsão mais simples possível, "daqui a H semanas haverá o mesmo número de casos de hoje". Na tendência, equivale a dizer sempre "estável". Um modelo só é útil se for melhor que isso.
 
-Outras métricas de tendência: **subidas detectadas** (das semanas em que os casos subiram, em quantas o modelo previu subida), **alarmes de subida corretos** (das vezes em que o modelo previu subida, em quantas os casos subiram) e **sentido oposto** (semanas em que o modelo previu subida e os casos caíram, ou o contrário; menor é melhor).
+Outras métricas de tendência: **log loss** e **Brier**, que avaliam as probabilidades que os classificadores dão a cada tendência, e não só a tendência escolhida (**menor é melhor**; não dependem da regra de decisão, decisão 15); **subidas detectadas** (das semanas em que os casos subiram, em quantas o modelo previu subida), **alarmes de subida corretos** (das vezes em que o modelo previu subida, em quantas os casos subiram) e **sentido oposto** (semanas em que o modelo previu subida e os casos caíram, ou o contrário; menor é melhor).
 
 ---
 
 ## 🧭 Decisões de Projeto
 
-Estado atual das decisões, com os números da base atual (115 municípios). Quando um resultado vem de uma etapa anterior do projeto, isso é indicado. A evolução de cada decisão, os testes intermediários e as conclusões que mudaram ao longo do caminho estão em [`docs/historia_decisoes.md`](docs/historia_decisoes.md).
+Estado atual das decisões, com os números da base atual (115 municípios, dados até a semana de 27/09/2026, baixados em 09/10/2026). Quando um resultado vem de uma etapa anterior do projeto, isso é indicado. A evolução de cada decisão, os testes intermediários e as conclusões que mudaram ao longo do caminho estão em [`docs/historia_decisoes.md`](docs/historia_decisoes.md).
 
 ### 1. Municípios e papéis (treino × validação)
 
@@ -162,7 +169,7 @@ Estado atual das decisões, com os números da base atual (115 municípios). Qua
 * **Decisão:** as últimas 10 semanas de cada município (`SEMANAS_INSTAVEIS`, em `src/train.py`) ficam fora do treino e da avaliação.
 * **Motivo:** o número de casos das semanas mais recentes ainda é uma estimativa (*nowcast*), revisada pelo InfoDengue à medida que chegam notificações atrasadas.
 * **Como chegamos a 10:** o InfoDengue informa um intervalo de incerteza do nowcast para cada semana. Contamos, em cada município de treino, quantas semanas finais ainda têm esse intervalo aberto, e adotamos o máximo. Foram 10 semanas nas três bases (SP, 74 e 115 municípios), em municípios como Cosmópolis, Indaiatuba, Manaus, Teresina, Varginha e Sobral. Municípios sem nowcast publicado, como Campinas, também têm a última semana visivelmente incompleta.
-* **Limitação:** o critério mede onde o InfoDengue ainda aplica o nowcast, e não o quanto os números mudam depois.
+* **Quanto os números mudam depois** (`src/revisao_dados.py`, `reports/revisao_dados.csv`): comparando a foto dos dados de 27/09/2026 com a de 09/10/2026, 12 dias depois, a soma dos casos estimados dos 115 municípios na semana mais recente subiu 45%, na anterior 18%, 3 semanas antes 5% e 5 semanas antes 2%; de 8 semanas para trás, menos de 1%. Nenhuma semana com mais de 1 ano mudou. O corte de 10 semanas cobre o período em que os números ainda mudam. Mesmo com o nowcast, a última semana ainda subestimava os casos. **Limitação:** é uma única comparação, de 12 dias; cada nova coleta acrescenta uma comparação ao arquivo.
 * **Ponto de partida das previsões:** 39 dos 115 municípios (entre eles Campinas, Belo Horizonte, Rio de Janeiro e Salvador) não têm nowcast publicado nas semanas recentes, então essas semanas têm só os casos já notificados e estão incompletas. Em 09/2026, em relação ao nível das semanas anteriores, a última semana desses municípios tinha 23% dos casos, a penúltima 63% e a antepenúltima 76%, contra 84%, 82% e 87% nos municípios com nowcast. Partir de uma semana incompleta fazia o modelo "ver" uma subida que era só o número voltando ao normal. Por isso, nesses municípios, as previsões do painel partem da **última semana completa** (a 4ª mais recente; `SEMANAS_INCOMPLETAS_SEM_NOWCAST` em `src/predict.py`), e o painel avisa isso. Os municípios não foram descartados: o treino usa só semanas antigas, já completas.
 * **Detalhe técnico:** o corte é feito depois de descartar as semanas sem alvo, para que também saiam as semanas cujo alvo (H semanas à frente) cai no período instável. Ele fica no treino, e não no pré-processamento, porque o painel precisa mostrar as semanas recentes.
 
@@ -193,7 +200,7 @@ Estado atual das decisões, com os números da base atual (115 municípios). Qua
   | **Modelo único, alvo relativo** | **0,87** | **0,79** | **0,75** | **0,72** |
 
 * **Variáveis comuns aos modelos:** casos atuais (em log), variação dos casos em relação a 1, 2, 3 e 4 semanas atrás e semana do ano (`FEATURES`, em `src/train.py`). O classificador de tendência acrescenta o clima das semanas S-1 a S-4 (decisão 9); o modelo de quantis usa só as variáveis comuns. **Nenhum modelo usa o Rt** (decisão 8). A incidência por 100 mil habitantes foi retirada por ser redundante com os casos.
-* **Modelos em produção** (decisão 11): LightGBM **classificador** com clima das semanas S-1 a S-4, para a tendência, e LightGBM **por quantis**, para o número de casos com intervalo de 80%. Os dois usam hiperparâmetros fixos (300 árvores, taxa de aprendizado 0,05).
+* **Modelos em produção** (decisão 11): LightGBM **classificador** com clima das semanas S-1 a S-4, para a tendência, e LightGBM **por quantis**, para o número de casos com intervalo de 80%. Os dois usam hiperparâmetros fixos (300 árvores, taxa de aprendizado 0,05); ajustá-los não trouxe ganho (decisões 11 e 15).
 
 ### 6. Avaliação: walk-forward, validação cruzada por município e baseline
 
@@ -204,11 +211,11 @@ Estado atual das decisões, com os números da base atual (115 municípios). Qua
 
   | Grupo | 1 sem. | 2 sem. | 3 sem. | 4 sem. |
   |---|---|---|---|---|
-  | Municípios de treino (100) | 0,83 | 0,77 | 0,73 | 0,71 |
+  | Municípios de treino (100) | 0,83 | 0,76 | 0,73 | 0,71 |
   | Municípios de validação (15) | 0,79 | 0,71 | 0,68 | 0,67 |
 
 * **Por ano** (`reports/metricas_por_ano.csv`): nos municípios de treino, a razão fica abaixo de 1 em todos os anos de 2015 a 2026. Os anos mais difíceis são os de transmissão baixa ou estável (2017, 2018 e o parcial de 2026, de 0,88 a 0,97), e os melhores, os de epidemia (2024, de 0,64 a 0,76). Nos municípios de validação, só 2017 fica acima de 1 (até 1,11 em 4 semanas).
-* **Por município de validação** (`reports/metricas_modelos.csv`): o modelo supera o baseline com folga em Blumenau, Sorocaba, Vitória da Conquista e Bauru (0,56 a 0,64 em 4 semanas), mas empata em Parauapebas e Manacapuru (Norte), Caruaru e Sinop (0,94 a 1,03). A generalização é mais fraca nas regiões com menos municípios parecidos no treino.
+* **Por município de validação** (`reports/metricas_modelos.csv`): o modelo supera o baseline com folga em Blumenau, Sorocaba, Vitória da Conquista e Bauru (0,56 a 0,64 em 4 semanas), mas empata em Parauapebas e Manacapuru (Norte), Caruaru e Sinop (0,94 a 1,04). A generalização é mais fraca nas regiões com menos municípios parecidos no treino.
 * **Pandemia (2020–2021):** num teste com a base de SP, treinar sem esses anos não mudou o resultado; todos os anos foram mantidos.
 * **Limitação: dados revisados.** A simulação usa os casos na versão revisada de hoje; em tempo real, as semanas recentes estariam incompletas. Por isso ela é otimista nesse ponto. O InfoDengue não guarda os dados como eram conhecidos em cada data, então isso não pode ser corrigido para o passado (avaliação pseudoprospectiva). A decisão 12 mede o tamanho desse efeito.
 
@@ -237,11 +244,11 @@ Estado atual das decisões, com os números da base atual (115 municípios). Qua
   | Modelo | 1 sem. | 2 sem. | 3 sem. | 4 sem. |
   |---|---|---|---|---|
   | **LightGBM classificador (melhor modelo)** | **0,419** | **0,554** | **0,605** | **0,623** |
-  | Classificador só com o Rt | 0,362 | 0,464 | 0,517 | 0,539 |
-  | Regra do `p_rt1` | 0,388 | 0,428 | 0,440 | 0,441 |
-  | Regra do Rt | 0,347 | 0,376 | 0,386 | 0,382 |
+  | Classificador só com o Rt | 0,362 | 0,464 | 0,516 | 0,538 |
+  | Regra do `p_rt1` | 0,388 | 0,428 | 0,440 | 0,440 |
+  | Regra do Rt | 0,347 | 0,376 | 0,385 | 0,382 |
 
-* **Conclusões:** o nosso modelo é melhor que qualquer uso do Rt, em todos os horizontes, com intervalos de confiança de 95% que excluem zero; nos 15 municípios de validação o resultado se repete. Mesmo o classificador treinado só com o Rt perde de 6 a 9 pontos, então os casos recentes contêm mais informação sobre a tendência do que o Rt. As regras diretas pouco superam o "sempre estável" e dão muitos alarmes falsos (só 21% a 36% dos alarmes da regra do Rt se confirmam). **Ressalva:** o Rt mede a transmissão atual e não foi criado para prever a variação dos casos com o nosso critério; a conclusão vale para essa pergunta específica.
+* **Conclusões:** o nosso modelo é melhor que qualquer uso do Rt, em todos os horizontes, com intervalos de confiança de 95% que excluem zero; nos 15 municípios de validação o resultado se repete, com uma exceção: em 1 semana, a regra do `p_rt1` empata com o nosso modelo. Mesmo o classificador treinado só com o Rt perde de 6 a 9 pontos, então os casos recentes contêm mais informação sobre a tendência do que o Rt. As regras diretas pouco superam o "sempre estável" e dão muitos alarmes falsos (só 21% a 36% dos alarmes da regra do Rt se confirmam). **Ressalva:** o Rt mede a transmissão atual e não foi criado para prever a variação dos casos com o nosso critério; a conclusão vale para essa pergunta específica.
 
 ### 9. Clima no modelo
 
@@ -256,9 +263,9 @@ Estado atual das decisões, com os números da base atual (115 municípios). Qua
     |---|---|---|---|---|
     | Classificador sem clima | 0,419 | 0,554 | 0,605 | 0,623 |
     | **Classificador com clima S-1 a S-4** | **0,430** | **0,560** | **0,611** | **0,633** |
-    | Classificador com clima S-1 a S-5 | 0,427 | 0,560 | 0,611 | 0,632 |
+    | Classificador com clima S-1 a S-5 | 0,427 | 0,561 | 0,612 | 0,632 |
 
-    O clima de S-1 a S-4 melhora o acerto balanceado em todos os horizontes (de +0,006 a +0,010, com intervalos de confiança de 95% que excluem zero). Com 4 semanas, detecta mais subidas (57,2% contra 54,8%), tem mais alarmes corretos (58,1% contra 56,9%) e erra menos o sentido (8,2% contra 8,9%). Nos 15 municípios de validação, as diferenças vão na mesma direção (+0,002 a +0,009), mas só são significativas em 1 e 2 semanas.
+    O clima de S-1 a S-4 melhora o acerto balanceado em todos os horizontes (de +0,006 a +0,010, com intervalos de confiança de 95% que excluem zero). Com 4 semanas, detecta mais subidas (57,0% contra 54,7%), tem mais alarmes corretos (58,1% contra 57,0%) e erra menos o sentido (8,2% contra 8,9%). Nos 15 municípios de validação, as diferenças vão na mesma direção (+0,002 a +0,009), mas só são significativas em 2 semanas (em 1 semana, o limite inferior do intervalo fica em zero).
 * **Interpretação:** o ganho é pequeno (cerca de 1 ponto). O efeito do clima sobre os casos leva semanas para aparecer (desenvolvimento do mosquito, incubação e notificação). O classificador aproveita o clima também nos horizontes curtos porque prevê diretamente a mudança de tendência, onde o clima recente ajuda a distinguir uma subida real de uma oscilação.
 
 ### 10. Base nacional e generalização
@@ -276,11 +283,11 @@ Estado atual das decisões, com os números da base atual (115 municípios). Qua
   | Modelo | 1 sem. | 2 sem. | 3 sem. | 4 sem. |
   |---|---|---|---|---|
   | Baseline de persistência | 0,333 | 0,333 | 0,333 | 0,333 |
-  | Regressão linear | 0,367 | 0,428 | 0,496 | 0,536 |
-  | Binomial negativa | 0,368 | 0,443 | 0,520 | 0,565 |
-  | Ensemble (média de linear, binomial negativa e LightGBM) | 0,363 | 0,462 | 0,545 | 0,586 |
-  | LightGBM por quantis | 0,374 | 0,499 | 0,554 | 0,586 |
-  | LightGBM de regressão (usado no painel antes desta decisão) | 0,387 | 0,509 | 0,562 | 0,592 |
+  | Regressão linear | 0,367 | 0,429 | 0,496 | 0,536 |
+  | Binomial negativa | 0,368 | 0,444 | 0,521 | 0,565 |
+  | Ensemble (média de linear, binomial negativa e LightGBM) | 0,363 | 0,463 | 0,546 | 0,586 |
+  | LightGBM por quantis | 0,373 | 0,499 | 0,554 | 0,587 |
+  | LightGBM de regressão (usado no painel antes desta decisão) | 0,387 | 0,510 | 0,563 | 0,592 |
   | LightGBM ajustado | 0,398 | 0,507 | 0,562 | 0,589 |
   | **LightGBM classificador** | **0,419** | **0,554** | **0,605** | **0,623** |
 
@@ -288,7 +295,7 @@ Estado atual das decisões, com os números da base atual (115 municípios). Qua
   * As relações não lineares fazem diferença: regressão linear e binomial negativa (o modelo clássico da epidemiologia para contagens) ficaram bem abaixo. Combinar modelos e ajustar hiperparâmetros não trouxe ganho.
   * O **classificador**, que prevê a tendência diretamente, é o único significativamente melhor que o LightGBM de regressão (3 a 4 pontos a mais). Ele detecta mais subidas (55% contra 42% em 4 semanas), mas com mais alarmes falsos (57% dos alarmes corretos, contra 65%) e não produz número de casos.
   * O **LightGBM por quantis** tem o menor erro em número de casos e um intervalo de previsão de 80% bem calibrado (o valor real caiu dentro dele em 78% a 82% das semanas).
-* **Decisão:** usar os dois modelos, cada um no que faz melhor. O **classificador com clima** (decisão 9) dá a tendência: no contexto do projeto, o mais importante é alertar uma subida, e ele detecta mais subidas que as alternativas. O **LightGBM por quantis** dá o número de casos, com uma faixa de 80% ("entre X e Y casos"). Os dois são independentes e podem divergir; o painel mostra os dois como são e avisa isso. Tabelas completas e limitações nas seções 16 a 19 de [`docs/historia_decisoes.md`](docs/historia_decisoes.md).
+* **Decisão:** usar os dois modelos, cada um no que faz melhor. O **classificador com clima** (decisão 9) dá a tendência: no contexto do projeto, o mais importante é alertar uma subida, e ele detecta mais subidas que as alternativas. O **LightGBM por quantis** dá o número de casos, com uma faixa de 80% ("entre X e Y casos"). Os dois são independentes e podem divergir; o painel mostra os dois como são e avisa isso. Tabelas completas e limitações nas seções 16 a 19 de [`docs/historia_decisoes.md`](docs/historia_decisoes.md). Outros tipos de modelo (XGBoost, Random Forest e redes neurais) foram comparados depois, na decisão 15.
 
 ### 12. Previsão com dados atrasados
 
@@ -323,6 +330,39 @@ Estado atual das decisões, com os números da base atual (115 municípios). Qua
 * **Clima incremental:** só as últimas 12 semanas são baixadas de novo, o que também cobre a revisão do ERA5 preliminar pelo definitivo.
 * **Configuração editável:** a lista de municípios fica em `data/config/cidades.csv`, e não no código.
 * **Experimentos versionados:** todo resultado citado aqui vem de um script em `src/` e de um arquivo em `reports/`, e pode ser reproduzido.
+* **Fotos dos dados:** cada ingestão guarda os dados baixados em `data/snapshots/AAAA-MM-DD/` (decisão 3). Como o InfoDengue revisa as semanas recentes, é a única forma de saber exatamente com quais dados um resultado foi calculado.
+* **Pipeline retomável:** `src/pipeline_completo.py` registra cada passo concluído em `reports/pipeline_estado.json`, com a identificação dos dados processados; se for interrompido, continua do passo onde parou, e se os dados mudarem, refaz tudo. O experimento de classificadores também guarda as previsões de cada treino em `reports/cache/` (fora do git) e retoma dentro do passo. Os experimentos históricos, feitos com bases anteriores (`experimento_variaveis.py` e `experimento_clima_semanal.py`), ficam fora do pipeline: os resultados citados na história das decisões são os dos commits originais.
+
+### 15. Outros modelos e regra de decisão
+
+* **Pergunta:** outros tipos de modelo (XGBoost, Random Forest e redes neurais) ou outra forma de transformar as probabilidades em tendência superam o classificador em produção?
+* **Teste** (`src/experimento_classificadores.py`; modelos em `src/modelos/`; resultados em `reports/comparacao_classificadores*.csv` e `reports/ajuste_classificadores*`): todos com as mesmas informações do classificador em produção (casos recentes e clima de S-1 a S-4), na mesma avaliação da decisão 11 (validação cruzada por município, validação final nos 15 municípios, walk-forward de 2019 em diante com retreino trimestral):
+  * **LightGBM ajustado**, **XGBoost** (outro boosting de árvores) e **Random Forest** (árvores independentes combinadas por votação);
+  * **MLP** (rede neural com as mesmas variáveis) e **LSTM** (rede neural que lê a sequência das últimas 12 semanas de casos e clima e aprende sozinha quais semanas importam), cada uma com 3 sementes;
+  * **LightGBM com janela de 12 semanas**, com a mesma informação que a LSTM recebe, para separar o efeito do modelo do efeito de olhar mais semanas para trás;
+  * **LightGBM com peso igual para as três tendências** e a **decisão balanceada** (glossário), duas formas de avisar mais subidas.
+* **Mesmo orçamento de ajuste para todos:** a configuração padrão de cada modelo e mais 8 alternativas, escolhidas pelo acerto balanceado médio na validação cruzada de 2015 a 2018. Os anos da comparação e os municípios de validação não participam da escolha.
+* **Resultado** (validação cruzada, 2019 em diante; acerto balanceado, **de 0 a 1, maior é melhor, o baseline tira 0,333**; * = diferença significativa em relação ao modelo em produção):
+
+  | Modelo | 1 sem. | 2 sem. | 3 sem. | 4 sem. |
+  |---|---|---|---|---|
+  | **LightGBM classificador com clima (em produção)** | **0,430** | **0,560** | **0,611** | **0,633** |
+  | LightGBM ajustado | 0,429 | 0,561 | 0,611 | 0,635 |
+  | LightGBM com janela de 12 semanas | 0,433 | 0,565* | 0,615* | 0,635 |
+  | XGBoost | 0,427 | 0,562 | 0,612 | 0,634 |
+  | Random Forest | 0,418* | 0,554* | 0,607* | 0,631 |
+  | MLP | 0,419* | 0,554* | 0,611 | 0,632 |
+  | LSTM | 0,419* | 0,557 | 0,609 | 0,630 |
+  | LightGBM com peso igual para as três tendências | 0,581* | 0,610* | 0,628* | 0,638 |
+  | **Em produção + decisão balanceada** | **0,580*** | **0,612*** | **0,630*** | **0,640** |
+
+* **Conclusões:**
+  * **Nenhum modelo supera o de produção de forma relevante.** XGBoost e LightGBM ajustado empatam; a janela de 12 semanas ganha menos de meio ponto; Random Forest e as redes neurais ficam um pouco abaixo nos horizontes curtos e têm probabilidades piores (log loss de 0,790 contra 0,780 em 4 semanas). Nos 15 municípios de validação e de 2022 em diante, o quadro é o mesmo. Com estas variáveis, o limite está na informação disponível, e não no modelo.
+  * **Ajustar hiperparâmetros não trouxe ganho** (a não ser para o Random Forest, cujo padrão era ruim), como já tinha acontecido na decisão 11.
+  * **O peso por classe não é um modelo melhor, é outra regra de decisão.** Aplicar a decisão balanceada às probabilidades do modelo em produção, sem treinar de novo, dá o mesmo resultado, com probabilidades melhores (log loss de 0,738 contra 0,957 em 1 semana). A troca: em 1 semana, as subidas detectadas passam de 18% para 63%, mas os alarmes de subida corretos caem de 50% para 35% e o acerto simples de 66% para 49%; em 4 semanas, de 57% para 69% das subidas, com 52% dos alarmes corretos contra 58%. Nos 15 municípios de validação, a decisão balanceada piora 3 e 4 semanas (0,590 contra 0,616 em 4 semanas).
+  * **Exigir mais confiança nos alarmes não resolve.** Em 2015–2018, nenhum ponto de corte da probabilidade de subida chega a 2 alarmes corretos para cada falso, a não ser avisando menos de 8% das subidas; em 1 semana, nem isso.
+* **Ruído numérico:** mudar só o último dígito (10⁻¹⁵) das variações de casos, ao recalculá-las, mudou o acerto balanceado de 1 semana em até 0,004 (o LightGBM escolhe alguns cortes diferentes). Diferenças desse tamanho entre modelos não devem ser interpretadas. O experimento foi refeito com as variáveis exatamente iguais às do pré-processamento.
+* **Decisão:** manter o LightGBM classificador com clima, sem ajuste. Estes resultados levaram a rever a pergunta do projeto: a tendência relativa (variação de 20%) não diz se o município precisa mobilizar recursos; ver a decisão 16.
 
 ### Nota sobre os municípios de validação
 

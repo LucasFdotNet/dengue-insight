@@ -38,6 +38,8 @@ Este documento reconstrói, em ordem cronológica, as decisões técnicas tomada
 | 17 | Modelo contra o Rt | 27/09/2026 | O classificador supera a regra do Rt, a do `p_rt1` e um classificador treinado só com o Rt; o Rt segue fora dos modelos | [17](#s17) |
 | 18 | Clima no classificador | 27/09/2026 | Com o classificador, o clima de S-1 a S-4 melhora todos os horizontes (+0,006 a +0,010); entra no modelo de 4 semanas | [18](#s18) |
 | 19 | Modelos em produção e painel | 27/09/2026 | Classificador com clima para a tendência e quantis para os casos; painel com aviso, Indicadores e Detalhes do Modelo | [19](#s19) |
+| 20 | Dados atualizados, fotos e pipeline completo | 09–10/10/2026 (`4ba56f0` a `d906288`) | Guardar uma foto dos dados a cada coleta; medir quanto o InfoDengue revisa as semanas recentes; refazer todos os números com um comando retomável | [20](#s20) |
+| 21 | Outros modelos e regra de decisão | 09–10/10/2026 | XGBoost, Random Forest, MLP e LSTM, com o mesmo ajuste, não superam o LightGBM; o peso por classe é só outra regra de decisão; a pergunta do projeto é revista | [21](#s21) |
 
 Observação sobre as datas: o código herdado é de 21/09/2026 e quase todo o trabalho de revisão foi registrado em commits de 26/09/2026 (o último, que fixa versões do `scipy` e do `statsmodels`, é de 27/09/2026). A coluna de commits permite reconstruir a ordem exata com `git log --reverse`.
 
@@ -854,3 +856,125 @@ Nos municípios com nowcast, a queda é real (baixa temporada). Nos sem nowcast,
 * **Resultado:** em Campinas, as previsões passaram de "subida" com cerca de 70 casos para "estável" com cerca de 150 casos, a partir de 23/08/2026.
 * **Limitação:** nesses municípios, algumas semanas previstas já passaram quando a previsão é exibida. A avaliação *walk-forward* não captura esse problema, porque usa os dados já revisados (avaliação pseudoprospectiva, seção 5).
 
+<a id="s20"></a>
+## 20. Dados atualizados, fotos dos dados e pipeline completo
+
+### Contexto
+
+Antes do relatório final, o grupo decidiu que todos os números citados devem ser calculados com os dados mais recentes. Os dados do InfoDengue, porém, mudam de uma coleta para outra: as semanas recentes são revisadas à medida que chegam notificações atrasadas (seção 2). Sem guardar o que foi baixado, não há como saber exatamente com quais dados um resultado foi calculado, nem medir essas revisões.
+
+### O que foi feito
+
+* **Fotos dos dados** (`src/snapshot.py`, commit `4ba56f0`): ao fim de cada ingestão, os arquivos baixados de casos e de clima são compactados em `data/snapshots/AAAA-MM-DD/`, com um manifesto que registra, por município, o número de semanas, a primeira e a última semana e o SHA-256 do arquivo. Antes da nova coleta, os dados em uso (baixados em 27/09/2026) foram guardados como a primeira foto; a nova coleta, de 09/10/2026, tem dados até a semana de 27/09/2026 (6,8 MB por foto).
+* **Revisão dos dados** (`src/revisao_dados.py`, `reports/revisao_dados.csv`): compara cada foto com a seguinte, somando os casos dos 115 municípios por semana.
+* **Pipeline completo** (`src/pipeline_completo.py`): refaz, na ordem, o pré-processamento, os modelos de produção, a análise exploratória, os experimentos, a revisão dos dados e os números do relatório. Registra cada passo concluído em `reports/pipeline_estado.json`, junto com a identificação dos dados processados (um SHA-256 dos arquivos de `data/processed/`), e retoma de onde parou. `scripts/rodar_pipeline.ps1` o roda em segundo plano no Windows, impedindo que o computador suspenda. A execução completa levou cerca de 6h30, das quais 3h40 no experimento de classificadores (seção 21).
+* **Números do relatório em script** (`src/numeros_relatorio.py`, `reports/relatorio/`): os cálculos avulsos que só imprimiam na tela (base de dados, casos por ano nos municípios em foco, correlação defasada com o clima, métricas do painel e tabela de comparação de modelos) passaram a gravar arquivos e a fazer parte do pipeline.
+
+### Resultados
+
+**Quanto os dados mudaram em 12 dias** (foto de 27/09/2026 contra a de 09/10/2026; soma dos 115 municípios; semanas contadas a partir da mais recente da primeira foto, 13/09/2026):
+
+| Semana | Casos estimados (com nowcast) | Casos notificados |
+|---|---|---|
+| Mais recente | +45% | +189% |
+| 1 antes | +18% | +37% |
+| 2 antes | +8% | +14% |
+| 3 antes | +5% | +8% |
+| 5 antes | +2% | +3% |
+| 8 ou mais antes | menos de 1% | cerca de 1% ou menos |
+| Mais de 1 ano antes | nenhuma semana mudou | nenhuma semana mudou |
+
+* As revisões se concentram nas semanas mais recentes e ficam abaixo de 1% a partir de 8 semanas: o corte de 10 semanas (seção 2) cobre o período em que os números ainda mudam. Isso responde, com dados, à limitação registrada na seção 2 ("o critério não mede o quanto os números mudam depois").
+* O nowcast corrige boa parte do atraso (os notificados subiram 189% na última semana; os estimados, 45%), mas ainda subestima a semana mais recente.
+
+**Efeito dos dados novos nos resultados.** Os dados novos acrescentam cerca de 2 semanas por município, e as 10 mais recentes ficam fora da avaliação; por isso, os números mudaram pouco. O acerto balanceado, as subidas detectadas e os alarmes corretos variaram no máximo 0,002 em todos os experimentos refeitos; o ajuste do LightGBM escolheu os mesmos hiperparâmetros. Duas afirmações do README foram ajustadas: no teste do clima no classificador (seção 18), o ganho nos 15 municípios de validação passou a ser significativo só em 2 semanas (em 1 semana, o limite inferior do intervalo ficou em −0,0002; antes, +0,0013); e, na comparação com o Rt (seção 17), a regra do `p_rt1` empata com o nosso modelo em 1 semana nos municípios de validação (o que já acontecia antes).
+
+### Correção: experimentos históricos fora do pipeline
+
+A primeira versão do pipeline incluía `experimento_variaveis.py` e `experimento_clima_semanal.py`. Esses experimentos foram feitos com bases anteriores (os 13 municípios de SP e a base de 63 municípios, seções 9, 10 e 12) e, rodados com a base atual, viram outro experimento e sobrescrevem os resultados citados nesta história. Os dois foram retirados do pipeline e seus arquivos em `reports/` foram mantidos como estavam.
+
+### Limitações
+
+* A revisão dos dados vem de uma única comparação, de 12 dias. Cada nova coleta acrescenta uma comparação a `reports/revisao_dados.csv`.
+* As fotos guardam os dados como foram baixados a partir de 27/09/2026; não há como recuperar versões anteriores (o InfoDengue não guarda o histórico de revisões), então a avaliação continua pseudoprospectiva (seção 5).
+
+<a id="s21"></a>
+## 21. Outros modelos e regra de decisão
+
+### Contexto e pergunta
+
+Com os modelos em produção definidos (seção 19), o grupo quis testar se modelos de outros tipos dariam resultados melhores: Random Forest, XGBoost e, se fizesse sentido, redes neurais. A comparação também serve para mostrar no relatório que outras hipóteses foram testadas.
+
+### O que foi testado
+
+(`src/experimento_classificadores.py`; um arquivo por modelo em `src/modelos/`.) Todos os modelos recebem as mesmas informações do classificador em produção (casos recentes e clima de S-1 a S-4) e são avaliados como na seção 16: validação cruzada por município, validação final nos 15 municípios, walk-forward de 2019 em diante com retreino trimestral, intervalos de confiança por bootstrap sobre municípios.
+
+| Modelo | Por que entrou |
+|---|---|
+| XGBoost | Outro boosting de árvores: o resultado depende da biblioteca? |
+| Random Forest | Árvores independentes combinadas por votação (*bagging*), que costumam sobreajustar menos |
+| MLP | Rede neural com as mesmas variáveis, padronizadas |
+| LSTM | Rede neural que lê a sequência das últimas 12 semanas de casos e clima e aprende sozinha quais defasagens importam; uma rede prevê os 4 horizontes |
+| LightGBM com janela de 12 semanas | A mesma informação que a LSTM recebe, para separar o efeito do modelo do efeito de olhar mais longe |
+| LightGBM com peso igual para as três tendências | Como a métrica principal é o acerto balanceado, testa se dar o mesmo peso às subidas e quedas, mais raras, ajuda |
+
+* **Ajuste de hiperparâmetros com o mesmo orçamento para todos:** a configuração padrão de cada modelo e mais 8 alternativas (por exemplo, tamanho e número de árvores; tamanho da rede, regularização e taxa de aprendizado), escolhidas pelo acerto balanceado médio na validação cruzada de 2015 a 2018, com retreino anual. A comparação usa a configuração escolhida de cada modelo; o classificador em produção entra também com a configuração padrão, como está no painel.
+* **Redes neurais com 3 sementes**, porque o resultado delas varia de um treino para outro; a variação entre sementes ficou entre 0,001 e 0,007 no acerto balanceado.
+* **Métricas novas:** log loss e Brier, que avaliam as probabilidades e não dependem da regra de decisão; e o recorte de 2022 em diante (pós-pandemia), como análise de sensibilidade.
+* **Execução:** cerca de 3h40 com 8 treinos em paralelo, retomável (cada treino grava suas previsões em `reports/cache/`).
+
+### Resultados
+
+Validação cruzada, 2019 em diante, acerto balanceado (* = diferença significativa em relação ao modelo em produção):
+
+| Modelo | 1 sem. | 2 sem. | 3 sem. | 4 sem. | Log loss, 4 sem. |
+|---|---|---|---|---|---|
+| **Em produção (padrão)** | **0,430** | **0,560** | **0,611** | **0,633** | **0,780** |
+| LightGBM ajustado | 0,429 | 0,561 | 0,611 | 0,635 | 0,777 |
+| LightGBM, janela de 12 semanas | 0,433 | 0,565* | 0,615* | 0,635 | 0,773 |
+| XGBoost | 0,427 | 0,562 | 0,612 | 0,634 | 0,779 |
+| Random Forest | 0,418* | 0,554* | 0,607* | 0,631 | 0,781 |
+| MLP | 0,419* | 0,554* | 0,611 | 0,632 | 0,790 |
+| LSTM | 0,419* | 0,557 | 0,609 | 0,630 | 0,790 |
+| LightGBM, peso igual por tendência | 0,581* | 0,610* | 0,628* | 0,638 | 0,829 |
+
+* **O modelo não é o limite.** Os sete modelos ficam a menos de 1,2 ponto uns dos outros na regra normal; nos 15 municípios de validação e de 2022 em diante, o quadro se repete. As redes neurais, inclusive a LSTM, que vê a sequência inteira, não superam o LightGBM, o que é comum em dados tabulares com poucas variáveis.
+* **O ajuste não ajudou:** no período de ajuste, o LightGBM foi de 0,554 (padrão) para 0,557 (ajustado); na comparação, empatou. Só o Random Forest ganhou com o ajuste (de 0,524 para 0,545), porque a configuração padrão era ruim.
+
+### O peso por classe é uma regra de decisão
+
+O peso igual por tendência parecia o único ganho relevante (de 0,430 para 0,581 em 1 semana). A hipótese era que ele não melhora o modelo, só desloca o ponto de corte: em vez de escolher a tendência mais provável, passa a favorecer as raras. Para testar, as probabilidades salvas do modelo em produção foram transformadas com a **decisão balanceada**: cada probabilidade dividida pela frequência daquela tendência no treino, antes de escolher a maior. Não é preciso treinar de novo.
+
+| Validação cruzada, 2019+ | Acerto balanceado | Acerto | Subidas detectadas | Alarmes de subida corretos | Sentido oposto | Log loss |
+|---|---|---|---|---|---|---|
+| 1 sem., em produção | 0,430 | 66% | 18% | 50% | 2% | 0,738 |
+| 1 sem., + decisão balanceada | 0,580 | 49% | 63% | 35% | 8% | 0,738 |
+| 1 sem., peso por tendência | 0,581 | 48% | 64% | 35% | 9% | 0,957 |
+| 4 sem., em produção | 0,633 | 64% | 57% | 58% | 8% | 0,780 |
+| 4 sem., + decisão balanceada | 0,640 | 61% | 69% | 52% | 11% | 0,780 |
+| 4 sem., peso por tendência | 0,638 | 61% | 69% | 52% | 11% | 0,829 |
+
+A decisão balanceada reproduz o peso por tendência, com probabilidades melhores. Com ela, os sete modelos também ficam empatados (de 0,570 a 0,585 em 1 semana). Nos 15 municípios de validação, ela piora 3 e 4 semanas (0,590 contra 0,616 em 4 semanas, significativo).
+
+### A sensibilidade do alarme
+
+A decisão balanceada levou a uma discussão sobre quanto o painel deve exigir para avisar "subida". Com as probabilidades de 2015 a 2018 do modelo em produção:
+
+* **A troca é contínua.** Avisando quando a chance de subida passa de 25%, o painel detectaria 50% das subidas de 1 semana, com 33% de alarmes corretos e alarme em 24 de cada 100 semanas; em 4 semanas, 71% das subidas com 44% de alarmes corretos.
+* **"Primeiro detectar o máximo de subidas" precisa de uma meta,** senão o ótimo é avisar sempre. O grupo propôs o critério de credibilidade "alarmes corretos pelo menos o dobro dos falsos". **Ele é praticamente inatingível:** em 1 semana, nenhum corte chega a 2 para 1; em 2 a 4 semanas, só com cortes perto de 75%, que avisam de 2% a 8% das subidas. Com 1 alarme correto para cada falso, o resultado fica perto da regra atual (de 9% das subidas em 1 semana a 53% em 4 semanas).
+* **Níveis de aviso graduam bem o risco.** Com "alerta" (corte com 1 correto para cada falso) e "atenção" (chance de subida acima do normal), os casos subiram depois de 50% dos alertas, 27% a 31% das atenções e só 7% a 11% das semanas sem sinalização; juntos, alerta e atenção capturaram cerca de 72% das subidas em todos os horizontes. Depois de um alerta, os casos caíram em 12% a 16% das vezes.
+
+### Ruído numérico
+
+Na primeira execução, o modelo em produção teve 0,426 de acerto balanceado em 1 semana, contra 0,430 no experimento da seção 18, com os mesmos dados. A causa: a janela de 12 semanas recalculava as variações de casos (`var_log_1` a `var_log_4`), e o recálculo diferia do valor do pré-processamento só no último dígito (cerca de 10⁻¹⁵); isso basta para o LightGBM escolher alguns cortes diferentes. O número de threads e a ordem das linhas não mudam o resultado. A janela passou a reaproveitar os valores do pré-processamento (commit `1ea513f`), o experimento foi refeito, e os dois experimentos passaram a dar previsões idênticas. **Lição:** diferenças de até cerca de 0,004 no acerto balanceado de 1 semana podem vir só de instabilidade numérica e não devem ser interpretadas.
+
+### Decisão e consequência
+
+* Manter o LightGBM classificador com clima, com a configuração padrão.
+* A discussão sobre os alarmes mostrou um problema de fundo na pergunta. A tendência relativa (subida de mais de 20% e 5 casos) trata igual ir de 5 para 8 casos e de 500 para 800; não indica que uma epidemia em platô exige manter equipes mobilizadas; e não distingue a queda depois do pico (desmobilizar) da queda em período normal (nada a fazer). O gestor decide pelo **nível** em que os casos vão estar. Isso levou à reformulação da seção 22.
+
+### Limitações
+
+* As redes neurais tiveram o mesmo orçamento de ajuste dos outros modelos (9 configurações); um ajuste mais extenso poderia melhorá-las um pouco, mas dificilmente o bastante para superar o empate, dado o tamanho das diferenças.
+* Os hiperparâmetros com a decisão balanceada são os escolhidos com a regra normal.
+* A análise da sensibilidade do alarme usou o período de ajuste (2015–2018).

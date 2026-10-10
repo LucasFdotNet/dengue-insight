@@ -17,9 +17,9 @@
       "n_estimators": 150
     },
     "lightgbm_classificador_janela12": {
-      "num_leaves": 63,
+      "num_leaves": 15,
       "min_child_samples": 200,
-      "n_estimators": 150
+      "n_estimators": 400
     },
     "xgboost_classificador": {},
     "random_forest_classificador": {

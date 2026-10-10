@@ -18,15 +18,27 @@
 
 **Classificador.** Modelo que prevê uma categoria (aqui: sobe, estável ou cai) em vez de um número. O LightGBM classificador é o modelo de tendência do painel.
 
+**Decisão balanceada (regra de decisão).** Forma de transformar as probabilidades de um classificador em uma tendência. A regra normal escolhe a tendência mais provável; como a maioria das semanas é estável, ela quase sempre escolhe "estável" com 1 semana de antecedência. A decisão balanceada compara cada probabilidade com a frequência daquela tendência no treino: uma chance de subida de 30%, quando só 17% das semanas sobem, conta mais que 60% de "estável", quando 67% das semanas são estáveis. Detecta muito mais subidas, mas com mais alarmes que não se confirmam. Não muda o modelo, só a regra aplicada às probabilidades.
+
 **ERA5.** Reanálise climática do Copernicus (serviço europeu): uma reconstrução do clima passado, hora a hora, em uma grade de 0,25° (cerca de 28 km) que cobre todo o planeta, a partir de observações e modelos meteorológicos. O projeto usa temperatura, chuva e umidade do ERA5, obtidas pela API Open-Meteo.
 
 **Faixa de 80% (intervalo de previsão).** Faixa "entre X e Y casos" do modelo por quantis. Se o modelo estiver bem calibrado, o valor real cai dentro dela em cerca de 80% das semanas; na avaliação, isso aconteceu em 78% a 82% das semanas.
+
+**Foto dos dados (snapshot).** Cópia compactada dos dados baixados numa data, guardada em `data/snapshots/AAAA-MM-DD/`. Como o InfoDengue revisa as semanas recentes, os mesmos dados mudam de uma coleta para outra; as fotos permitem saber com quais dados cada resultado foi calculado e medir essas revisões.
+
+**Hiperparâmetros.** Configurações de um modelo escolhidas antes do treino, e não aprendidas dos dados: por exemplo, quantas árvores o LightGBM usa ou o tamanho de uma rede neural. O ajuste testa algumas configurações num período separado (2015 a 2018) e escolhe a melhor, sem usar os anos em que os modelos são comparados.
 
 **Incidência.** Casos por 100 mil habitantes. Permite comparar municípios de tamanhos diferentes. O Ministério da Saúde considera alta uma incidência anual de 300 ou mais.
 
 **InfoDengue.** Sistema de alerta de arboviroses da Fiocruz e da FGV, que publica, por município e por semana, os casos de dengue, o *nowcast*, o Rt e níveis de alerta. É a fonte dos dados de casos do projeto.
 
 **LightGBM.** Algoritmo de aprendizado de máquina que combina muitas árvores de decisão pequenas, cada uma corrigindo os erros das anteriores (*gradient boosting*). Funciona bem com dados em tabela e capta relações não lineares.
+
+**Log loss e Brier.** Métricas que avaliam as probabilidades que um classificador dá a cada tendência, e não só a tendência escolhida. Um modelo que dá 80% de chance à tendência que de fato aconteceu é melhor que um que dá 40%, mesmo que os dois tenham escolhido a mesma. Quanto menor, melhor. Não dependem da regra de decisão.
+
+**LSTM.** Tipo de rede neural feito para sequências: lê a série semana a semana (aqui, as 12 últimas semanas de casos e clima) e aprende sozinho quais semanas passadas importam. Foi comparado com o LightGBM e não o superou.
+
+**MLP (perceptron multicamadas).** Rede neural "comum", com camadas de neurônios ligadas em sequência, que recebe as mesmas variáveis do LightGBM. Foi comparada com o LightGBM e não o superou.
 
 **Município de treino.** Um dos 100 municípios cujos dados são usados para treinar os modelos.
 
@@ -38,11 +50,17 @@
 
 **Quantis (modelo por quantis).** Modelo que, em vez de prever um único valor, prevê pontos da distribuição dos resultados possíveis: aqui, o quantil de 10% (limite inferior da faixa), de 50% (mediana, o valor mostrado) e de 90% (limite superior).
 
+**Random Forest.** Algoritmo que treina muitas árvores de decisão independentes, cada uma com uma amostra diferente dos dados, e combina os votos delas (*bagging*). Diferente do LightGBM, em que cada árvore corrige as anteriores. Foi comparado com o LightGBM e não o superou.
+
+**Rede neural.** Modelo formado por camadas de unidades simples ("neurônios") que transformam as entradas; aprende relações complexas ajustando milhares de pesos. O projeto testou dois tipos, MLP e LSTM.
+
 **Rt (número de reprodução).** Estimativa, feita pelo InfoDengue, de quantas pessoas cada infectado está contaminando na semana. Acima de 1, a epidemia cresce; abaixo de 1, diminui. Não é usado nos modelos do projeto, só como comparação.
 
 **Semana epidemiológica.** Semana de domingo a sábado, a unidade de tempo em que a vigilância epidemiológica e o InfoDengue trabalham. Cada ponto dos gráficos é uma semana, identificada pela data do domingo em que começa.
 
 **Semanas instáveis.** As 10 semanas mais recentes de cada município, cujos casos ainda estão sendo revisados. Ficam fora do treino e da avaliação.
+
+**Semente.** Número que fixa a parte aleatória do treino de um modelo (por exemplo, os pesos iniciais de uma rede neural). Treinar com sementes diferentes mostra quanto o resultado varia só por acaso; as redes neurais foram avaliadas com 3 sementes.
 
 **Sentido oposto.** Semanas em que o modelo previu subida e os casos caíram, ou o contrário. Quanto menor, melhor.
 
@@ -55,6 +73,8 @@
 **Viés de seleção.** Distorção causada pela forma de escolher os dados. Aqui: 37 municípios de treino foram escolhidos pelo histórico de surtos, o que pode deixar o modelo mais propenso a prever subidas.
 
 **Walk-forward.** Forma de avaliar que simula o uso real: a cada mês, o modelo é treinado só com o que já era conhecido e prevê as semanas seguintes. Nenhuma informação do futuro entra no modelo que o previu.
+
+**XGBoost.** Algoritmo de *gradient boosting*, da mesma família do LightGBM, com outra implementação. Foi comparado para verificar se o resultado dependia da biblioteca; empatou com o LightGBM.
 
 ## Dicionário de dados
 
@@ -118,4 +138,15 @@ Valores diários agregados por semana epidemiológica; só entram semanas com os
 | `metricas_gerais.csv`, `metricas_por_ano.csv`, `metricas_modelos.csv` | Erro do modelo de casos contra o baseline, geral, por ano e por município |
 | `metricas_tendencia.csv` | Acerto de tendência do classificador |
 | `comparacao_modelos*.csv`, `comparacao_rt*.csv`, `comparacao_clima_classificador*.csv` | Comparação de modelos, com o Rt e do clima no classificador |
+| `comparacao_classificadores*.csv`, `ajuste_classificadores*` | Comparação de XGBoost, Random Forest, redes neurais e regras de decisão com o classificador em produção, e o ajuste de hiperparâmetros de cada modelo |
 | `generalizacao_*.csv`, `experimento_*.csv` | Demais experimentos (ver README) |
+| `revisao_dados.csv` | Quanto os casos de cada semana mudaram entre duas fotos dos dados |
+| `relatorio/*.csv` | Números do relatório final (base de dados, casos por ano, correlação com o clima, métricas do painel, tabela de comparação de modelos) |
+| `pipeline_estado.json` | Passos do pipeline completo já concluídos e com quais dados |
+
+### Fotos dos dados (`data/snapshots/AAAA-MM-DD/`)
+
+| Arquivo | Conteúdo |
+|---|---|
+| `infodengue.zip`, `clima.zip` | Arquivos brutos de casos e de clima de todos os municípios, como foram baixados naquela data |
+| `infodengue.json`, `clima.json` | Manifesto: data da coleta e, por município, número de semanas, primeira e última semana e SHA-256 do arquivo |
