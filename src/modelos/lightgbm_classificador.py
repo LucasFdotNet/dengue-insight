@@ -6,23 +6,18 @@ Como o objetivo do projeto passou a ser acertar a tendência, este modelo testa 
 pena treinar diretamente para essa pergunta. Ele não produz número de casos, então não
 entra nas métricas de erro em casos.
 """
-import numpy as np
-import pandas as pd
 from lightgbm import LGBMClassifier
 
-from src.modelos.base import Modelo, tendencia_real
+from src.modelos.base import Classificador
 from src.train import FEATURES
 
 
-class LightGBMClassificador(Modelo):
+class LightGBMClassificador(Classificador):
     nome = 'lightgbm_classificador'
     descricao = 'LightGBM classificador (prevê a tendência diretamente)'
     features = FEATURES
+    peso_classes = None
 
-    def treinar(self, df, horizonte):
-        self.modelo = LGBMClassifier(n_estimators=300, learning_rate=0.05, random_state=42, verbose=-1)
-        self.modelo.fit(df[self.features], tendencia_real(df, horizonte))
-        return self
-
-    def prever(self, df, horizonte):
-        return pd.DataFrame({'previsto': np.nan, 'tendencia': self.modelo.predict(df[self.features])}, index=df.index)
+    def _novo_modelo(self):
+        return LGBMClassifier(n_estimators=300, learning_rate=0.05, class_weight=self.peso_classes,
+                              random_state=self.semente, n_jobs=self.threads, verbose=-1)

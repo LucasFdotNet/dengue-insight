@@ -7,12 +7,16 @@ relação à semana t. A tendência segue a mesma regra do resto do projeto
 (train.classificar_tendencia: subida ou queda quando a variação passa de 20% e de 5 casos).
 
 Para implementar um modelo novo, basta herdar de Modelo e implementar treinar() e
-_prever_casos() (ou prever(), se o modelo prevê a tendência diretamente).
+_prever_casos() (ou prever(), se o modelo prevê a tendência diretamente). Classificadores
+de tendência herdam de Classificador e implementam só _novo_modelo().
 """
 import numpy as np
 import pandas as pd
 
-from src.train import FEATURES, classificar_tendencia
+from src.train import FEATURES, TENDENCIAS, classificar_tendencia
+
+# Colunas de probabilidade devolvidas pelos classificadores (uma por tendência)
+COLUNAS_PROB = {'sobe': 'p_sobe', 'estável': 'p_estavel', 'cai': 'p_cai'}
 
 
 class Modelo:
@@ -33,6 +37,45 @@ class Modelo:
             'previsto': previsto,
             'tendencia': classificar_tendencia(previsto, df['casos_est']),
         }, index=df.index)
+
+
+class Classificador(Modelo):
+    """Prevê a tendência diretamente (sem número de casos), com a probabilidade de cada classe.
+
+    'semente' fixa a aleatoriedade do treino; 'threads' limita os núcleos usados por um
+    treino (os experimentos rodam vários treinos em paralelo).
+    """
+    features = FEATURES
+
+    def __init__(self, semente=42, threads=-1):
+        self.semente = semente
+        self.threads = threads
+
+    def _novo_modelo(self):
+        """Estimador no padrão do scikit-learn (fit, predict_proba, classes_)."""
+        raise NotImplementedError
+
+    def _x(self, df):
+        return df[self.features]
+
+    def treinar(self, df, horizonte):
+        self.modelo = self._novo_modelo()
+        self.modelo.fit(self._x(df), tendencia_real(df, horizonte))
+        return self
+
+    def _classes(self):
+        """Tendência correspondente a cada coluna de predict_proba."""
+        return self.modelo.classes_
+
+    def probabilidades(self, df, horizonte):
+        """DataFrame com uma coluna por tendência (TENDENCIAS)."""
+        p = pd.DataFrame(self.modelo.predict_proba(self._x(df)), columns=self._classes(), index=df.index)
+        return p.reindex(columns=TENDENCIAS, fill_value=0.0)
+
+    def prever(self, df, horizonte):
+        p = self.probabilidades(df, horizonte)
+        return pd.DataFrame({'previsto': np.nan, 'tendencia': p.idxmax(axis=1).to_numpy(),
+                             **{COLUNAS_PROB[t]: p[t].to_numpy() for t in TENDENCIAS}}, index=df.index)
 
 
 # --------------------------------------------------------------- utilitários comuns

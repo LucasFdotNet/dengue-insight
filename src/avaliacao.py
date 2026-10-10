@@ -6,7 +6,7 @@ erro em casos, com intervalos de confiança por bootstrap sobre municípios.
 import numpy as np
 import pandas as pd
 
-from src.modelos.base import tendencia_real
+from src.modelos.base import COLUNAS_PROB, tendencia_real
 from src.train import HORIZONTES, TENDENCIAS, linhas_validas
 
 N_BOOTSTRAP = 2000
@@ -68,11 +68,28 @@ def resumo_por_municipio(prev):
         for r in TENDENCIAS:
             for p in TENDENCIAS:
                 linha[f'real_{r}_prev_{p}'] = int(((g['tend_real'] == r) & (g['tend_prev'] == p)).sum())
+        linha.update(somas_probabilidade(g))
         linhas.append(linha)
     return pd.DataFrame(linhas)
 
 
-COLUNAS_SOMA = ['semanas', 'erro_abs_modelo', 'erro_abs_baseline', 'dentro_intervalo'] +     [f'real_{r}_prev_{p}' for r in TENDENCIAS for p in TENDENCIAS]
+def somas_probabilidade(g):
+    """Somas de log loss e de Brier (classificadores com probabilidades; NaN nos demais).
+
+    Avaliam as probabilidades, e não só a classe escolhida: não dependem do ponto de corte
+    e distinguem um modelo melhor de um modelo que só troca acertos de uma classe por outra.
+    """
+    colunas = [COLUNAS_PROB[t] for t in TENDENCIAS]
+    if not set(colunas) <= set(g.columns) or g[colunas].isna().any().any():
+        return {'log_loss_soma': np.nan, 'brier_soma': np.nan}
+    p = g[colunas].to_numpy(float)
+    real = (g['tend_real'].to_numpy()[:, None] == np.array(TENDENCIAS)[None, :]).astype(float)
+    return {'log_loss_soma': -np.log(np.clip((p * real).sum(axis=1), 1e-15, 1)).sum(),
+            'brier_soma': ((p - real) ** 2).sum()}
+
+
+COLUNAS_SOMA = (['semanas', 'erro_abs_modelo', 'erro_abs_baseline', 'dentro_intervalo', 'log_loss_soma', 'brier_soma']
+                + [f'real_{r}_prev_{p}' for r in TENDENCIAS for p in TENDENCIAS])
 
 
 def metricas_de_somas(soma):
@@ -92,12 +109,15 @@ def metricas_de_somas(soma):
         # NaN quando o modelo não prevê casos (classificador) ou não tem intervalo
         'razao_mae': soma['erro_abs_modelo'] / soma['erro_abs_baseline'],
         'cobertura_intervalo_80': soma['dentro_intervalo'] / soma['semanas'],
+        # Só para classificadores com probabilidades; menor é melhor
+        'log_loss': soma['log_loss_soma'] / soma['semanas'],
+        'brier': soma['brier_soma'] / soma['semanas'],
     }
 
 
 def metricas(pm):
     """Métricas de um conjunto de municípios (qualquer subconjunto de resumo_por_municipio)."""
-    return metricas_de_somas(pm[COLUNAS_SOMA].sum(skipna=False).to_dict())
+    return metricas_de_somas(pm.reindex(columns=COLUNAS_SOMA).sum(skipna=False).to_dict())
 
 
 def metricas_com_ic(pm_modelo, pm_referencia):
@@ -107,7 +127,7 @@ def metricas_com_ic(pm_modelo, pm_referencia):
     for h in HORIZONTES:
         a = pm_modelo[pm_modelo['h'] == h].set_index('cidade').sort_index()
         b = pm_referencia[pm_referencia['h'] == h].set_index('cidade').reindex(a.index)
-        va, vb = a[COLUNAS_SOMA].to_numpy(float), b[COLUNAS_SOMA].to_numpy(float)
+        va, vb = a.reindex(columns=COLUNAS_SOMA).to_numpy(float), b.reindex(columns=COLUNAS_SOMA).to_numpy(float)
         pontual, pontual_ref = metricas(a), metricas(b)
         amostras = {k: [] for k in pontual}
         difs = {k: [] for k in pontual}

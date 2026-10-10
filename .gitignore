@@ -2,3 +2,5 @@ venv/
 __pycache__/
 *.pyc
 .DS_Store
+# Cache dos experimentos (previsões por unidade de trabalho; recriado ao rodar)
+reports/cache/
