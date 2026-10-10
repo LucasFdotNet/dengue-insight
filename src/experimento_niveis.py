@@ -1,0 +1,393 @@
+"""
+Experimento: previsão de três níveis (verde, amarelo, vermelho) e comparação de duas definições.
+
+Definições (src/estados.VARIANTES_NIVEIS), com limiares por município calculados só com os
+anos anteriores:
+  A: amarelo a partir do percentil 75, vermelho a partir do 90;
+  B: amarelo do percentil 80 ao 97 (faixa em torno do 90), vermelho a partir do 97.
+
+Previsões: como em experimento_estados.py (walk-forward com retreino trimestral desde 2015,
+validação cruzada por município e validação final), com o modelo de src/modelos/nivel_lightgbm.py.
+
+Nível previsto para S+H: vermelho se a probabilidade de vermelho passa do corte do vermelho;
+senão, amarelo se a probabilidade de amarelo ou vermelho passa do corte do amarelo; senão,
+verde. Cada corte é o menor em que, no passado, pelo menos metade das previsões daquele nível
+(ou acima) se confirmou; escolhido a cada trimestre e antecedência, só com as previsões
+anteriores dos municípios de treino. Comparação: persistência (o nível de S se mantém em S+H).
+
+Métricas por semana (2019 em diante): acerto, acerto balanceado, acerto nas semanas em que o
+nível muda entre S e S+H, vermelho detectado, previsões de vermelho corretas, epidemias
+perdidas (previu verde, veio vermelho) e alarmes graves (previu vermelho, veio verde).
+Métricas por episódio do vermelho (mobilização): como em experimento_estados.py.
+
+Saídas:
+  reports/niveis_semanas.csv, reports/niveis_episodios.csv, reports/niveis_cortes.csv
+  reports/figures/niveis/*.png (comparação das definições e quadradinhos por município)
+
+Uso:
+  python -m src.experimento_niveis
+"""
+import functools
+import logging
+import os
+import sys
+
+import matplotlib
+matplotlib.use('Agg')
+import matplotlib.pyplot as plt  # noqa: E402
+import numpy as np  # noqa: E402
+import pandas as pd  # noqa: E402
+from joblib import Parallel, delayed  # noqa: E402
+from threadpoolctl import threadpool_limits  # noqa: E402
+
+from src import experimento_estados as ee  # noqa: E402
+from src.cidades import CIDADES, cidades_por_papel  # noqa: E402
+from src.estados import NOMES_NIVEIS, VARIANTES_NIVEIS, adicionar_niveis  # noqa: E402
+from src.experimento_generalizacao import grupos_de_municipios  # noqa: E402
+from src.modelos.nivel_lightgbm import NivelLightGBM  # noqa: E402
+from src.snapshot import id_dados_processados  # noqa: E402
+from src.train import HORIZONTES, PRIMEIRO_ANO_TESTE, carregar, linhas_validas  # noqa: E402
+
+logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
+
+INICIO_AVALIACAO = ee.INICIO_AVALIACAO
+MESES_POR_RETREINO = 3
+PRECISAO_MINIMA = 0.5
+CORTES = ee.CORTES
+PROCESSOS, THREADS = 8, 2
+VERSAO_CACHE = 1
+PASTA_CACHE = 'reports/cache/niveis'
+PASTA_FIGURAS = 'reports/figures/niveis'
+ARQUIVO_SEMANAS = 'reports/niveis_semanas.csv'
+ARQUIVO_EPISODIOS = 'reports/niveis_episodios.csv'
+ARQUIVO_CORTES = 'reports/niveis_cortes.csv'
+# Exemplos para os quadradinhos: um município de treino e um de validação, com epidemias recentes
+EXEMPLOS = [('campinas', '2023-07-01', '2025-07-01'), ('sorocaba', '2023-07-01', '2025-07-01')]
+
+# Cores (paleta de status do guia de visualização; sempre com legenda em texto)
+COR_NIVEL = {0: '#0ca30c', 1: '#fab219', 2: '#d03b3b'}
+COR_VARIANTE = {'A': '#2a78d6', 'B': '#eb6834'}
+TINTA, TINTA_SEC, MUDO, GRADE, FUNDO = '#0b0b0b', '#52514e', '#898781', '#e1e0d9', '#fcfcfb'
+
+
+# --------------------------------------------------------------- previsões
+
+@functools.lru_cache(maxsize=2)
+def dados(variante):
+    return adicionar_niveis(carregar('treino'), variante), adicionar_niveis(carregar('validacao'), variante)
+
+
+def caminho(id_, variante, conjunto, inicio):
+    return os.path.join(PASTA_CACHE, f'{id_}_v{VERSAO_CACHE}', variante, f'{conjunto}_{inicio}.parquet')
+
+
+def executar_unidade(id_, variante, conjunto, inicio):
+    destino = caminho(id_, variante, conjunto, inicio)
+    if os.path.exists(destino):
+        return
+    treino, validacao = dados(variante)
+    if conjunto == 'final':
+        tr_base, te_base = treino, validacao
+    else:
+        separado = grupos_de_municipios(treino['cidade'].unique())[int(conjunto[2:])]
+        tr_base, te_base = treino[~treino['cidade'].isin(separado)], treino[treino['cidade'].isin(separado)]
+    ini = pd.Period(inicio, freq='M').start_time
+    fim = (pd.Period(inicio, freq='M') + MESES_POR_RETREINO).start_time
+    partes = []
+    with threadpool_limits(THREADS):
+        for h in HORIZONTES:
+            tr = linhas_validas(tr_base, h)
+            tr = tr[tr[f'faixa_h{h}'].notna() & (tr['data_iniSE'] + pd.Timedelta(weeks=h) < ini)]
+            te = linhas_validas(te_base, h)
+            te = te[te[f'faixa_h{h}'].notna() & (te['data_iniSE'] >= ini) & (te['data_iniSE'] < fim)]
+            if te.empty:
+                continue
+            p = NivelLightGBM(threads=THREADS).treinar(tr, h).prever(te, h)
+            partes.append(pd.DataFrame({'cidade': te['cidade'].to_numpy(), 'data_iniSE': te['data_iniSE'].to_numpy(),
+                                        'h': h, 'p0': p[:, 0], 'p1': p[:, 1], 'p2': p[:, 2]}))
+    resultado = pd.concat(partes, ignore_index=True) if partes else pd.DataFrame()
+    os.makedirs(os.path.dirname(destino), exist_ok=True)
+    resultado.to_parquet(destino + '.tmp', index=False)
+    os.replace(destino + '.tmp', destino)
+
+
+def rodar_previsoes(id_, fim, processos):
+    inicios = [str(p) for p in pd.period_range(f'{PRIMEIRO_ANO_TESTE}-01', fim, freq='M')[::MESES_POR_RETREINO]]
+    unidades = [(v, c, i) for v in VARIANTES_NIVEIS for c in [f'cv{k}' for k in range(5)] + ['final'] for i in inicios]
+    pendentes = [u for u in unidades if not os.path.exists(caminho(id_, *u))]
+    logging.info(f"{len(unidades)} unidades; {len(pendentes)} a rodar.")
+    Parallel(n_jobs=processos, batch_size=1)(delayed(executar_unidade)(id_, *u) for u in pendentes)
+    return unidades
+
+
+def tabela_longa(id_, variante, unidades):
+    """Uma linha por município, semana S e antecedência: probabilidades, faixa em S e faixa real em S+H (nivel_futuro)."""
+    prev = pd.concat([pd.read_parquet(caminho(id_, *u)) for u in unidades if u[0] == variante], ignore_index=True)
+    treino, validacao = dados(variante)
+    base = pd.concat([treino, validacao], ignore_index=True)
+    futuro = base.melt(id_vars=['cidade', 'data_iniSE', 'faixa'], value_vars=[f'faixa_h{h}' for h in HORIZONTES],
+                       var_name='h', value_name='nivel_futuro')
+    futuro['h'] = futuro['h'].str[-1].astype(int)
+    t = prev.merge(futuro, on=['cidade', 'data_iniSE', 'h'], how='left')
+    t['conjunto'] = np.where(t['cidade'].isin(list(cidades_por_papel('validacao'))), 'validacao_final',
+                             'validacao_cruzada')
+    return t
+
+
+# --------------------------------------------------------------- nível previsto
+
+def escolher_cortes(t):
+    """Cortes de amarelo e vermelho por antecedência e trimestre, só com o passado (validação cruzada)."""
+    linhas = []
+    cv = t[(t['conjunto'] == 'validacao_cruzada') & t['nivel_futuro'].notna()]
+    for h in HORIZONTES:
+        g = cv[cv['h'] == h]
+        for trimestre in pd.period_range(INICIO_AVALIACAO[:7], t['data_iniSE'].max(), freq='Q'):
+            passado = g[g['data_iniSE'] + pd.Timedelta(weeks=h) < trimestre.start_time]
+            cortes = {}
+            for nome, prob, real in [('vermelho', passado['p2'], passado['nivel_futuro'] == 2),
+                                     ('amarelo', passado['p1'] + passado['p2'], passado['nivel_futuro'] >= 1)]:
+                prob, real = prob.to_numpy(), real.to_numpy()
+                cortes[nome] = next((c for c in CORTES if (prob >= c).sum() >= 20
+                                     and real[prob >= c].mean() >= PRECISAO_MINIMA), np.nan)
+            linhas.append({'h': h, 'trimestre': str(trimestre), 'corte_amarelo': cortes['amarelo'],
+                           'corte_vermelho': cortes['vermelho']})
+    return pd.DataFrame(linhas)
+
+
+def prever_nivel(t, cortes):
+    """nivel_previsto: o nível mais provável (regra adotada). nivel_corte: regra dos cortes (testada e descartada:
+    com pelo menos metade das previsões de vermelho confirmadas, prevê vermelho demais semana a semana e perde
+    para a persistência; os cortes servem para o alerta de mobilização, que parte do nível normal)."""
+    t['nivel_previsto'] = t[['p0', 'p1', 'p2']].to_numpy().argmax(axis=1)
+    tri = t['data_iniSE'].dt.to_period('Q').astype(str)
+    c = cortes.set_index(['h', 'trimestre'])
+    chave = pd.MultiIndex.from_arrays([t['h'], tri])
+    ca, cv = c['corte_amarelo'].reindex(chave).to_numpy(), c['corte_vermelho'].reindex(chave).to_numpy()
+    t['nivel_corte'] = np.where(t['p2'] >= cv, 2, np.where(t['p1'] + t['p2'] >= ca, 1, 0))
+    t.loc[np.isnan(cv) & np.isnan(ca), 'nivel_corte'] = np.nan
+    return t
+
+
+def metricas_semana(real, prev, atual):
+    real, prev, atual = (np.asarray(x, dtype=float) for x in (real, prev, atual))
+    acertos = [(prev[real == k] == k).mean() for k in range(3) if (real == k).any()]
+    muda = real != atual
+    return {'semanas': len(real), 'acerto': (prev == real).mean(), 'acerto_balanceado': np.mean(acertos),
+            'acerto_quando_muda': (prev[muda] == real[muda]).mean() if muda.any() else np.nan,
+            'vermelho_detectado': (prev[real == 2] == 2).mean() if (real == 2).any() else np.nan,
+            'vermelho_correto': (real[prev == 2] == 2).mean() if (prev == 2).any() else np.nan,
+            'epidemias_perdidas': (prev[real == 2] == 0).mean() if (real == 2).any() else np.nan,
+            'alarmes_graves': (real[prev == 2] == 0).mean() if (prev == 2).any() else np.nan}
+
+
+# --------------------------------------------------------------- mobilização no vermelho (por episódio)
+
+def episodios_vermelho(t, variante):
+    """Avaliação por episódio do vermelho, com as funções de experimento_estados (alto = vermelho)."""
+    treino, validacao = dados(variante)
+    base = pd.concat([treino, validacao], ignore_index=True)
+    p_max = t.pivot_table(index=['cidade', 'data_iniSE'], columns='h', values='p2').max(axis=1).rename('p_max')
+    s = base[['cidade', 'data_iniSE', 'faixa', 'razao_vermelho', 'var_log_1', 'var_log_2']]
+    s = s.merge(p_max.reset_index(), on=['cidade', 'data_iniSE'], how='left').sort_values(['cidade', 'data_iniSE'])
+    s['alto'] = (s['faixa'] == 2).where(s['faixa'].notna())
+    s['conjunto'] = np.where(s['cidade'].isin(list(cidades_por_papel('validacao'))), 'validacao_final',
+                             'validacao_cruzada')
+    futuro = pd.concat([s.groupby('cidade')['alto'].shift(-k) for k in range(1, 5)], axis=1)
+    s['entra_4sem'] = futuro.max(axis=1, skipna=False)
+    s['regra'] = (s['var_log_1'] > 0) & (s['var_log_2'] > s['var_log_1']) & (s['razao_vermelho'] >= np.log(0.5))
+    s['infodengue'] = False  # a comparação com o InfoDengue está em experimento_estados.py
+    s = s.reset_index(drop=True)
+    cortes = ee.escolher_cortes(s)
+    s = ee.aplicar_cortes(s, cortes)
+    linhas = []
+    for conjunto, g in s.groupby('conjunto'):
+        for sinal, nome in [('modelo_alerta', 'Modelo: alerta de vermelho'), ('regra', 'Regra simples')]:
+            linhas.append({'variante': variante, 'conjunto': conjunto, 'metodo': nome, **ee.avaliar(g, sinal)})
+    return linhas, s
+
+
+# --------------------------------------------------------------- gráficos
+
+def estilo(ax):
+    ax.set_facecolor(FUNDO)
+    for lado in ('top', 'right'):
+        ax.spines[lado].set_visible(False)
+    for lado in ('left', 'bottom'):
+        ax.spines[lado].set_color('#c3c2b7')
+    ax.tick_params(colors=MUDO, labelsize=9)
+    ax.grid(axis='y', color=GRADE, linewidth=0.8)
+    ax.set_axisbelow(True)
+
+
+def grafico_comparacao(semanas):
+    """Pequenos múltiplos: modelo e persistência das duas definições, por antecedência."""
+    s = semanas[semanas['conjunto'] == 'validacao_cruzada']
+    paineis = [('acerto', 'Acerto (todas as semanas)'),
+               ('acerto_quando_muda', 'Acerto quando o nível muda (persistência: 0%)'),
+               ('vermelho_detectado', 'Semanas vermelhas previstas como vermelho'),
+               ('vermelho_correto', 'Previsões de vermelho que se confirmaram')]
+    fig, eixos = plt.subplots(2, 2, figsize=(11, 7.5), facecolor=FUNDO)
+    for ax, (metrica, titulo) in zip(eixos.flat, paineis):
+        estilo(ax)
+        for v in VARIANTES_NIVEIS:
+            for metodo, estilo_linha in [('modelo', '-'), ('persistencia', '--')]:
+                x = s[(s['variante'] == v) & (s['metodo'] == metodo)].sort_values('h')
+                ax.plot(x['h'], 100 * x[metrica], estilo_linha, color=COR_VARIANTE[v], linewidth=2,
+                        marker='o', markersize=6, markeredgecolor=FUNDO, markeredgewidth=1.5,
+                        label=f"{v}: {'modelo' if metodo == 'modelo' else 'persistência'}")
+        ax.set_title(titulo, loc='left', fontsize=11, color=TINTA)
+        ax.set_xticks(HORIZONTES, [f'{h} sem.' for h in HORIZONTES])
+        ax.set_ylim(0, 100)
+        ax.yaxis.set_major_formatter(lambda v, _: f'{v:.0f}%')
+    eixos[0, 0].legend(frameon=False, fontsize=9, labelcolor=TINTA_SEC, loc='lower left', handlelength=3.5)
+    fig.suptitle('Três níveis: definição A (amarelo ≥ p75, vermelho ≥ p90) × B (amarelo ≥ p80, vermelho ≥ p97)\n'
+                 'Nível mais provável × persistência; validação cruzada por município, 2019 em diante',
+                 x=0.06, ha='left', fontsize=12, color=TINTA)
+    fig.tight_layout(rect=(0, 0, 1, 0.92))
+    caminho_fig = os.path.join(PASTA_FIGURAS, 'comparacao_definicoes.png')
+    fig.savefig(caminho_fig, dpi=150, facecolor=FUNDO)
+    plt.close(fig)
+    return caminho_fig
+
+
+def grafico_alertas(episodios_):
+    """Alerta de mobilização (entrada no vermelho) nas duas definições, contra a regra simples."""
+    e = episodios_[episodios_['conjunto'] == 'validacao_cruzada']
+    paineis = [('epidemias_avisadas', 'Epidemias avisadas antes de começar', True),
+               ('alarmes_corretos', 'Alarmes que se confirmaram', True),
+               ('alarmes_falsos_por_municipio_ano', 'Alarmes falsos por município por ano', False)]
+    fig, eixos = plt.subplots(1, 3, figsize=(12, 4), facecolor=FUNDO)
+    metodos = [('Modelo: alerta de vermelho', 'modelo'), ('Regra simples', 'regra simples')]
+    for ax, (metrica, titulo, pct) in zip(eixos, paineis):
+        estilo(ax)
+        for i, v in enumerate(VARIANTES_NIVEIS):
+            for j, (metodo, rotulo) in enumerate(metodos):
+                valor = e[(e['variante'] == v) & (e['metodo'] == metodo)][metrica].iloc[0]
+                valor = 100 * valor if pct else valor
+                x = i * 3 + j
+                ax.bar(x, valor, width=0.8, color=COR_VARIANTE[v], alpha=1.0 if j == 0 else 0.45,
+                       edgecolor=FUNDO, linewidth=2)
+                ax.text(x, valor, f'{valor:.0f}%' if pct else f'{valor:.2f}', ha='center', va='bottom',
+                        fontsize=9, color=TINTA)
+        ax.set_xticks([0, 1, 3, 4], ['A: modelo', 'A: regra', 'B: modelo', 'B: regra'], fontsize=9)
+        ax.set_title(titulo, loc='left', fontsize=11, color=TINTA)
+        if pct:
+            ax.set_ylim(0, 100)
+            ax.yaxis.set_major_formatter(lambda v, _: f'{v:.0f}%')
+    fig.suptitle('Alerta de mobilização (entrada no vermelho): definição A (vermelho ≥ p90) × B (vermelho ≥ p97)\n'
+                 'Validação cruzada por município, episódios de 2019 em diante; aviso até 4 semanas antes do início',
+                 x=0.06, ha='left', fontsize=12, color=TINTA)
+    fig.tight_layout(rect=(0, 0, 1, 0.86))
+    caminho_fig = os.path.join(PASTA_FIGURAS, 'alertas_definicoes.png')
+    fig.savefig(caminho_fig, dpi=150, facecolor=FUNDO)
+    plt.close(fig)
+    return caminho_fig
+
+
+def grafico_quadradinhos(t, alertas, variante, cidade, inicio, fim):
+    """O que aconteceu, o alerta de mobilização e, para cada antecedência, o nível mais provável, com os erros marcados."""
+    alvo = t[(t['cidade'] == cidade)].copy()
+    alvo['data_alvo'] = alvo['data_iniSE'] + pd.to_timedelta(7 * alvo['h'], unit='D')
+    alvo = alvo[(alvo['data_alvo'] >= inicio) & (alvo['data_alvo'] < fim)]
+    treino, validacao = dados(variante)
+    base = pd.concat([treino, validacao])
+    real = base[(base['cidade'] == cidade) & (base['data_iniSE'] >= inicio) & (base['data_iniSE'] < fim)]
+    semanas = sorted(real['data_iniSE'])
+    pos = {d: i for i, d in enumerate(semanas)}
+    fig, ax = plt.subplots(figsize=(14, 4.3), facecolor=FUNDO)
+    ax.set_facecolor(FUNDO)
+    linhas = ['Aconteceu', 'Alerta de vermelho'] + [f'Previsto {h} sem. antes' for h in HORIZONTES]
+    for _, r in real.iterrows():
+        if pd.notna(r['faixa']):
+            ax.add_patch(plt.Rectangle((pos[r['data_iniSE']], 0), 0.86, 0.86, color=COR_NIVEL[int(r['faixa'])]))
+    # Alerta emitido na semana: triângulo cheio se um episódio vermelho começou nas 4 semanas seguintes ao alerta
+    a = ee.alarmes(alertas[alertas['cidade'] == cidade], 'modelo_alerta', desde=inicio)
+    for _, r in a.iterrows():
+        for d in pd.date_range(r['inicio'], r['fim'], freq='7D'):
+            if d in pos:
+                ax.plot(pos[d] + 0.43, 1.15 + 0.43, marker='^', markersize=7, linestyle='',
+                        color=TINTA if r['correto'] else FUNDO, markeredgecolor=TINTA, markeredgewidth=1)
+    for _, r in alvo.iterrows():
+        if pd.isna(r['nivel_previsto']) or r['data_alvo'] not in pos:
+            continue
+        y = (r['h'] + 1) * 1.15 + 0.25
+        x = pos[r['data_alvo']]
+        ax.add_patch(plt.Rectangle((x, y), 0.86, 0.86, color=COR_NIVEL[int(r['nivel_previsto'])]))
+        if pd.notna(r['nivel_futuro']) and r['nivel_previsto'] != r['nivel_futuro']:
+            grave = abs(r['nivel_previsto'] - r['nivel_futuro']) == 2
+            ax.text(x + 0.43, y + 0.43, '×' if grave else '•', ha='center', va='center',
+                    fontsize=9 if grave else 7, color=TINTA, fontweight='bold')
+    ax.set_xlim(-0.5, len(semanas) + 0.5)
+    ax.set_ylim(-0.3, 5 * 1.15 + 1.3)
+    ax.invert_yaxis()
+    ax.set_yticks([0.43, 1.58] + [(h + 1) * 1.15 + 0.68 for h in HORIZONTES], linhas)
+    meses = [(i, d) for i, d in enumerate(semanas) if d.day <= 7 and d.month in (1, 4, 7, 10)]
+    ax.set_xticks([i for i, _ in meses], [d.strftime('%m/%Y') for _, d in meses])
+    ax.tick_params(colors=TINTA_SEC, labelsize=9, length=0)
+    for lado in ax.spines.values():
+        lado.set_visible(False)
+    nome = CIDADES[cidade]['nome']
+    papel = 'validação' if cidade in cidades_por_papel('validacao') else 'treino'
+    p_am, p_ve = VARIANTES_NIVEIS[variante]
+    ax.set_title(f'{nome} ({papel}) · definição {variante}: amarelo ≥ p{round(p_am * 100)}, '
+                 f'vermelho ≥ p{round(p_ve * 100)} · cada quadrado é uma semana; previsões = nível mais provável',
+                 loc='left', fontsize=11, color=TINTA)
+    legenda = [plt.Rectangle((0, 0), 1, 1, color=COR_NIVEL[k]) for k in range(3)]
+    rotulos = ['verde: normal', 'amarelo: elevado', 'vermelho: epidêmico']
+    legenda += [plt.Line2D([], [], marker='$•$', color=TINTA, linestyle='', markersize=7),
+                plt.Line2D([], [], marker='$×$', color=TINTA, linestyle='', markersize=8),
+                plt.Line2D([], [], marker='^', color=TINTA, linestyle='', markersize=7),
+                plt.Line2D([], [], marker='^', color=FUNDO, markeredgecolor=TINTA, linestyle='', markersize=7)]
+    rotulos += ['errou por 1 nível', 'erro grave (verde × vermelho)', 'alerta que se confirmou', 'alarme falso']
+    ax.legend(legenda, rotulos, ncol=4, frameon=False, fontsize=9, labelcolor=TINTA_SEC,
+              loc='upper left', bbox_to_anchor=(0, -0.12))
+    fig.tight_layout()
+    caminho_fig = os.path.join(PASTA_FIGURAS, f'quadradinhos_{cidade}_{variante}.png')
+    fig.savefig(caminho_fig, dpi=150, facecolor=FUNDO)
+    plt.close(fig)
+    return caminho_fig
+
+
+# --------------------------------------------------------------- execução
+
+def run_experimento(processos=PROCESSOS):
+    id_ = id_dados_processados()
+    fim = dados('A')[0]['data_iniSE'].max().to_period('M').strftime('%Y-%m')
+    unidades = rodar_previsoes(id_, fim, processos)
+    os.makedirs(PASTA_FIGURAS, exist_ok=True)
+
+    semanas, episodios_, cortes_todos = [], [], []
+    for variante in VARIANTES_NIVEIS:
+        t = tabela_longa(id_, variante, unidades)
+        cortes = escolher_cortes(t)
+        t = prever_nivel(t, cortes)
+        cortes_todos.append(cortes.assign(variante=variante))
+        avaliada = t[(t['data_iniSE'] >= INICIO_AVALIACAO) & t['nivel_futuro'].notna() & t['nivel_corte'].notna()]
+        for (conjunto, h), g in avaliada.groupby(['conjunto', 'h']):
+            for metodo, prev in [('modelo', g['nivel_previsto']), ('modelo_cortes', g['nivel_corte']),
+                                 ('persistencia', g['faixa'])]:
+                semanas.append({'variante': variante, 'conjunto': conjunto, 'h': h, 'metodo': metodo,
+                                'semanas_vermelhas': (g['nivel_futuro'] == 2).mean(),
+                                'semanas_amarelas': (g['nivel_futuro'] == 1).mean(),
+                                **metricas_semana(g['nivel_futuro'], prev, g['faixa'])})
+        linhas_ep, alertas = episodios_vermelho(t, variante)
+        episodios_ += linhas_ep
+        for cidade, inicio, fim_ex in EXEMPLOS:
+            logging.info(f"Figura: {grafico_quadradinhos(t, alertas, variante, cidade, inicio, fim_ex)}")
+
+    semanas = pd.DataFrame(semanas)
+    semanas.round(3).to_csv(ARQUIVO_SEMANAS, index=False)
+    pd.DataFrame(episodios_).round(3).to_csv(ARQUIVO_EPISODIOS, index=False)
+    pd.concat(cortes_todos).to_csv(ARQUIVO_CORTES, index=False)
+    logging.info(f"Figura: {grafico_comparacao(semanas)}")
+    logging.info(f"Figura: {grafico_alertas(pd.DataFrame(episodios_))}")
+    pd.set_option('display.width', 250)
+    print(semanas[semanas['conjunto'] == 'validacao_cruzada'].round(3).to_string(index=False))
+    print(pd.DataFrame(episodios_).round(3).to_string(index=False))
+
+
+if __name__ == "__main__":
+    n = int(sys.argv[sys.argv.index('--processos') + 1]) if '--processos' in sys.argv else PROCESSOS
+    from src import experimento_niveis
+    experimento_niveis.run_experimento(n)

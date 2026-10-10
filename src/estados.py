@@ -38,7 +38,7 @@ MIN_SEMANAS_EPISODIO = 2
 MAX_INTERRUPCAO = 1
 
 
-def limiares(df, percentil=PERCENTIL_ALTO):
+def limiares(df, percentil=PERCENTIL_ALTO, minimo=MIN_CASOS_ALTO):
     """Limiar de cada município e ano (DataFrame com cidade, ano, limiar)."""
     linhas = []
     for cidade, g in df.groupby('cidade'):
@@ -46,9 +46,39 @@ def limiares(df, percentil=PERCENTIL_ALTO):
         for ano in sorted(anos.unique()):
             ate = max(ano, PRIMEIRO_ANO_TESTE)
             passado = g.loc[anos < ate, 'casos_est'].dropna()
-            limiar = max(passado.quantile(percentil), MIN_CASOS_ALTO) if len(passado) else np.nan
+            limiar = max(passado.quantile(percentil), minimo) if len(passado) else np.nan
             linhas.append({'cidade': cidade, 'ano': ano, 'limiar': limiar})
     return pd.DataFrame(linhas)
+
+
+# --------------------------------------------------------------- três níveis
+
+# Verde (normal), amarelo (elevado) e vermelho (epidêmico): dois limiares por município e ano,
+# calculados como o limiar acima. Variantes comparadas em experimento_niveis.py:
+#   A: amarelo a partir do percentil 75, vermelho a partir do 90 (o "alto" já avaliado);
+#   B: amarelo numa faixa em torno do percentil 90 (do 80 ao 97), vermelho só muito acima (97).
+VARIANTES_NIVEIS = {'A': (0.75, 0.90), 'B': (0.80, 0.97)}
+MIN_CASOS_AMARELO = 5
+NOMES_NIVEIS = ['verde', 'amarelo', 'vermelho']
+
+
+def adicionar_niveis(df, variante):
+    """Acrescenta limiar_amarelo, limiar_vermelho, faixa (0 verde, 1 amarelo, 2 vermelho), faixa_h1 a faixa_h4 e as
+    distâncias aos limiares. "faixa", e não "nivel", porque nivel é o alerta do InfoDengue nos dados."""
+    p_amarelo, p_vermelho = VARIANTES_NIVEIS[variante]
+    df = df.sort_values(['cidade', 'data_iniSE']).copy()
+    df['ano'] = df['data_iniSE'].dt.year
+    for nome, p, minimo in [('amarelo', p_amarelo, MIN_CASOS_AMARELO), ('vermelho', p_vermelho, MIN_CASOS_ALTO)]:
+        df = df.merge(limiares(df, p, minimo).rename(columns={'limiar': f'limiar_{nome}'}), on=['cidade', 'ano'],
+                      how='left')
+        df[f'razao_{nome}'] = np.log1p(df['casos_est']) - np.log1p(df[f'limiar_{nome}'])
+    df = df.drop(columns='ano')
+    faixa = (df['casos_est'] >= df['limiar_amarelo']).astype(float) + (df['casos_est'] >= df['limiar_vermelho'])
+    df['faixa'] = faixa.where(df['casos_est'].notna())
+    por_cidade = df.groupby('cidade', sort=False)['faixa']
+    for h in HORIZONTES:
+        df[f'faixa_h{h}'] = por_cidade.shift(-h)
+    return df
 
 
 def adicionar_estados(df, percentil=PERCENTIL_ALTO):
