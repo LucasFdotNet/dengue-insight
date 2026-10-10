@@ -1,6 +1,7 @@
 """
 Refaz, na ordem, tudo o que depende dos dados: pré-processamento, modelos de produção,
-análise exploratória, todos os experimentos e a comparação entre fotos dos dados. É o
+análise exploratória, todos os experimentos, a comparação entre fotos dos dados e os
+números do relatório (numeros_relatorio.py). É o
 comando para atualizar os números do README e do relatório com os dados mais recentes.
 
 Retomada: ao fim de cada passo, grava em reports/pipeline_estado.json o passo, a
@@ -31,12 +32,12 @@ logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(
 DOWNLOAD = ['ingestion', 'ingestion_clima']
 # (módulo em src/, argumentos); a ordem respeita as dependências entre os experimentos
 PASSOS = [
+    ('experimento_classificadores', []),     # o mais longo e o mais esperado: primeiro
     ('train', []),
     ('eda', []),
     ('experimento_modelos', ['--reajustar']),
     ('experimento_clima_classificador', []),  # usa comparacao_modelos_por_municipio.csv
     ('experimento_rt', []),                   # idem
-    ('experimento_classificadores', []),
     ('experimento_generalizacao', []),
     ('experimento_atraso', []),
     ('experimento_clima_semanal', []),
@@ -98,6 +99,7 @@ def run_pipeline(baixar=False, refazer=False):
         gravar_estado(estado)
 
     rodar('revisao_dados')
+    rodar('numeros_relatorio')  # depende de train e dos experimentos
     logging.info("Pipeline concluído. Números do README e do relatório podem ser atualizados a partir de reports/.")
 
 

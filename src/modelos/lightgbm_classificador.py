@@ -17,7 +17,8 @@ class LightGBMClassificador(Classificador):
     descricao = 'LightGBM classificador (prevê a tendência diretamente)'
     features = FEATURES
     peso_classes = None
+    parametros = {'n_estimators': 300, 'learning_rate': 0.05, 'num_leaves': 31, 'min_child_samples': 20}
 
     def _novo_modelo(self):
-        return LGBMClassifier(n_estimators=300, learning_rate=0.05, class_weight=self.peso_classes,
-                              random_state=self.semente, n_jobs=self.threads, verbose=-1)
+        return LGBMClassifier(**self.parametros, class_weight=self.peso_classes, random_state=self.semente,
+                              n_jobs=self.threads, verbose=-1)

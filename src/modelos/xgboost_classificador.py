@@ -16,7 +16,7 @@ class XGBoostClassificador(Classificador):
     nome = 'xgboost_classificador'
     descricao = 'XGBoost classificador com clima de S-1 a S-4'
     features = ClassificadorClimaS1S4.features
-    parametros = {'n_estimators': 300, 'learning_rate': 0.05, 'max_depth': 6}
+    parametros = {'n_estimators': 300, 'learning_rate': 0.05, 'max_depth': 6, 'min_child_weight': 1}
 
     def _novo_modelo(self):
         return XGBClassifier(**self.parametros, tree_method='hist', random_state=self.semente,

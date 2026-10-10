@@ -4,6 +4,7 @@ Experimento: outros modelos superam o classificador em produção na tendência?
 Compara, com as mesmas informações (casos recentes e clima de S-1 a S-4) e a mesma
 avaliação de experimento_modelos.py, o LightGBM classificador com clima (em produção,
 referência) com:
+  - o mesmo LightGBM com hiperparâmetros ajustados;
   - o mesmo LightGBM com peso igual para as três tendências;
   - o mesmo LightGBM com janela de 12 semanas (a informação que a LSTM recebe);
   - XGBoost (outro boosting de árvores);
@@ -12,7 +13,14 @@ referência) com:
   - rede neural LSTM (sequência das últimas 12 semanas).
 Modelos em src/modelos/, um arquivo cada.
 
-Avaliação:
+Etapa 1, ajuste de hiperparâmetros (mesmo orçamento para todos): a configuração padrão de
+cada modelo e mais 8 alternativas (GRADES), avaliadas por validação cruzada por município
+em 2015-2018, com retreino anual e uma semente. Critério: acerto balanceado médio nos
+quatro horizontes (o mesmo do ajuste de experimento_modelos.py). Os 15 municípios de
+validação e os anos de 2019 em diante não participam da escolha.
+
+Etapa 2, comparação com a configuração escolhida de cada modelo (o classificador em
+produção entra com a configuração padrão, como está no painel):
   - validação cruzada por município (5 grupos de 20) e validação final nos 15 municípios
     de validação; walk-forward de 2019 em diante, com retreino a cada 3 meses;
   - redes neurais com SEMENTES_REDES sementes (o resultado varia de uma para outra); as
@@ -25,13 +33,17 @@ Avaliação:
   - intervalos de confiança de 95% por bootstrap sobre municípios e diferença pareada para
     a referência.
 
-Retomada: cada unidade de trabalho (modelo, semente, grupo, trimestre) grava suas
-previsões em reports/cache/classificadores/<dados>/, onde <dados> identifica os dados
-processados. Se a execução for interrompida, rodar de novo continua de onde parou; se os
-dados mudarem, nada antigo é reaproveitado. As unidades rodam em paralelo (PROCESSOS
-processos com THREADS núcleos cada).
+Retomada: cada unidade de trabalho (modelo, configuração, semente, grupo, período de
+retreino) grava suas previsões em reports/cache/classificadores/<dados>/, onde <dados>
+identifica os dados processados e cada configuração tem sua pasta. Se a execução for
+interrompida, rodar de novo continua de onde parou; se os dados ou a configuração mudarem,
+nada antigo é reaproveitado. Mudanças no código de um modelo que não alteram os
+hiperparâmetros não são detectadas: nesse caso, apague a pasta do modelo no cache. As
+unidades rodam em paralelo (PROCESSOS processos com THREADS núcleos cada).
 
 Saídas:
+  reports/ajuste_classificadores.csv                     acerto de cada configuração no ajuste
+  reports/ajuste_classificadores_parametros.json         configuração escolhida de cada modelo
   reports/comparacao_classificadores.csv                 métricas com IC 95% por modelo, conjunto, período e horizonte
   reports/comparacao_classificadores_por_municipio.csv   matriz de confusão e somas por município (desde 2019)
   reports/comparacao_classificadores_por_ano.csv         métricas por ano
@@ -39,15 +51,17 @@ Saídas:
 
 Uso:
   python -m src.experimento_classificadores                    roda tudo (ou continua)
-  python -m src.experimento_classificadores --modelos a,b       só os modelos indicados (pelo nome)
   python -m src.experimento_classificadores --processos 4       muda o número de processos
 """
 import functools
+import hashlib
+import itertools
 import json
 import logging
 import os
 import sys
 import time
+from collections import namedtuple
 
 import numpy as np
 import pandas as pd
@@ -67,36 +81,54 @@ from src.modelos.mlp_classificador import MLPClassificador
 from src.modelos.random_forest_classificador import RandomForestClassificador
 from src.modelos.xgboost_classificador import XGBoostClassificador
 from src.snapshot import id_dados_processados
-from src.train import HORIZONTES, TENDENCIAS, carregar, linhas_validas
+from src.train import HORIZONTES, carregar, linhas_validas
 
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
 
-MODELOS = [
-    BaselinePersistencia,
-    ClassificadorClimaS1S4,
-    ClassificadorClimaBalanceado,
-    ClassificadorClimaJanela12,
-    XGBoostClassificador,
-    RandomForestClassificador,
-    MLPClassificador,
-    LSTMClassificador,
-]
+
+def _grade(**valores):
+    """Todas as combinações dos valores (8 com 2 valores para 3 hiperparâmetros)."""
+    return [dict(zip(valores, v)) for v in itertools.product(*valores.values())]
+
+
+GRADE_LIGHTGBM = _grade(num_leaves=[15, 63], min_child_samples=[20, 200], n_estimators=[150, 400])
+# Alternativas à configuração padrão de cada classe (o padrão sempre entra; nenhuma alternativa o repete)
+GRADES = {
+    ClassificadorClimaS1S4: GRADE_LIGHTGBM,
+    ClassificadorClimaBalanceado: GRADE_LIGHTGBM,
+    ClassificadorClimaJanela12: GRADE_LIGHTGBM,
+    XGBoostClassificador: _grade(max_depth=[4, 8], min_child_weight=[1, 10], n_estimators=[150, 400]),
+    RandomForestClassificador: _grade(min_samples_leaf=[5, 50], max_features=['sqrt', 0.5], max_depth=[None, 12]),
+    MLPClassificador: _grade(hidden_layer_sizes=[(32,), (128, 64)], alpha=[1e-4, 1e-2],
+                             learning_rate_init=[1e-3, 3e-3]),
+    LSTMClassificador: _grade(oculto=[16, 64], dropout=[0.0, 0.3], taxa=[1e-3, 3e-3]),
+}
 REFERENCIA = ClassificadorClimaS1S4.nome
 REDES = {MLPClassificador.nome, LSTMClassificador.nome}
+LENTOS = REDES | {RandomForestClassificador.nome}
 SEMENTES_REDES = [42, 43, 44]
 SEMENTE_PADRAO = 42
 
+PERIODO_AJUSTE = ('2015-01', '2018-12')
+MESES_POR_RETREINO_AJUSTE = 12
 INICIO_COMPARACAO = '2019-01'
-PERIODOS = {'desde_2019': '2019-01-01', 'desde_2022': '2022-01-01'}
 MESES_POR_RETREINO = 3
+PERIODOS = {'desde_2019': '2019-01-01', 'desde_2022': '2022-01-01'}
 PROCESSOS = 8
 THREADS = 2
 
 PASTA_CACHE = 'reports/cache/classificadores'
+ARQUIVO_AJUSTE = 'reports/ajuste_classificadores.csv'
+ARQUIVO_PARAMETROS = 'reports/ajuste_classificadores_parametros.json'
 ARQUIVO_METRICAS = 'reports/comparacao_classificadores.csv'
 ARQUIVO_POR_MUNICIPIO = 'reports/comparacao_classificadores_por_municipio.csv'
 ARQUIVO_POR_ANO = 'reports/comparacao_classificadores_por_ano.csv'
 ARQUIVO_SEMENTES = 'reports/comparacao_classificadores_sementes.csv'
+
+# Um modelo na comparação: nome nas tabelas, classe e hiperparâmetros (alterações ao padrão da classe)
+Entrada = namedtuple('Entrada', 'rotulo classe config descricao')
+# Uma unidade de trabalho: um treino por trimestre (ou ano, no ajuste) para um grupo de municípios
+Unidade = namedtuple('Unidade', 'classe config semente conjunto inicio meses')
 
 
 # --------------------------------------------------------------- dados
@@ -109,61 +141,37 @@ def dados():
 
 # --------------------------------------------------------------- unidades de trabalho
 
-def assinatura(classe):
-    """Configuração do modelo; o cache só vale para a mesma configuração."""
+def parametros_completos(classe, config):
+    return classe(parametros=config).parametros if classe is not BaselinePersistencia else {}
+
+
+def id_config(classe, config):
+    """Identifica a configuração completa (hiperparâmetros, peso das classes e variáveis)."""
     exemplo = classe()
-    return {'parametros': repr(getattr(classe, 'parametros', None)),
-            'peso_classes': repr(getattr(classe, 'peso_classes', None)),
-            'features': list(exemplo.features) if hasattr(exemplo, 'features') else None}
+    descricao = {'parametros': parametros_completos(classe, config),
+                 'peso_classes': getattr(classe, 'peso_classes', None),
+                 'features': list(getattr(exemplo, 'features', []))}
+    return hashlib.sha256(json.dumps(descricao, sort_keys=True, default=str).encode()).hexdigest()[:10]
 
 
-def conferir_assinaturas(id_, classes):
-    """Grava a assinatura de cada modelo no cache ou para se ela mudou (o cache seria de outro modelo).
-
-    Mudanças no código do modelo que não alteram a assinatura não são detectadas: nesse
-    caso, apague a pasta do modelo em reports/cache/classificadores/<dados>/.
-    """
-    for classe in classes:
-        caminho = os.path.join(PASTA_CACHE, id_, classe.nome, 'assinatura.json')
-        atual = assinatura(classe)
-        if os.path.exists(caminho):
-            with open(caminho, encoding='utf-8') as f:
-                if json.load(f) != atual:
-                    raise RuntimeError(f"A configuração de {classe.nome} mudou desde que o cache foi criado. "
-                                       f"Apague {os.path.dirname(caminho)} para recalcular.")
-        else:
-            os.makedirs(os.path.dirname(caminho), exist_ok=True)
-            with open(caminho, 'w', encoding='utf-8') as f:
-                json.dump(atual, f, ensure_ascii=False, indent=1)
-
-def unidades(classes, fim):
-    """(modelo, semente, conjunto, início do trimestre) de todas as unidades do experimento."""
-    inicios = pd.period_range(INICIO_COMPARACAO, fim, freq='M')[::MESES_POR_RETREINO]
-    conjuntos = [f'cv{i}' for i in range(5)] + ['final']
-    return [(classe, semente, conjunto, str(inicio))
-            for classe in classes
-            for semente in (SEMENTES_REDES if classe.nome in REDES else [SEMENTE_PADRAO])
-            for conjunto in conjuntos
-            for inicio in inicios]
+def caminho_unidade(id_, u):
+    return os.path.join(PASTA_CACHE, id_, u.classe.nome, id_config(u.classe, u.config), f's{u.semente}',
+                        f'{u.conjunto}_{u.inicio}_{u.meses}m.parquet')
 
 
-def caminho_unidade(id_, classe, semente, conjunto, inicio):
-    return os.path.join(PASTA_CACHE, id_, classe.nome, f's{semente}', f'{conjunto}_{inicio}.parquet')
-
-
-def executar_unidade(id_, classe, semente, conjunto, inicio):
-    """Treina com o que era conhecido no início do trimestre e prevê as semanas do trimestre."""
-    destino = caminho_unidade(id_, classe, semente, conjunto, inicio)
+def executar_unidade(id_, u):
+    """Treina com o que era conhecido no início do período e prevê as semanas do período."""
+    destino = caminho_unidade(id_, u)
     if os.path.exists(destino):
         return destino
     treino, validacao = dados()
-    if conjunto == 'final':
+    if u.conjunto == 'final':
         tr_base, te_base = treino, validacao
     else:
-        separado = grupos_de_municipios(treino['cidade'].unique())[int(conjunto[2:])]
+        separado = grupos_de_municipios(treino['cidade'].unique())[int(u.conjunto[2:])]
         tr_base, te_base = treino[~treino['cidade'].isin(separado)], treino[treino['cidade'].isin(separado)]
-    ini = pd.Period(inicio, freq='M').start_time
-    fim = (pd.Period(inicio, freq='M') + MESES_POR_RETREINO).start_time
+    ini = pd.Period(u.inicio, freq='M').start_time
+    fim = (pd.Period(u.inicio, freq='M') + u.meses).start_time
 
     trs, tes = {}, {}
     for h in HORIZONTES:
@@ -171,14 +179,18 @@ def executar_unidade(id_, classe, semente, conjunto, inicio):
         trs[h] = tr_h[tr_h['data_iniSE'] + pd.Timedelta(weeks=h) < ini]
         tes[h] = te_h[(te_h['data_iniSE'] >= ini) & (te_h['data_iniSE'] < fim)]
 
+    def novo():
+        if u.classe is BaselinePersistencia:
+            return u.classe()
+        return u.classe(semente=u.semente, threads=THREADS, parametros=u.config)
+
     partes = []
     with threadpool_limits(THREADS):
-        if getattr(classe, 'multi_horizonte', False):
-            unico = classe(semente=semente, threads=THREADS).treinar_horizontes(trs)
+        if getattr(u.classe, 'multi_horizonte', False):
+            unico = novo().treinar_horizontes(trs)
             modelos = {h: unico for h in HORIZONTES}
         else:
-            modelos = {h: (classe(semente=semente, threads=THREADS) if classe is not BaselinePersistencia
-                           else classe()).treinar(trs[h], h) for h in HORIZONTES if not tes[h].empty}
+            modelos = {h: novo().treinar(trs[h], h) for h in HORIZONTES if not tes[h].empty}
         for h, te in tes.items():
             if te.empty:
                 continue
@@ -198,88 +210,140 @@ def executar_unidade(id_, classe, semente, conjunto, inicio):
     return destino
 
 
-def rodar_unidades(id_, classes, fim, processos):
-    conferir_assinaturas(id_, classes)
-    todas = unidades(classes, fim)
-    pendentes = [u for u in todas if not os.path.exists(caminho_unidade(id_, *u))]
-    logging.info(f"{len(todas)} unidades; {len(todas) - len(pendentes)} já prontas, {len(pendentes)} a rodar "
-                 f"({processos} processos x {THREADS} threads).")
+def rodar_unidades(id_, todas, processos, etapa):
+    # Grava a configuração ao lado do cache, para consulta
+    for u in {(u.classe, json.dumps(u.config, sort_keys=True, default=str)): u for u in todas}.values():
+        pasta = os.path.join(PASTA_CACHE, id_, u.classe.nome, id_config(u.classe, u.config))
+        os.makedirs(pasta, exist_ok=True)
+        with open(os.path.join(pasta, 'config.json'), 'w', encoding='utf-8') as f:
+            json.dump(parametros_completos(u.classe, u.config), f, ensure_ascii=False, indent=1, default=str)
+
+    pendentes = [u for u in todas if not os.path.exists(caminho_unidade(id_, u))]
+    logging.info(f"{etapa}: {len(todas)} unidades; {len(todas) - len(pendentes)} já prontas, {len(pendentes)} "
+                 f"a rodar ({processos} processos x {THREADS} threads).")
     if not pendentes:
         return
-    # As unidades mais lentas (redes e Random Forest) primeiro, para equilibrar o fim
-    ordem = {c.nome: i for i, c in enumerate(classes)}
-    pendentes.sort(key=lambda u: (u[0].nome not in REDES | {RandomForestClassificador.nome}, ordem[u[0].nome]))
+    # As unidades mais lentas primeiro, para equilibrar o fim
+    pendentes.sort(key=lambda u: u.classe.nome not in LENTOS)
     inicio = time.time()
     feitas = 0
     for _ in Parallel(n_jobs=processos, return_as='generator_unordered', batch_size=1)(
-            delayed(executar_unidade)(id_, *u) for u in pendentes):
+            delayed(executar_unidade)(id_, u) for u in pendentes):
         feitas += 1
         if feitas % 25 == 0 or feitas == len(pendentes):
             decorrido = time.time() - inicio
             restante = decorrido / feitas * (len(pendentes) - feitas)
-            logging.info(f"{feitas}/{len(pendentes)} unidades ({decorrido / 60:.0f} min; faltam ~{restante / 60:.0f} min)")
+            logging.info(f"{etapa}: {feitas}/{len(pendentes)} unidades ({decorrido / 60:.0f} min; "
+                         f"faltam ~{restante / 60:.0f} min)")
 
 
-# --------------------------------------------------------------- métricas
-
-def previsoes(id_, classe, semente, fim):
-    caminhos = [caminho_unidade(id_, c, s, conj, ini) for c, s, conj, ini in unidades([classe], fim) if s == semente]
-    prev = pd.concat([pd.read_parquet(c) for c in caminhos], ignore_index=True)
+def ler_previsoes(id_, unidades_):
+    prev = pd.concat([pd.read_parquet(caminho_unidade(id_, u)) for u in unidades_], ignore_index=True)
     # Classificadores não preveem casos (colunas esperadas por resumo_por_municipio)
     return prev.assign(previsto=np.nan, inferior=np.nan, superior=np.nan)
 
 
-def resumir(id_, classes, fim):
+# --------------------------------------------------------------- etapa 1: ajuste
+
+def unidades_ajuste(classe, config):
+    inicios = pd.period_range(*PERIODO_AJUSTE, freq='M')[::MESES_POR_RETREINO_AJUSTE]
+    return [Unidade(classe, config, SEMENTE_PADRAO, f'cv{i}', str(ini), MESES_POR_RETREINO_AJUSTE)
+            for i in range(5) for ini in inicios]
+
+
+def ajustar(id_, processos):
+    candidatos = [(classe, config) for classe, grade in GRADES.items() for config in [{}] + grade]
+    rodar_unidades(id_, [u for c in candidatos for u in unidades_ajuste(*c)], processos, 'Ajuste')
+
+    linhas = []
+    for classe, config in candidatos:
+        pm = resumo_por_municipio(ler_previsoes(id_, unidades_ajuste(classe, config)))
+        por_h = {h: metricas(pm[pm['h'] == h]) for h in HORIZONTES}
+        linhas.append({'modelo': classe.nome, 'config': json.dumps(config, default=str), 'padrao': not config,
+                       **{f'acerto_balanceado_h{h}': m['acerto_balanceado'] for h, m in por_h.items()},
+                       'acerto_balanceado_medio': np.mean([m['acerto_balanceado'] for m in por_h.values()]),
+                       'log_loss_medio': np.mean([m['log_loss'] for m in por_h.values()])})
+    tabela = pd.DataFrame(linhas)
+    tabela.round(4).to_csv(ARQUIVO_AJUSTE, index=False)
+
+    escolhidos = {}
+    for modelo, g in tabela.groupby('modelo', sort=False):
+        melhor = g.sort_values('acerto_balanceado_medio', ascending=False).iloc[0]
+        escolhidos[modelo] = json.loads(melhor['config'])
+        logging.info(f"Ajuste de {modelo}: {melhor['config']} (acerto balanceado médio "
+                     f"{melhor['acerto_balanceado_medio']:.4f}; padrão "
+                     f"{g[g['padrao']]['acerto_balanceado_medio'].iloc[0]:.4f})")
+    with open(ARQUIVO_PARAMETROS, 'w', encoding='utf-8') as f:
+        json.dump({'id_dados': id_, 'periodo_ajuste': list(PERIODO_AJUSTE),
+                   'criterio': 'acerto balanceado médio (H+1 a H+4), validação cruzada por município',
+                   'modelos': escolhidos}, f, ensure_ascii=False, indent=2)
+    return escolhidos
+
+
+# --------------------------------------------------------------- etapa 2: comparação
+
+def entradas_comparacao(escolhidos):
+    def config(classe):
+        # JSON transforma tuplas em listas; o MLP precisa de tupla nas camadas
+        c = dict(escolhidos[classe.nome])
+        if 'hidden_layer_sizes' in c:
+            c['hidden_layer_sizes'] = tuple(c['hidden_layer_sizes'])
+        return c
+
+    entradas = [Entrada(BaselinePersistencia.nome, BaselinePersistencia, {}, BaselinePersistencia.descricao),
+                Entrada(REFERENCIA, ClassificadorClimaS1S4, {},
+                        ClassificadorClimaS1S4.descricao + ' (em produção, configuração padrão)')]
+    for classe in GRADES:
+        rotulo = classe.nome + ('_ajustado' if classe is ClassificadorClimaS1S4 else '')
+        entradas.append(Entrada(rotulo, classe, config(classe), classe.descricao + ' (hiperparâmetros ajustados)'))
+    return entradas
+
+
+def unidades_comparacao(entrada, fim):
+    inicios = pd.period_range(INICIO_COMPARACAO, fim, freq='M')[::MESES_POR_RETREINO]
+    sementes = SEMENTES_REDES if entrada.classe.nome in REDES else [SEMENTE_PADRAO]
+    return [Unidade(entrada.classe, entrada.config, s, conjunto, str(ini), MESES_POR_RETREINO)
+            for s in sementes for conjunto in [f'cv{i}' for i in range(5)] + ['final'] for ini in inicios]
+
+
+def resumir(id_, entradas, fim):
     """Resumo por município (somando as sementes), por ano e por semente."""
+    validacao = list(cidades_por_papel('validacao'))
     resumos, por_ano, por_semente = [], [], []
-    for classe in classes:
-        sementes = SEMENTES_REDES if classe.nome in REDES else [SEMENTE_PADRAO]
-        for semente in sementes:
-            prev = previsoes(id_, classe, semente, fim)
-            prev['conjunto'] = np.where(prev['cidade'].isin(list(cidades_por_papel('validacao'))),
-                                        'validacao_final', 'validacao_cruzada')
-            prev['ano'] = pd.to_datetime(prev['data_iniSE']).dt.year
+    for e in entradas:
+        unidades_ = unidades_comparacao(e, fim)
+        for semente in sorted({u.semente for u in unidades_}):
+            prev = ler_previsoes(id_, [u for u in unidades_ if u.semente == semente])
+            prev['conjunto'] = np.where(prev['cidade'].isin(validacao), 'validacao_final', 'validacao_cruzada')
+            prev['data_iniSE'] = pd.to_datetime(prev['data_iniSE'])
             for periodo, desde in PERIODOS.items():
-                recorte = prev[pd.to_datetime(prev['data_iniSE']) >= desde]
-                for conjunto, g in recorte.groupby('conjunto'):
-                    pm = resumo_por_municipio(g).assign(modelo=classe.nome, conjunto=conjunto, periodo=periodo,
-                                                        semente=semente)
+                for conjunto, g in prev[prev['data_iniSE'] >= desde].groupby('conjunto'):
+                    pm = resumo_por_municipio(g).assign(modelo=e.rotulo, conjunto=conjunto, periodo=periodo)
                     resumos.append(pm)
-            for (conjunto, ano), g in prev.groupby(['conjunto', 'ano']):
+                    if e.classe.nome in REDES:
+                        for h in HORIZONTES:
+                            por_semente.append({'modelo': e.rotulo, 'conjunto': conjunto, 'periodo': periodo,
+                                                'semente': semente, 'h': h, **metricas(pm[pm['h'] == h])})
+            for (conjunto, ano), g in prev.groupby(['conjunto', prev['data_iniSE'].dt.year.rename('ano')]):
                 pm = resumo_por_municipio(g)
                 for h in HORIZONTES:
-                    por_ano.append({'modelo': classe.nome, 'conjunto': conjunto, 'ano': ano, 'h': h,
-                                    'semente': semente, **metricas(pm[pm['h'] == h])})
+                    por_ano.append({'modelo': e.rotulo, 'conjunto': conjunto, 'ano': ano, 'h': h,
+                                    **metricas(pm[pm['h'] == h])})
 
-    pm_sementes = pd.concat(resumos, ignore_index=True)
-    for (modelo, conjunto, periodo, semente), g in pm_sementes.groupby(['modelo', 'conjunto', 'periodo', 'semente']):
-        if modelo in REDES:
-            for h in HORIZONTES:
-                por_semente.append({'modelo': modelo, 'conjunto': conjunto, 'periodo': periodo, 'semente': semente,
-                                    'h': h, **metricas(g[g['h'] == h])})
     chaves = ['modelo', 'conjunto', 'periodo', 'cidade', 'h']
-    por_municipio = pm_sementes.drop(columns='semente').groupby(chaves, sort=False).sum(min_count=1).reset_index()
-
-    # Por ano: média das sementes
-    por_ano = pd.DataFrame(por_ano).drop(columns='semente').groupby(['modelo', 'conjunto', 'ano', 'h'],
-                                                                    sort=False).mean().reset_index()
+    por_municipio = pd.concat(resumos, ignore_index=True).groupby(chaves, sort=False).sum(min_count=1).reset_index()
+    por_ano = pd.DataFrame(por_ano).groupby(['modelo', 'conjunto', 'ano', 'h'], sort=False).mean().reset_index()
     return por_municipio, por_ano, pd.DataFrame(por_semente)
 
 
-def run_experimento(nomes=None, processos=PROCESSOS):
+def comparar(id_, escolhidos, processos):
     treino, _ = dados()
     fim = treino['data_iniSE'].max().to_period('M').strftime('%Y-%m')
-    id_ = id_dados_processados()
-    classes = [c for c in MODELOS if nomes is None or c.nome in nomes or c.nome == REFERENCIA]
-    logging.info(f"Dados {id_} (até {treino['data_iniSE'].max():%d/%m/%Y}); modelos: {[c.nome for c in classes]}")
+    entradas = entradas_comparacao(escolhidos)
+    rodar_unidades(id_, [u for e in entradas for u in unidades_comparacao(e, fim)], processos, 'Comparação')
+    por_municipio, por_ano, por_semente = resumir(id_, entradas, fim)
 
-    rodar_unidades(id_, classes, fim, processos)
-    # As métricas usam todos os modelos já calculados para estes dados
-    prontos = [c for c in MODELOS
-               if all(os.path.exists(caminho_unidade(id_, *u)) for u in unidades([c], fim))]
-    por_municipio, por_ano, por_semente = resumir(id_, prontos, fim)
-
-    descricao = {c.nome: c.descricao for c in MODELOS}
+    descricao = {e.rotulo: e.descricao for e in entradas}
     tabelas = []
     for (modelo, conjunto, periodo), pm in por_municipio.groupby(['modelo', 'conjunto', 'periodo'], sort=False):
         ref = por_municipio[(por_municipio['modelo'] == REFERENCIA) & (por_municipio['conjunto'] == conjunto)
@@ -304,9 +368,15 @@ def run_experimento(nomes=None, processos=PROCESSOS):
         print(tabela.pivot_table(index=['conjunto', 'modelo'], columns='h', values='valor', sort=False).round(3))
 
 
+def run_experimento(processos=PROCESSOS):
+    id_ = id_dados_processados()
+    logging.info(f"Dados {id_}.")
+    escolhidos = ajustar(id_, processos)
+    comparar(id_, escolhidos, processos)
+
+
 if __name__ == "__main__":
-    selecao = sys.argv[sys.argv.index('--modelos') + 1].split(',') if '--modelos' in sys.argv else None
     n = int(sys.argv[sys.argv.index('--processos') + 1]) if '--processos' in sys.argv else PROCESSOS
     # Chama pelo nome do módulo, e não por __main__, para os processos paralelos encontrarem as funções
     from src import experimento_classificadores
-    experimento_classificadores.run_experimento(selecao, n)
+    experimento_classificadores.run_experimento(n)

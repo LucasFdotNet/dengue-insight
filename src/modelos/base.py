@@ -43,13 +43,16 @@ class Classificador(Modelo):
     """Prevê a tendência diretamente (sem número de casos), com a probabilidade de cada classe.
 
     'semente' fixa a aleatoriedade do treino; 'threads' limita os núcleos usados por um
-    treino (os experimentos rodam vários treinos em paralelo).
+    treino (os experimentos rodam vários treinos em paralelo); 'parametros' substitui
+    hiperparâmetros do padrão da classe (usado no ajuste de experimento_classificadores.py).
     """
     features = FEATURES
+    parametros = {}
 
-    def __init__(self, semente=42, threads=-1):
+    def __init__(self, semente=42, threads=-1, parametros=None):
         self.semente = semente
         self.threads = threads
+        self.parametros = {**type(self).parametros, **(parametros or {})}
 
     def _novo_modelo(self):
         """Estimador no padrão do scikit-learn (fit, predict_proba, classes_)."""
