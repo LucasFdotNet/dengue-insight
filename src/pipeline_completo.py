@@ -40,9 +40,10 @@ PASSOS = [
     ('experimento_rt', []),                   # idem
     ('experimento_generalizacao', []),
     ('experimento_atraso', []),
-    ('experimento_clima_semanal', []),
-    ('experimento_variaveis', []),
 ]
+# Fora do pipeline: experimento_variaveis.py (base de SP) e experimento_clima_semanal.py (base de 63
+# municípios) são históricos; os resultados citados em docs/historia_decisoes.md são os dos commits
+# originais, e rodá-los com a base atual seria outro experimento.
 ARQUIVO_ESTADO = 'reports/pipeline_estado.json'
 PASTA_LOGS = 'reports/logs'
 
