@@ -30,6 +30,13 @@ produção entra com a configuração padrão, como está no painel):
     análise de sensibilidade); e métricas por ano, sem intervalo de confiança;
   - além das métricas de tendência, log loss e Brier, que avaliam as probabilidades e não
     dependem do ponto de corte (o peso por classe muda o ponto de corte);
+  - duas regras de decisão para cada classificador sem peso por classe: a tendência mais
+    provável (como o modelo foi treinado) e a "decisão balanceada", que divide cada
+    probabilidade pela frequência daquela tendência no treino da unidade antes de escolher.
+    A decisão balanceada equivale ao peso igual para as três tendências, mas aplicada depois
+    do treino, sobre as probabilidades salvas (não exige treinar de novo); detecta mais
+    subidas e quedas, com mais alarmes que não se confirmam. Os hiperparâmetros são os
+    escolhidos com a regra normal;
   - intervalos de confiança de 95% por bootstrap sobre municípios e diferença pareada para
     a referência.
 
@@ -81,7 +88,7 @@ from src.modelos.mlp_classificador import MLPClassificador
 from src.modelos.random_forest_classificador import RandomForestClassificador
 from src.modelos.xgboost_classificador import XGBoostClassificador
 from src.snapshot import id_dados_processados
-from src.train import HORIZONTES, carregar, linhas_validas
+from src.train import HORIZONTES, TENDENCIAS, carregar, linhas_validas
 
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
 
@@ -126,7 +133,7 @@ ARQUIVO_POR_ANO = 'reports/comparacao_classificadores_por_ano.csv'
 ARQUIVO_SEMENTES = 'reports/comparacao_classificadores_sementes.csv'
 
 # Um modelo na comparação: nome nas tabelas, classe e hiperparâmetros (alterações ao padrão da classe)
-Entrada = namedtuple('Entrada', 'rotulo classe config descricao')
+Entrada = namedtuple('Entrada', 'rotulo classe config descricao regra', defaults=['treinada'])
 # Uma unidade de trabalho: um treino por trimestre (ou ano, no ajuste) para um grupo de municípios
 Unidade = namedtuple('Unidade', 'classe config semente conjunto inicio meses')
 
@@ -237,8 +244,34 @@ def rodar_unidades(id_, todas, processos, etapa):
                          f"faltam ~{restante / 60:.0f} min)")
 
 
-def ler_previsoes(id_, unidades_):
-    prev = pd.concat([pd.read_parquet(caminho_unidade(id_, u)) for u in unidades_], ignore_index=True)
+@functools.lru_cache(maxsize=None)
+def frequencias_treino(conjunto, inicio, h):
+    """Frequência de cada tendência (ordem de TENDENCIAS) nas linhas de treino de uma unidade."""
+    treino, _ = dados()
+    if conjunto != 'final':
+        treino = treino[~treino['cidade'].isin(grupos_de_municipios(treino['cidade'].unique())[int(conjunto[2:])])]
+    v = linhas_validas(treino, h)
+    v = v[v['data_iniSE'] + pd.Timedelta(weeks=h) < pd.Period(inicio, freq='M').start_time]
+    frequencia = pd.Series(tendencia_real(v, h)).value_counts(normalize=True)
+    return np.array([frequencia.get(t, 0.0) for t in TENDENCIAS])
+
+
+def decisao_balanceada(prev, u):
+    """Tendência com maior probabilidade dividida pela frequência no treino da unidade."""
+    prev = prev.copy()
+    colunas = [COLUNAS_PROB[t] for t in TENDENCIAS]
+    for h, g in prev.groupby('h'):
+        relativa = g[colunas].to_numpy() / np.maximum(frequencias_treino(u.conjunto, u.inicio, h), 1e-9)
+        prev.loc[g.index, 'tend_prev'] = np.array(TENDENCIAS)[relativa.argmax(axis=1)]
+    return prev
+
+
+def ler_previsoes(id_, unidades_, regra='treinada'):
+    partes = []
+    for u in unidades_:
+        prev = pd.read_parquet(caminho_unidade(id_, u))
+        partes.append(decisao_balanceada(prev, u) if regra == 'balanceada' and not prev.empty else prev)
+    prev = pd.concat(partes, ignore_index=True)
     # Classificadores não preveem casos (colunas esperadas por resumo_por_municipio)
     return prev.assign(previsto=np.nan, inferior=np.nan, superior=np.nan)
 
@@ -259,10 +292,13 @@ def ajustar(id_, processos):
     for classe, config in candidatos:
         pm = resumo_por_municipio(ler_previsoes(id_, unidades_ajuste(classe, config)))
         por_h = {h: metricas(pm[pm['h'] == h]) for h in HORIZONTES}
+        pm_bal = resumo_por_municipio(ler_previsoes(id_, unidades_ajuste(classe, config), 'balanceada'))
         linhas.append({'modelo': classe.nome, 'config': json.dumps(config, default=str), 'padrao': not config,
                        **{f'acerto_balanceado_h{h}': m['acerto_balanceado'] for h, m in por_h.items()},
                        'acerto_balanceado_medio': np.mean([m['acerto_balanceado'] for m in por_h.values()]),
-                       'log_loss_medio': np.mean([m['log_loss'] for m in por_h.values()])})
+                       'log_loss_medio': np.mean([m['log_loss'] for m in por_h.values()]),
+                       'acerto_balanceado_medio_decisao_balanceada':
+                           np.mean([metricas(pm_bal[pm_bal['h'] == h])['acerto_balanceado'] for h in HORIZONTES])})
     tabela = pd.DataFrame(linhas)
     tabela.round(4).to_csv(ARQUIVO_AJUSTE, index=False)
 
@@ -296,6 +332,10 @@ def entradas_comparacao(escolhidos):
     for classe in GRADES:
         rotulo = classe.nome + ('_ajustado' if classe is ClassificadorClimaS1S4 else '')
         entradas.append(Entrada(rotulo, classe, config(classe), classe.descricao + ' (hiperparâmetros ajustados)'))
+    # Decisão balanceada para os classificadores treinados sem peso por classe
+    for e in [e for e in entradas if e.classe in GRADES and getattr(e.classe, 'peso_classes', None) is None]:
+        entradas.append(e._replace(rotulo=e.rotulo + '_decisao_balanceada', regra='balanceada',
+                                   descricao=e.descricao.rstrip(')') + '; decisão balanceada)'))
     return entradas
 
 
@@ -313,7 +353,7 @@ def resumir(id_, entradas, fim):
     for e in entradas:
         unidades_ = unidades_comparacao(e, fim)
         for semente in sorted({u.semente for u in unidades_}):
-            prev = ler_previsoes(id_, [u for u in unidades_ if u.semente == semente])
+            prev = ler_previsoes(id_, [u for u in unidades_ if u.semente == semente], e.regra)
             prev['conjunto'] = np.where(prev['cidade'].isin(validacao), 'validacao_final', 'validacao_cruzada')
             prev['data_iniSE'] = pd.to_datetime(prev['data_iniSE'])
             for periodo, desde in PERIODOS.items():
@@ -340,7 +380,9 @@ def comparar(id_, escolhidos, processos):
     treino, _ = dados()
     fim = treino['data_iniSE'].max().to_period('M').strftime('%Y-%m')
     entradas = entradas_comparacao(escolhidos)
-    rodar_unidades(id_, [u for e in entradas for u in unidades_comparacao(e, fim)], processos, 'Comparação')
+    # As entradas com decisão balanceada usam as mesmas unidades das entradas com a regra normal
+    rodar_unidades(id_, [u for e in entradas if e.regra == 'treinada' for u in unidades_comparacao(e, fim)],
+                   processos, 'Comparação')
     por_municipio, por_ano, por_semente = resumir(id_, entradas, fim)
 
     descricao = {e.rotulo: e.descricao for e in entradas}
