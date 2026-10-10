@@ -1,0 +1,21 @@
+percentil,conjunto,metodo,episodios,epidemias_avisadas,antecedencia_mediana,antecedencia_media,alarmes,alarmes_corretos,alarmes_falsos_por_municipio_ano,fins_de_episodio,fins_antecipados,avisos_prematuros_por_episodio
+0.9,validacao_cruzada,Modelo: alerta,502.0,0.671,2.0,2.395,736.0,0.516,0.473,,,
+0.9,validacao_cruzada,Modelo: atenção ou alerta,502.0,0.986,4.0,3.483,2008.0,0.272,1.941,,,
+0.9,validacao_cruzada,Regra simples,502.0,0.647,2.0,2.372,947.0,0.361,0.803,,,
+0.9,validacao_cruzada,Alerta do InfoDengue (comparação),502.0,0.504,3.0,2.743,988.0,0.269,0.959,,,
+0.9,validacao_cruzada,Modelo: desmobilização,,,,,,,,506.0,0.765,0.64
+0.9,validacao_final,Modelo: alerta,82.0,0.695,2.0,2.526,107.0,0.598,0.381,,,
+0.9,validacao_final,Modelo: atenção ou alerta,82.0,0.963,4.0,3.595,311.0,0.273,2.0,,,
+0.9,validacao_final,Regra simples,82.0,0.671,3.0,2.727,165.0,0.358,0.938,,,
+0.9,validacao_final,Alerta do InfoDengue (comparação),82.0,0.537,3.0,2.795,140.0,0.336,0.823,,,
+0.9,validacao_final,Modelo: desmobilização,,,,,,,,86.0,0.802,0.442
+0.8,validacao_cruzada,Modelo: alerta,677.0,0.539,2.0,2.405,840.0,0.505,0.552,,,
+0.8,validacao_cruzada,Modelo: atenção ou alerta,677.0,0.968,4.0,3.379,2475.0,0.303,2.29,,,
+0.8,validacao_cruzada,Regra simples,677.0,0.511,2.5,2.54,1123.0,0.327,1.004,,,
+0.8,validacao_cruzada,Alerta do InfoDengue (comparação),677.0,0.226,2.0,2.431,395.0,0.415,0.307,,,
+0.8,validacao_cruzada,Modelo: desmobilização,,,,,,,,683.0,0.679,0.747
+0.8,validacao_final,Modelo: alerta,109.0,0.514,2.0,2.196,134.0,0.463,0.637,,,
+0.8,validacao_final,Modelo: atenção ou alerta,109.0,0.963,4.0,3.524,413.0,0.288,2.602,,,
+0.8,validacao_final,Regra simples,109.0,0.578,2.0,2.587,212.0,0.33,1.257,,,
+0.8,validacao_final,Alerta do InfoDengue (comparação),109.0,0.183,2.0,2.25,48.0,0.438,0.239,,,
+0.8,validacao_final,Modelo: desmobilização,,,,,,,,114.0,0.737,1.307
