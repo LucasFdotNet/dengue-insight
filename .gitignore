@@ -4,3 +4,4 @@ __pycache__/
 .DS_Store
 # Cache dos experimentos (previsões por unidade de trabalho; recriado ao rodar)
 reports/cache/
+reports/logs/

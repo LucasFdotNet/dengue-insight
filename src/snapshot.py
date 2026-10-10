@@ -28,7 +28,7 @@ from datetime import datetime
 
 import pandas as pd
 
-from src.cidades import CIDADES
+from src.cidades import CIDADES, cidades_por_papel
 
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
 
@@ -52,6 +52,16 @@ def _resumo(caminho):
         'ultima_semana': str(df['data_iniSE'].max()),
         'sha256': _sha256(caminho),
     }
+
+
+def id_dados_processados():
+    """Identifica os dados processados de todos os municípios (muda quando os dados são atualizados)."""
+    sha = hashlib.sha256()
+    for papel in ('treino', 'validacao'):
+        for cidade in sorted(cidades_por_papel(papel)):
+            with open(os.path.join('data/processed', f'{cidade}_processed.csv'), 'rb') as f:
+                sha.update(f.read())
+    return sha.hexdigest()[:12]
 
 
 def salvar_foto(fonte):

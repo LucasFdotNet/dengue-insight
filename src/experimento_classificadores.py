@@ -43,7 +43,7 @@ Uso:
   python -m src.experimento_classificadores --processos 4       muda o número de processos
 """
 import functools
-import hashlib
+import json
 import logging
 import os
 import sys
@@ -66,6 +66,7 @@ from src.modelos.lstm_classificador import LSTMClassificador
 from src.modelos.mlp_classificador import MLPClassificador
 from src.modelos.random_forest_classificador import RandomForestClassificador
 from src.modelos.xgboost_classificador import XGBoostClassificador
+from src.snapshot import id_dados_processados
 from src.train import HORIZONTES, TENDENCIAS, carregar, linhas_validas
 
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
@@ -106,17 +107,34 @@ def dados():
     return adicionar_janela(carregar('treino')), adicionar_janela(carregar('validacao'))
 
 
-def id_dados():
-    """Identifica os dados processados (muda quando os dados são atualizados)."""
-    sha = hashlib.sha256()
-    for papel in ('treino', 'validacao'):
-        for cidade in sorted(cidades_por_papel(papel)):
-            with open(os.path.join('data/processed', f'{cidade}_processed.csv'), 'rb') as f:
-                sha.update(f.read())
-    return sha.hexdigest()[:12]
-
-
 # --------------------------------------------------------------- unidades de trabalho
+
+def assinatura(classe):
+    """Configuração do modelo; o cache só vale para a mesma configuração."""
+    exemplo = classe()
+    return {'parametros': repr(getattr(classe, 'parametros', None)),
+            'peso_classes': repr(getattr(classe, 'peso_classes', None)),
+            'features': list(exemplo.features) if hasattr(exemplo, 'features') else None}
+
+
+def conferir_assinaturas(id_, classes):
+    """Grava a assinatura de cada modelo no cache ou para se ela mudou (o cache seria de outro modelo).
+
+    Mudanças no código do modelo que não alteram a assinatura não são detectadas: nesse
+    caso, apague a pasta do modelo em reports/cache/classificadores/<dados>/.
+    """
+    for classe in classes:
+        caminho = os.path.join(PASTA_CACHE, id_, classe.nome, 'assinatura.json')
+        atual = assinatura(classe)
+        if os.path.exists(caminho):
+            with open(caminho, encoding='utf-8') as f:
+                if json.load(f) != atual:
+                    raise RuntimeError(f"A configuração de {classe.nome} mudou desde que o cache foi criado. "
+                                       f"Apague {os.path.dirname(caminho)} para recalcular.")
+        else:
+            os.makedirs(os.path.dirname(caminho), exist_ok=True)
+            with open(caminho, 'w', encoding='utf-8') as f:
+                json.dump(atual, f, ensure_ascii=False, indent=1)
 
 def unidades(classes, fim):
     """(modelo, semente, conjunto, início do trimestre) de todas as unidades do experimento."""
@@ -181,6 +199,7 @@ def executar_unidade(id_, classe, semente, conjunto, inicio):
 
 
 def rodar_unidades(id_, classes, fim, processos):
+    conferir_assinaturas(id_, classes)
     todas = unidades(classes, fim)
     pendentes = [u for u in todas if not os.path.exists(caminho_unidade(id_, *u))]
     logging.info(f"{len(todas)} unidades; {len(todas) - len(pendentes)} já prontas, {len(pendentes)} a rodar "
@@ -250,7 +269,7 @@ def resumir(id_, classes, fim):
 def run_experimento(nomes=None, processos=PROCESSOS):
     treino, _ = dados()
     fim = treino['data_iniSE'].max().to_period('M').strftime('%Y-%m')
-    id_ = id_dados()
+    id_ = id_dados_processados()
     classes = [c for c in MODELOS if nomes is None or c.nome in nomes or c.nome == REFERENCIA]
     logging.info(f"Dados {id_} (até {treino['data_iniSE'].max():%d/%m/%Y}); modelos: {[c.nome for c in classes]}")
 
