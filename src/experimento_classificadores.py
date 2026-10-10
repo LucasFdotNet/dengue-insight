@@ -125,6 +125,9 @@ PROCESSOS = 8
 THREADS = 2
 
 PASTA_CACHE = 'reports/cache/classificadores'
+# Muda quando o preparo dos dados do experimento muda sem mudar os dados processados (o cache
+# antigo deixa de valer). 2: janela.adicionar_janela mantém os var_log_1 a 4 do pré-processamento
+VERSAO_CACHE = 2
 ARQUIVO_AJUSTE = 'reports/ajuste_classificadores.csv'
 ARQUIVO_PARAMETROS = 'reports/ajuste_classificadores_parametros.json'
 ARQUIVO_METRICAS = 'reports/comparacao_classificadores.csv'
@@ -162,7 +165,7 @@ def id_config(classe, config):
 
 
 def caminho_unidade(id_, u):
-    return os.path.join(PASTA_CACHE, id_, u.classe.nome, id_config(u.classe, u.config), f's{u.semente}',
+    return os.path.join(PASTA_CACHE, f'{id_}_v{VERSAO_CACHE}', u.classe.nome, id_config(u.classe, u.config), f's{u.semente}',
                         f'{u.conjunto}_{u.inicio}_{u.meses}m.parquet')
 
 
@@ -220,7 +223,7 @@ def executar_unidade(id_, u):
 def rodar_unidades(id_, todas, processos, etapa):
     # Grava a configuração ao lado do cache, para consulta
     for u in {(u.classe, json.dumps(u.config, sort_keys=True, default=str)): u for u in todas}.values():
-        pasta = os.path.join(PASTA_CACHE, id_, u.classe.nome, id_config(u.classe, u.config))
+        pasta = os.path.join(PASTA_CACHE, f'{id_}_v{VERSAO_CACHE}', u.classe.nome, id_config(u.classe, u.config))
         os.makedirs(pasta, exist_ok=True)
         with open(os.path.join(pasta, 'config.json'), 'w', encoding='utf-8') as f:
             json.dump(parametros_completos(u.classe, u.config), f, ensure_ascii=False, indent=1, default=str)
