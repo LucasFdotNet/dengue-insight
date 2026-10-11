@@ -35,6 +35,8 @@ Saídas:
   reports/niveis_alertas_antecedencia.csv
   reports/figures/niveis/quadradinhos_<município>_<definição>.png, com a definição pelo nome
   (mem, percentis_80_97, canal_endemico); com --resumo, também a comparação das definições A e B
+  reports/figures/niveis/casos_<município>.png: casos, limiares do MEM e a previsão do modelo de
+  quantis (src/train.py, reports/previsoes_walkforward.csv) no mesmo período dos quadradinhos
 
 Uso:
   python -m src.experimento_niveis              previsões, métricas e quadradinhos
@@ -46,6 +48,8 @@ import os
 import sys
 
 import matplotlib
+import matplotlib.dates
+import matplotlib.ticker
 matplotlib.use('Agg')
 import matplotlib.pyplot as plt  # noqa: E402
 import numpy as np  # noqa: E402
@@ -59,7 +63,8 @@ from src.estados import DESCRICAO_VARIANTES, VARIANTES_NIVEIS, adicionar_niveis 
 from src.experimento_generalizacao import grupos_de_municipios  # noqa: E402
 from src.modelos.nivel_lightgbm import NivelLightGBM  # noqa: E402
 from src.snapshot import id_dados_processados  # noqa: E402
-from src.train import HORIZONTES, PRIMEIRO_ANO_TESTE, carregar, linhas_validas  # noqa: E402
+from src.train import (ARQUIVO_PREVISOES_PASSADAS, HORIZONTES, PRIMEIRO_ANO_TESTE, carregar,  # noqa: E402
+                       linhas_validas)
 
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
 
@@ -374,6 +379,62 @@ def grafico_quadradinhos(t, variante, cidade, inicio, fim):
     return caminho_fig
 
 
+def grafico_casos(cidade, inicio, fim):
+    """Casos, limiares do MEM e a previsão do modelo de quantis 2 a 4 semanas antes, alinhados aos quadradinhos."""
+    treino, validacao = dados('D')
+    base = pd.concat([treino, validacao])
+    real = base[(base['cidade'] == cidade) & (base['data_iniSE'] >= inicio) & (base['data_iniSE'] < fim)]
+    prev = pd.read_csv(ARQUIVO_PREVISOES_PASSADAS, parse_dates=['data_alvo'])
+    prev = prev[(prev['cidade'] == cidade) & (prev['data_alvo'] >= inicio) & (prev['data_alvo'] < fim)]
+    linhas = [None] + HORIZONTES_NIVEIS
+    fig, eixos = plt.subplots(len(linhas), 1, figsize=(14, 8.5), sharex=True, sharey=True, facecolor=FUNDO)
+    for ax, h in zip(eixos, linhas):
+        estilo(ax)
+        ax.step(real['data_iniSE'], real['limiar_vermelho'], where='post', color=COR_NIVEL[2], linewidth=1.2,
+                linestyle='--')
+        ax.step(real['data_iniSE'], real['limiar_amarelo'], where='post', color=COR_NIVEL[1], linewidth=1.2,
+                linestyle='--')
+        if h is None:
+            ax.plot(real['data_iniSE'], real['casos_est'], color=TINTA, linewidth=2)
+            ax.set_title('Aconteceu', loc='left', fontsize=10, color=TINTA)
+            continue
+        p = prev[prev['h'] == h].sort_values('data_alvo')
+        ax.fill_between(p['data_alvo'], p['inferior'], p['superior'], color=COR_VARIANTE['A'], alpha=0.18,
+                        linewidth=0)
+        ax.plot(real['data_iniSE'], real['casos_est'], color=MUDO, linewidth=1.2)
+        ax.plot(p['data_alvo'], p['previsto'], color=COR_VARIANTE['A'], linewidth=2)
+        ax.set_title(f'Previsto {h} sem. antes', loc='left', fontsize=10, color=TINTA)
+    # Escala logarítmica: os limiares e as fases de poucos casos ficam visíveis ao lado dos picos
+    topo = max(real['casos_est'].max(), prev[prev['h'].isin(HORIZONTES_NIVEIS)]['superior'].max())
+    eixos[0].set_yscale('log', nonpositive='clip')
+    eixos[0].set_ylim(1, topo * 1.5)
+    eixos[0].yaxis.set_major_formatter(lambda v, _: f'{v:,.0f}'.replace(',', '.'))
+    eixos[0].yaxis.set_minor_formatter(matplotlib.ticker.NullFormatter())
+    eixos[-1].set_xlim(pd.Timestamp(inicio), pd.Timestamp(fim))
+    eixos[-1].xaxis.set_major_formatter(matplotlib.dates.DateFormatter('%m/%Y'))
+    eixos[-1].xaxis.set_major_locator(matplotlib.dates.MonthLocator(bymonth=(1, 4, 7, 10)))
+    nome = CIDADES[cidade]['nome']
+    papel = 'validação' if cidade in cidades_por_papel('validacao') else 'treino'
+    fig.suptitle(f'{nome} ({papel}) · casos por semana (escala logarítmica) e limiares do MEM\n'
+                 'Nas linhas "Previsto x sem. antes", a previsão do modelo de quantis feita x semanas antes para aquela '
+                 'semana, com a faixa de 80%;\no que aconteceu aparece em cinza para comparação.',
+                 x=0.06, y=0.98, ha='left', fontsize=10, color=TINTA)
+    legenda = [plt.Line2D([], [], color=TINTA, linewidth=2), plt.Line2D([], [], color=MUDO, linewidth=1.2),
+               plt.Line2D([], [], color=COR_VARIANTE['A'], linewidth=2),
+               plt.Rectangle((0, 0), 1, 1, color=COR_VARIANTE['A'], alpha=0.18, linewidth=0),
+               plt.Line2D([], [], color=COR_NIVEL[1], linewidth=1.2, linestyle='--'),
+               plt.Line2D([], [], color=COR_NIVEL[2], linewidth=1.2, linestyle='--')]
+    rotulos = ['casos (aconteceu)', 'casos (para comparação)', 'previsto (mediana)', 'faixa de 80%',
+               'limiar do amarelo (pré-epidêmico)', 'limiar do vermelho (epidêmico)']
+    fig.legend(legenda, rotulos, ncol=6, frameon=False, fontsize=9, labelcolor=TINTA_SEC, loc='lower left',
+               bbox_to_anchor=(0.05, 0), handlelength=2.5)
+    fig.subplots_adjust(left=0.06, right=0.98, top=0.88, bottom=0.08, hspace=0.35)
+    caminho_fig = os.path.join(PASTA_FIGURAS, f'casos_{cidade}.png')
+    fig.savefig(caminho_fig, dpi=150, facecolor=FUNDO)
+    plt.close(fig)
+    return caminho_fig
+
+
 # --------------------------------------------------------------- execução
 
 def run_experimento(processos=PROCESSOS, resumo=False):
@@ -402,6 +463,8 @@ def run_experimento(processos=PROCESSOS, resumo=False):
         alertas_h += resumo_alertas_por_antecedencia(t, variante)
         for cidade, inicio, fim_ex in (EXEMPLOS if variante in VARIANTES_QUADRADINHOS else []):
             logging.info(f"Figura: {grafico_quadradinhos(t, variante, cidade, inicio, fim_ex)}")
+            if variante == 'D' and os.path.exists(ARQUIVO_PREVISOES_PASSADAS):
+                logging.info(f"Figura: {grafico_casos(cidade, inicio, fim_ex)}")
 
     semanas = pd.DataFrame(semanas)
     semanas.round(3).to_csv(ARQUIVO_SEMANAS, index=False)

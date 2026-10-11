@@ -57,7 +57,7 @@ São 115 municípios, listados em [`data/config/cidades.csv`](data/config/cidade
 | `src/experimento_classificadores.py` | Outros classificadores (XGBoost, Random Forest, redes neurais MLP e LSTM) ou outra regra de decisão superam o classificador em produção? (decisão 15) |
 | `src/experimento_clima_classificador.py` | O clima melhora o classificador de tendência? |
 | `src/experimento_estados.py` | Prevendo o nível (normal ou alto) em vez da tendência, o painel avisaria as epidemias a tempo? (decisão 16) |
-| `src/experimento_niveis.py` | Três níveis (verde, amarelo, vermelho): qual definição de limiares, e quão bem o modelo prevê e alerta? Gera os gráficos de quadradinhos (decisão 16) |
+| `src/experimento_niveis.py` | Três níveis (verde, amarelo, vermelho): qual definição de limiares, e quão bem o modelo prevê e alerta? Gera os gráficos de quadradinhos e os de casos com os limiares e a previsão do modelo de quantis (decisão 16) |
 | `src/experimento_rt.py` | O melhor modelo é mais útil que o Rt do InfoDengue? |
 | `src/experimento_generalizacao.py` | O modelo generaliza para municípios não vistos? Mais municípios ajudam? O clima ajuda? |
 | `src/experimento_atraso.py` | Quanto o modelo piora se os dados recentes ainda não estiverem disponíveis? |
