@@ -325,7 +325,7 @@ def grafico_alertas(episodios_):
 
 
 def grafico_quadradinhos(t, variante, cidade, inicio, fim):
-    """O que aconteceu e, para cada antecedência, o nível mais provável, com os erros e os alertas de vermelho."""
+    """O que aconteceu e, para cada antecedência, o nível mais provável (acertos e erros se veem pela cor)."""
     alvo = t[(t['cidade'] == cidade)].copy()
     alvo['data_alvo'] = alvo['data_iniSE'] + pd.to_timedelta(7 * alvo['h'], unit='D')
     alvo = alvo[(alvo['data_alvo'] >= inicio) & (alvo['data_alvo'] < fim)]
@@ -340,21 +340,13 @@ def grafico_quadradinhos(t, variante, cidade, inicio, fim):
     linha_y = {h: (i + 1) * 1.15 + 0.25 for i, h in enumerate(HORIZONTES_NIVEIS)}
     for _, r in real.iterrows():
         if pd.notna(r['faixa']):
-            ax.add_patch(plt.Rectangle((pos[r['data_iniSE']], 0), 0.86, 0.86, facecolor=COR_NIVEL[int(r['faixa'])], linewidth=0))
+            ax.add_patch(plt.Rectangle((pos[r['data_iniSE']], 0), 0.86, 0.86,
+                                       facecolor=COR_NIVEL[int(r['faixa'])], linewidth=0))
     for _, r in alvo.iterrows():
         if pd.isna(r['nivel_previsto']) or r['data_alvo'] not in pos:
             continue
         y, x = linha_y[r['h']], pos[r['data_alvo']]
         ax.add_patch(plt.Rectangle((x, y), 0.86, 0.86, facecolor=COR_NIVEL[int(r['nivel_previsto'])], linewidth=0))
-        if r['alerta_h']:
-            # Esta previsão acendeu o alerta de vermelho: cheio se a semana foi vermelha, vazado se não foi
-            confirmou = r['nivel_futuro'] == 2
-            ax.plot(x + 0.43, y + 0.43, marker='^', markersize=7, linestyle='',
-                    color=TINTA if confirmou else FUNDO, markeredgecolor=TINTA, markeredgewidth=1)
-        elif pd.notna(r['nivel_futuro']) and r['nivel_previsto'] != r['nivel_futuro']:
-            grave = abs(r['nivel_previsto'] - r['nivel_futuro']) == 2
-            ax.text(x + 0.43, y + 0.43, '×' if grave else '•', ha='center', va='center',
-                    fontsize=9 if grave else 7, color=TINTA, fontweight='bold')
     ax.set_xlim(-0.5, len(semanas) + 0.5)
     ax.set_ylim(-0.3, len(HORIZONTES_NIVEIS) * 1.15 + 1.3)
     ax.invert_yaxis()
@@ -368,18 +360,12 @@ def grafico_quadradinhos(t, variante, cidade, inicio, fim):
     papel = 'validação' if cidade in cidades_por_papel('validacao') else 'treino'
     ax.set_title(f'{nome} ({papel}) · definição {variante} ({DESCRICAO_VARIANTES[variante]})\n'
                  'Cada coluna é uma semana. Nas linhas "Previsto x sem. antes", o quadrado mostra o nível mais provável '
-                 'previsto x semanas antes para aquela semana;\no triângulo marca a previsão que acendeu o alerta de '
-                 'vermelho (feita numa semana que não era vermelha).',
+                 'previsto x semanas antes para aquela semana;\na previsão acertou quando a cor é a mesma da linha '
+                 '"Aconteceu" na mesma coluna.',
                  loc='left', fontsize=10, color=TINTA)
     legenda = [plt.Rectangle((0, 0), 1, 1, color=COR_NIVEL[k]) for k in range(3)]
     rotulos = ['verde: normal', 'amarelo: elevado', 'vermelho: epidêmico']
-    legenda += [plt.Line2D([], [], marker='$•$', color=TINTA, linestyle='', markersize=7),
-                plt.Line2D([], [], marker='$×$', color=TINTA, linestyle='', markersize=8),
-                plt.Line2D([], [], marker='^', color=TINTA, linestyle='', markersize=7),
-                plt.Line2D([], [], marker='^', color=FUNDO, markeredgecolor=TINTA, linestyle='', markersize=7)]
-    rotulos += ['errou por 1 nível', 'erro grave (verde × vermelho)', 'alerta: a semana foi vermelha',
-                'alerta: a semana não foi vermelha']
-    ax.legend(legenda, rotulos, ncol=4, frameon=False, fontsize=9, labelcolor=TINTA_SEC,
+    ax.legend(legenda, rotulos, ncol=3, frameon=False, fontsize=9, labelcolor=TINTA_SEC,
               loc='upper left', bbox_to_anchor=(0, -0.12))
     fig.tight_layout()
     caminho_fig = os.path.join(PASTA_FIGURAS, f'quadradinhos_{cidade}_{ARQUIVO_VARIANTE[variante]}.png')
