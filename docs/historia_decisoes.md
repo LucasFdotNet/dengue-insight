@@ -40,6 +40,7 @@ Este documento reconstrói, em ordem cronológica, as decisões técnicas tomada
 | 19 | Modelos em produção e painel | 27/09/2026 | Classificador com clima para a tendência e quantis para os casos; painel com aviso, Indicadores e Detalhes do Modelo | [19](#s19) |
 | 20 | Dados atualizados, fotos e pipeline completo | 09–10/10/2026 (`4ba56f0` a `d906288`) | Guardar uma foto dos dados a cada coleta; medir quanto o InfoDengue revisa as semanas recentes; refazer todos os números com um comando retomável | [20](#s20) |
 | 21 | Outros modelos e regra de decisão | 09–10/10/2026 | XGBoost, Random Forest, MLP e LSTM, com o mesmo ajuste, não superam o LightGBM; o peso por classe é só outra regra de decisão; a pergunta do projeto é revista | [21](#s21) |
+| 22 | Da tendência aos níveis de incidência | 10/10/2026 | Prever o nível (verde, amarelo, vermelho) pelos limiares do MEM e alertar a entrada no vermelho; canal endêmico e percentis descartados | [22](#s22) |
 
 Observação sobre as datas: o código herdado é de 21/09/2026 e quase todo o trabalho de revisão foi registrado em commits de 26/09/2026 (o último, que fixa versões do `scipy` e do `statsmodels`, é de 27/09/2026). A coluna de commits permite reconstruir a ordem exata com `git log --reverse`.
 
@@ -978,3 +979,92 @@ Na primeira execução, o modelo em produção teve 0,426 de acerto balanceado e
 * As redes neurais tiveram o mesmo orçamento de ajuste dos outros modelos (9 configurações); um ajuste mais extenso poderia melhorá-las um pouco, mas dificilmente o bastante para superar o empate, dado o tamanho das diferenças.
 * Os hiperparâmetros com a decisão balanceada são os escolhidos com a regra normal.
 * A análise da sensibilidade do alarme usou o período de ajuste (2015–2018).
+
+<a id="s22"></a>
+## 22. Da tendência aos níveis de incidência
+
+### Contexto
+
+A discussão sobre a sensibilidade do alarme (seção 21) levou o grupo a reformular o objetivo do painel: permitir que gestores de saúde se antecipem, **mobilizando** recursos (ações contra criadouros, equipes de atendimento) quando houver expectativa de epidemia, **mantendo-os** enquanto ela durar e **desmobilizando-os** quando ela terminar. Detectar a subida importa para agir a tempo; evitar alarmes falsos importa porque a mobilização tem custo e, com alarmes demais, os gestores deixam de prestar atenção. A queda só importa quando há mobilização em curso. Com isso, a pergunta deixou de ser "os casos vão subir 20%?" e passou a ser "em que **nível** o município estará nas próximas semanas?".
+
+### Etapa 1: dois estados (normal e alto)
+
+(`src/estados.py`, `src/modelos/estado_lightgbm.py`, `src/experimento_estados.py`; resultados em `reports/estados_*.csv`.)
+
+* **Estado alto:** casos da semana acima do percentil 90 das semanas dos anos anteriores do próprio município, com mínimo de 10 casos; o limiar é recalculado a cada ano só com o passado. Como validação externa, 88% das semanas altas estão no nível epidêmico do InfoDengue (`nivel_inc = 2`), que não entra nos modelos. Os estados são persistentes: 74% das semanas altas continuam altas 4 semanas depois.
+* **Modelo:** o LightGBM do classificador de tendência, com a distância da semana atual ao limiar, prevê a probabilidade de estado alto em S+1 a S+4. Entre as semanas normais, a AUC para a entrada no estado alto foi de 0,92 a 0,96.
+* **Avaliação por episódio** (Buehler et al., 2004), e não por semana, porque a persistência acerta quase tudo semana a semana e nunca antecipa nada: epidemias avisadas nas 4 semanas antes do início, antecedência, alarmes corretos e alarmes falsos por município por ano.
+* **Alerta e atenção:** o alerta acende quando a maior probabilidade de estado alto em S+1 a S+4 passa de um corte com pelo menos 1 alarme correto para cada falso no passado; a atenção, quando a probabilidade passa da frequência normal de entrada. Os cortes são escolhidos a cada trimestre só com as previsões anteriores. **Correção:** na primeira versão, o corte do alerta era escolhido por semana, e a avaliação era por alarme (uma sequência de semanas com aviso); os alarmes corretos ficaram em 39%, e não nos 50% pretendidos. O corte passou a ser escolhido pelo mesmo critério da avaliação. Os cortes ficaram estáveis desde 2019 (alerta perto de 50% de probabilidade, atenção de 5% a 7%).
+
+| Validação cruzada, 2019+ (502 epidemias) | Avisadas | Antecedência (mediana) | Alarmes corretos | Falsos por município por ano |
+|---|---|---|---|---|
+| Persistência | 0% | — | — | 0 |
+| Regra simples (casos subindo há 2 semanas e acima de metade do limiar) | 65% | 2 semanas | 36% | 0,80 |
+| Alerta do InfoDengue, laranja ou vermelho (só comparação) | 50% | 3 semanas | 27% | 0,96 |
+| **Modelo: alerta** | **67%** | **2 semanas** | **52%** | **0,47** |
+| Modelo: atenção ou alerta | 99% | 4 semanas | 27% | 1,9 |
+
+Nos 15 municípios de validação, o alerta avisou 70% das epidemias, com 60% de alarmes corretos e 0,38 alarme falso por ano. Desmobilização: em 77% dos fins de epidemia (80% na validação), a probabilidade de estado alto 2 semanas à frente caiu abaixo de 50% nas 2 semanas anteriores ao retorno ao normal. Com o percentil 80, o alerta avisou só 54% das epidemias.
+
+### Etapa 2: três níveis e o gráfico de quadradinhos
+
+O grupo propôs três níveis, para separar "alta que merece atenção" de epidemia, e um gráfico de quadradinhos para ver, semana a semana, o que aconteceu, o que foi previsto com 1 a 4 semanas de antecedência e se o alerta acertou (`src/experimento_niveis.py`, figuras em `reports/figures/niveis/`, fora do git). Nos quadradinhos, cada coluna é uma semana; na linha "Previsto x semanas antes", o quadrado mostra o que foi previsto x semanas antes para aquela semana; o alerta aparece na semana em que foi emitido.
+
+* **Magnitude e confiança separadas:** a cor de cada quadrado é sempre o nível (magnitude); a confiança aparece no alerta. Usar as mesmas cores para "atenção" (confiança) e "amarelo" (magnitude) confundia as duas coisas.
+* **Nível previsto = o mais provável.** A primeira versão escolhia o vermelho sempre que a probabilidade passava de um corte com metade das previsões confirmadas; semana a semana, isso previa vermelho demais e perdia para a persistência (76% contra 88% de acerto em 1 semana). Com o nível mais provável, o modelo empata ou supera a persistência e acerta de 28% a 48% das mudanças de nível; a antecipação das epidemias fica com o alerta.
+* **Previsão de 1 semana:** é quase uma cópia do nível atual deslocada uma semana (ganho de 0,3 a 0,7 ponto sobre a persistência, contra cerca de 3 pontos com 4 semanas).
+* **Duas definições por percentis:** A (amarelo a partir do percentil 75, vermelho a partir do 90) e B (amarelo do 80 ao 97, vermelho a partir do 97). Para seguir uma referência da literatura, o grupo pediu que os limiares viessem de um método publicado.
+
+### Etapa 3: canal endêmico do Ministério da Saúde (definição C)
+
+O Plano de Contingência Nacional para Dengue, Chikungunya e Zika (Ministério da Saúde, 2025, seção 5) define o diagrama de controle: para cada semana epidemiológica, a mediana e os quartis dos casos da mesma semana nos últimos 5 anos; os estágios de mobilização (acima da mediana e abaixo do Q3 por 4 semanas), alerta (acima do Q3 por 4 semanas) e desmobilização. Como o plano não define exclusão de anos epidêmicos, método de quartil, contagem ou taxa e tratamento de semanas zeradas, essas escolhas foram registradas em `src/estados.py` (sem exclusão de anos, quartil linear, contagem, mínimos de 5 e 10 casos).
+
+* **Resultado:** com o aumento da dengue de 2022 a 2025, a maior parte das semanas ficou acima do Q3 (60% em 2023, 69% em 2024, 46% em 2025, nos 115 municípios); Campinas e Blumenau ficaram vermelhos por quase 2 anos seguidos, inclusive no inverno (em Campinas, em julho de 2025, cerca de 400 casos por semana contra um Q3 de 300). O modelo superou a persistência por só 1 ponto, acertou 22% das mudanças de nível, e o alerta avisou 3% das epidemias.
+* **Leitura:** o canal mede "acima do esperado para esta época, em relação aos últimos anos", o que serve para acompanhar a temporada, mas é sensível a mudanças de patamar; a regra das 4 semanas não resolveria, porque os vermelhos duraram anos. Não serve para decidir quando mobilizar.
+
+### Etapa 4: MEM (definição D)
+
+O InfoDengue calcula os seus limiares pelo MEM (*Moving Epidemic Method*; Vega et al., 2013 e 2015), e o próprio Plano de Contingência os cita como apoio (pp. 23 e 90). O código do InfoDengue (AlertTools) e o do pacote R `mem` são públicos, e a reimplementação em Python ficou pequena (`src/mem.py`, cerca de 150 linhas):
+
+1. temporadas da semana 41 à 40 do ano seguinte, até as 10 mais recentes;
+2. em cada temporada, a curva MAP (a maior porcentagem dos casos concentrada em r semanas seguidas, para cada r), suavizada por regressão local linear; o período epidêmico tem a última duração antes de a inclinação da curva cair abaixo de 2,8 pontos;
+3. limiar pré-epidêmico: limite superior do intervalo de confiança unilateral de 95% da média geométrica das semanas anteriores aos períodos epidêmicos; limiar epidêmico: o mesmo, para as semanas dos períodos epidêmicos;
+4. segundo passe, como o InfoDengue: sem as temporadas cujo pico não passou do limiar pré-epidêmico; mínimos de 5 e 10 casos.
+
+* **Validação:** com os dados de 2010 a 2022, os limiares do projeto têm correlação de 0,996 (pré-epidêmico) e 0,992 (epidêmico) com os publicados pelo InfoDengue para os 115 municípios (`parameters/mem/mem_mun_2010_2022_BR.csv`), e ficam em média 5% abaixo, provavelmente pela revisão dos dados desde então.
+* **Uso:** limiares recalculados a cada temporada só com as anteriores, sobre a incidência por 100 mil habitantes (Censo 2022). De 2015 em diante, 42% das semanas ficam verdes, 42% amarelas e 16% vermelhas, com cerca de 0,6 epidemia por município por ano. Em Campinas, o amarelo começa perto de 130 casos por semana e o vermelho perto de 1.000.
+
+### Comparação das definições
+
+Validação cruzada, 2019 em diante; alerta de entrada no vermelho:
+
+| | A (percentis 75/90) | B (percentis 80/97) | C (canal endêmico) | **D (MEM)** |
+|---|---|---|---|---|
+| Semanas vermelhas (2015+) | 16% | 7% | 36% | 16% |
+| Ganho sobre a persistência, 4 semanas | +3,1 pontos | +2,9 | +1,0 | +3,3 |
+| Mudanças de nível acertadas, 4 semanas | 44% | 48% | 22% | 41% |
+| Alerta: epidemias avisadas | 63% | 84% | 3% | **74%** |
+| Alerta: antecedência (mediana) | 2 semanas | 3 semanas | — | 2 semanas |
+| Alerta: alarmes corretos | 53% | 50% | — | 52% |
+| Alerta: falsos por município por ano | 0,43 | 0,33 | — | 0,50 |
+
+Na definição D, nos 15 municípios de validação, o alerta avisou 70% das epidemias, com 3 semanas de antecedência, 53% de alarmes corretos e 0,47 alarme falso por ano; a regra simples avisou 71%, com 37% de alarmes corretos e 0,89 falso por ano. Nos quadradinhos, as epidemias de 2024 e de 2025 em Campinas e em Sorocaba (validação) foram avisadas de 2 a 3 semanas antes.
+
+### Decisão
+
+* Níveis pelo **MEM** (definição D): método publicado, usado pelo InfoDengue e citado pelo Ministério da Saúde, reimplementado e validado pelo projeto, com desempenho próximo ao das melhores alternativas e vermelho equivalente ao nível epidêmico usado na vigilância.
+* Percentis (A e B) e canal endêmico (C) ficam registrados como alternativas descartadas, com os motivos na decisão 16 do README.
+
+### Limitações
+
+* Avaliação pseudoprospectiva, como as anteriores (seção 5).
+* A desmobilização foi avaliada só na versão de dois estados.
+* O ganho semana a semana sobre a persistência é pequeno (cerca de 3 pontos com 4 semanas); o valor do modelo está nas mudanças de nível e no alerta.
+
+### Como reproduzir
+
+```bash
+python -m src.experimento_estados   # dois estados; reports/estados_*.csv
+python -m src.experimento_niveis    # três níveis, definições A a D; reports/niveis_*.csv e quadradinhos
+python -m src.mem <arquivo mem_mun_2010_2022_BR.csv do InfoDengue>   # validação do MEM
+```

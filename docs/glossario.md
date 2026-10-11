@@ -4,6 +4,8 @@
 
 **Alarmes de subida corretos.** Das vezes em que o modelo previu subida, em quantas os casos realmente subiram. Mede a confiabilidade dos alertas.
 
+**Alerta de mobilização.** Aviso de que o município deve entrar no nível vermelho nas próximas semanas. Acende quando a chance de vermelho em alguma das próximas 4 semanas passa de um ponto de corte escolhido com os dados do passado, de forma que pelo menos metade dos alarmes se confirme. Diferente do nível (o estado da semana), o alerta é uma previsão.
+
 **Alvo relativo.** O que o modelo de casos aprende a prever: a variação dos casos em escala logarítmica, `log(1 + casos daqui a H semanas) − log(1 + casos hoje)`, e não o número de casos. Deixa municípios de tamanhos diferentes na mesma escala e permite prever valores maiores que os já vistos.
 
 **Antecedência (horizonte).** Quantas semanas à frente a previsão olha: de 1 a 4 semanas. Há um modelo para cada antecedência.
@@ -12,6 +14,8 @@
 
 **Bootstrap e intervalo de confiança de 95%.** Para saber se um resultado pode ser efeito do acaso, sorteamos municípios com reposição 2.000 vezes e recalculamos a métrica. O intervalo de confiança de 95% é a faixa em que ficam 95% desses resultados. Se o intervalo de uma diferença entre dois modelos não inclui zero, a diferença é considerada estatisticamente significativa.
 
+**Canal endêmico (diagrama de controle).** Método do Ministério da Saúde para acompanhar a temporada: para cada semana do ano, a mediana e os quartis dos casos da mesma semana nos 5 anos anteriores. Mostra se a semana está acima do esperado para a época. Foi testado para definir os níveis e descartado, porque, com o aumento da dengue nos últimos anos, muitos municípios ficaram acima do esperado por anos seguidos.
+
 **Casos estimados.** Estimativa do InfoDengue de quantos casos uma semana terá quando todas as notificações chegarem (ver *nowcast*). É o número usado pelo projeto. Nas semanas antigas, é igual aos casos notificados.
 
 **Casos notificados.** Casos de dengue já registrados no sistema de vigilância para uma semana. Nas semanas recentes, estão incompletos, porque as notificações chegam com atraso.
@@ -19,6 +23,8 @@
 **Classificador.** Modelo que prevê uma categoria (aqui: sobe, estável ou cai) em vez de um número. O LightGBM classificador é o modelo de tendência do painel.
 
 **Decisão balanceada (regra de decisão).** Forma de transformar as probabilidades de um classificador em uma tendência. A regra normal escolhe a tendência mais provável; como a maioria das semanas é estável, ela quase sempre escolhe "estável" com 1 semana de antecedência. A decisão balanceada compara cada probabilidade com a frequência daquela tendência no treino: uma chance de subida de 30%, quando só 17% das semanas sobem, conta mais que 60% de "estável", quando 67% das semanas são estáveis. Detecta muito mais subidas, mas com mais alarmes que não se confirmam. Não muda o modelo, só a regra aplicada às probabilidades.
+
+**Episódio (epidemia).** Sequência de pelo menos 2 semanas seguidas no nível vermelho (interrupções de 1 semana não separam o episódio). É a unidade usada para avaliar o alerta: quantas epidemias foram avisadas antes de começar e com quanta antecedência.
 
 **ERA5.** Reanálise climática do Copernicus (serviço europeu): uma reconstrução do clima passado, hora a hora, em uma grade de 0,25° (cerca de 28 km) que cobre todo o planeta, a partir de observações e modelos meteorológicos. O projeto usa temperatura, chuva e umidade do ERA5, obtidas pela API Open-Meteo.
 
@@ -34,15 +40,21 @@
 
 **LightGBM.** Algoritmo de aprendizado de máquina que combina muitas árvores de decisão pequenas, cada uma corrigindo os erros das anteriores (*gradient boosting*). Funciona bem com dados em tabela e capta relações não lineares.
 
+**Limiar pré-epidêmico e limiar epidêmico.** Os dois valores de casos por semana, calculados para cada município pelo MEM, que separam os níveis: abaixo do pré-epidêmico, verde; acima dele, amarelo (a temporada de transmissão começou); acima do epidêmico, vermelho. São recalculados a cada temporada com as temporadas anteriores.
+
 **Log loss e Brier.** Métricas que avaliam as probabilidades que um classificador dá a cada tendência, e não só a tendência escolhida. Um modelo que dá 80% de chance à tendência que de fato aconteceu é melhor que um que dá 40%, mesmo que os dois tenham escolhido a mesma. Quanto menor, melhor. Não dependem da regra de decisão.
 
 **LSTM.** Tipo de rede neural feito para sequências: lê a série semana a semana (aqui, as 12 últimas semanas de casos e clima) e aprende sozinho quais semanas passadas importam. Foi comparado com o LightGBM e não o superou.
+
+**MEM (*Moving Epidemic Method*).** Método estatístico para calcular, com o histórico de cada local, os limiares que indicam o início de uma epidemia e a sua intensidade. Usado pelo InfoDengue e adotado pelo projeto para definir os níveis verde, amarelo e vermelho.
 
 **MLP (perceptron multicamadas).** Rede neural "comum", com camadas de neurônios ligadas em sequência, que recebe as mesmas variáveis do LightGBM. Foi comparada com o LightGBM e não o superou.
 
 **Município de treino.** Um dos 100 municípios cujos dados são usados para treinar os modelos.
 
 **Município de validação.** Um dos 15 municípios que nunca entram no treino nem em nenhuma escolha do projeto. Servem para medir se o modelo funciona em municípios que não viu.
+
+**Níveis (verde, amarelo e vermelho).** Faixas de incidência de cada semana, definidas pelos limiares do MEM do município. O modelo do projeto prevê o nível das próximas semanas; o alerta de mobilização avisa a entrada no vermelho.
 
 **Nowcast.** Técnica que estima o **presente** corrigindo o atraso das notificações. Um caso de dengue desta semana pode só entrar no sistema duas ou três semanas depois; por isso, os casos notificados das semanas recentes parecem menores do que são. O *nowcast* do InfoDengue estima quantos casos cada semana recente terá quando todas as notificações chegarem, com uma margem de incerteza (o intervalo do nowcast). Não é uma previsão do futuro: o futuro é o papel do modelo do projeto. Em 39 dos 115 municípios o InfoDengue não publica o nowcast nas semanas recentes; nesses, o painel parte da última semana completa.
 
