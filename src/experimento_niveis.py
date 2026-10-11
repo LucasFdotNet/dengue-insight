@@ -6,7 +6,9 @@ anos anteriores:
   A: amarelo a partir do percentil 75, vermelho a partir do 90;
   B: amarelo do percentil 80 ao 97 (faixa em torno do 90), vermelho a partir do 97;
   C: canal endêmico do Ministério da Saúde: amarelo acima da mediana e vermelho acima do Q3 dos
-     casos da mesma semana epidemiológica nos 5 anos anteriores.
+     casos da mesma semana epidemiológica nos 5 anos anteriores;
+  D: MEM, como o InfoDengue (src/mem.py): amarelo a partir do limiar pré-epidêmico e vermelho a
+     partir do limiar epidêmico, recalculados a cada temporada com as temporadas anteriores.
 
 Previsões: como em experimento_estados.py (walk-forward com retreino trimestral desde 2015,
 validação cruzada por município e validação final), com o modelo de src/modelos/nivel_lightgbm.py.
@@ -66,6 +68,7 @@ ARQUIVO_EPISODIOS = 'reports/niveis_episodios.csv'
 ARQUIVO_CORTES = 'reports/niveis_cortes.csv'
 # Exemplos para os quadradinhos: um município de treino e um de validação, com epidemias recentes
 EXEMPLOS = [(c, '2023-07-01', '2025-07-01') for c in ('campinas', 'sorocaba', 'fortaleza', 'blumenau')]
+VARIANTES_QUADRADINHOS = ['B', 'C', 'D']
 
 # Cores (paleta de status do guia de visualização; sempre com legenda em texto)
 COR_NIVEL = {0: '#0ca30c', 1: '#fab219', 2: '#d03b3b'}
@@ -376,7 +379,7 @@ def run_experimento(processos=PROCESSOS, resumo=False):
                                 **metricas_semana(g['nivel_futuro'], prev, g['faixa'])})
         linhas_ep, alertas = episodios_vermelho(t, variante)
         episodios_ += linhas_ep
-        for cidade, inicio, fim_ex in EXEMPLOS:
+        for cidade, inicio, fim_ex in (EXEMPLOS if variante in VARIANTES_QUADRADINHOS else []):
             logging.info(f"Figura: {grafico_quadradinhos(t, alertas, variante, cidade, inicio, fim_ex)}")
 
     semanas = pd.DataFrame(semanas)

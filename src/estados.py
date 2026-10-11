@@ -60,11 +60,16 @@ def limiares(df, percentil=PERCENTIL_ALTO, minimo=MIN_CASOS_ALTO):
 #      e Zika, 2025, seção 5; ver docs/referencias.md): para cada semana epidemiológica, a mediana e o
 #      terceiro quartil (Q3) dos casos da mesma semana nos 5 anos anteriores; amarelo acima da
 #      mediana (faixa de "mobilização" do plano) e vermelho acima do Q3 ("alerta").
-VARIANTES_NIVEIS = {'A': ('percentis', 0.75, 0.90), 'B': ('percentis', 0.80, 0.97), 'C': ('canal',)}
+#   D: MEM (Moving Epidemic Method), como o InfoDengue calcula (src/mem.py): amarelo a partir do
+#      limiar pré-epidêmico e vermelho a partir do limiar epidêmico, recalculados a cada temporada
+#      (semana 41 à 40) com as temporadas anteriores, sobre a incidência por 100 mil habitantes
+#      (população do Censo 2022), com os mínimos de 5 e 10 casos do InfoDengue.
+VARIANTES_NIVEIS = {'A': ('percentis', 0.75, 0.90), 'B': ('percentis', 0.80, 0.97), 'C': ('canal',), 'D': ('mem',)}
 DESCRICAO_VARIANTES = {
     'A': 'percentis: amarelo ≥ p75, vermelho ≥ p90',
     'B': 'percentis: amarelo ≥ p80, vermelho ≥ p97',
     'C': 'canal endêmico (MS): amarelo > mediana, vermelho > Q3 dos 5 anos anteriores',
+    'D': 'MEM (como o InfoDengue): amarelo ≥ limiar pré-epidêmico, vermelho ≥ limiar epidêmico',
 }
 MIN_CASOS_AMARELO = 5
 NOMES_NIVEIS = ['verde', 'amarelo', 'vermelho']
@@ -97,6 +102,31 @@ def canal_endemico(df):
     return pd.concat(linhas, ignore_index=True)
 
 
+def limiares_mem_por_temporada(df):
+    """Limiares MEM (em casos) de cada município e temporada, calculados com as temporadas anteriores.
+
+    Temporada = semana 41 de um ano à 40 do seguinte, identificada pelo ano de início. As
+    temporadas anteriores a 2014-2015 (a que contém o início da avaliação, 2015) usam as de
+    2010-2011 a 2013-2014, como em limiares().
+    """
+    from src.cidades import CIDADES
+    from src.mem import SEMANA_INICIO_TEMPORADA, limiares_mem, temporadas_do_municipio
+
+    linhas = []
+    for cidade, g in df.groupby('cidade'):
+        g = g.sort_values('SE')
+        pop = CIDADES[cidade]['populacao']
+        incidencia = g['casos_est'].to_numpy() * 1e5 / pop
+        se = g['SE'].to_numpy()
+        inicio = np.where(se % 100 >= SEMANA_INICIO_TEMPORADA, se // 100, se // 100 - 1)
+        for temporada in np.unique(inicio):
+            ate = max(temporada, PRIMEIRO_ANO_TESTE - 1)
+            pre, epi = limiares_mem(list(temporadas_do_municipio(se, incidencia, ate_temporada=ate).values()))
+            linhas.append({'cidade': cidade, 'temporada': temporada,
+                           'mem_pre': pre * pop / 1e5, 'mem_epi': epi * pop / 1e5})
+    return pd.DataFrame(linhas)
+
+
 def adicionar_niveis(df, variante):
     """Acrescenta limiar_amarelo, limiar_vermelho, faixa (0 verde, 1 amarelo, 2 vermelho), faixa_h1 a faixa_h4 e as
     distâncias aos limiares. "faixa", e não "nivel", porque nivel é o alerta do InfoDengue nos dados."""
@@ -108,6 +138,14 @@ def adicionar_niveis(df, variante):
             df = df.merge(limiares(df, p, minimo).rename(columns={'limiar': f'limiar_{nome}'}), on=['cidade', 'ano'],
                           how='left')
         df = df.drop(columns='ano')
+        acima = {'amarelo': df['casos_est'] >= df['limiar_amarelo'], 'vermelho': df['casos_est'] >= df['limiar_vermelho']}
+    elif metodo[0] == 'mem':
+        from src.mem import SEMANA_INICIO_TEMPORADA
+        se = df['SE']
+        df['temporada'] = np.where(se % 100 >= SEMANA_INICIO_TEMPORADA, se // 100, se // 100 - 1)
+        df = df.merge(limiares_mem_por_temporada(df), on=['cidade', 'temporada'], how='left').drop(columns='temporada')
+        df['limiar_amarelo'] = np.maximum(df['mem_pre'], MIN_CASOS_AMARELO)
+        df['limiar_vermelho'] = np.maximum(df['mem_epi'], MIN_CASOS_ALTO)
         acima = {'amarelo': df['casos_est'] >= df['limiar_amarelo'], 'vermelho': df['casos_est'] >= df['limiar_vermelho']}
     else:
         df['ano'], df['semana'] = df['SE'] // 100, np.minimum(df['SE'] % 100, 52)
