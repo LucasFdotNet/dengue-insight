@@ -19,7 +19,7 @@ Este arquivo lista as fontes que o projeto usa e diz, para cada uma, **o que o p
 
 **BASTOS, L. S.; ECONOMOU, T.; GOMES, M. F. C.; VILLELA, D. A. M. et al.** A modelling approach for correcting reporting delays in disease surveillance data. *Statistics in Medicine*, v. 38, n. 22, p. 4363-4377, 2019. Disponível em: <https://doi.org/10.1002/sim.8303>.
 
-* Explica o *nowcasting*: estimar quantos casos uma semana recente ainda vai receber quando as notificações atrasadas chegarem. É o motivo de descartar as 10 semanas mais recentes do treino e da avaliação (`SEMANAS_INSTAVEIS` em `src/train.py`; decisão 3; seção 2) e de as previsões partirem da última semana completa nos municípios sem *nowcast* (`src/predict.py`).
+* Explica o *nowcasting*: estimar quantos casos uma semana recente ainda vai receber quando as notificações atrasadas chegarem. É o motivo de descartar as 10 semanas mais recentes do treino e da avaliação (`SEMANAS_INSTAVEIS` em `src/train.py`; decisão 3; seção 2) e de o painel partir do último nível confirmado, 2 semanas antes da semana atual (decisão 17); os municípios sem *nowcast* foram substituídos (decisão 1).
 
 **HERSBACH, H. et al.** The ERA5 global reanalysis. *Quarterly Journal of the Royal Meteorological Society*, v. 146, n. 730, p. 1999-2049, 2020. Disponível em: <https://doi.org/10.1002/qj.3803>.
 
@@ -159,13 +159,19 @@ Este arquivo lista as fontes que o projeto usa e diz, para cada uma, **o que o p
 
 **TUFTE, E. R.** *The visual display of quantitative information*. 2. ed. Cheshire: Graphics Press, 2001.
 
-* Princípios de painéis e gráficos que reduzem a carga de leitura. Orientam o desenho do painel (`app.py` e `painel/`; decisão 13).
+* Princípios de painéis e gráficos que reduzem a carga de leitura. Orientam o desenho do painel (`web/`; decisões 13 e 17).
 
 **STREAMLIT.** The fastest way to build and share data apps. 2026. Disponível em: <https://streamlit.io>. Acesso em: 18 set. 2026.
 
 **PLOTLY TECHNOLOGIES INC.** Collaborative data science. Montreal, QC: Plotly Technologies Inc., 2015. Disponível em: <https://plot.ly>. Acesso em: 18 set. 2026.
 
-* Ferramentas do painel web (Streamlit) e dos gráficos interativos (Plotly) (`app.py` e `painel/`; decisão 13).
+* Ferramentas do primeiro painel (Streamlit) e dos seus gráficos interativos (Plotly) (decisão 13); o painel foi refeito como site estático (decisão 17).
+
+**OBSERVABLE.** Observable Plot: the JavaScript library for exploratory data visualization. 2026. Disponível em: <https://observablehq.com/plot/>. Acesso em: 11 out. 2026.
+
+**VITE.** Vite: next generation frontend tooling. 2026. Disponível em: <https://vite.dev>. Acesso em: 11 out. 2026.
+
+* Gráficos e build do painel estático (`web/`; decisão 17).
 
 ---
 

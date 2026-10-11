@@ -46,7 +46,7 @@ export function graficoCasos(m: Municipio, semanas: number, log: boolean): Eleme
   const s = m.serie;
   const total = s.semana.length;
   const ini = Math.max(0, total - semanas);
-  const confirmadas = total - 2;
+  const confirmadas = total - m.lacuna;
   const sem = s.semana.slice(ini);
   const conf = pontos(sem.slice(0, confirmadas - ini), s.casos.slice(ini, confirmadas));
   // As semanas incompletas ligam-se à última confirmada para a linha não ficar solta

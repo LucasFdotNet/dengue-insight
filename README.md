@@ -44,11 +44,10 @@ São 115 municípios, listados em [`data/config/cidades.csv`](data/config/cidade
    * **Clima (`src/ingestion_clima.py`):** baixa temperatura, chuva e umidade diárias da reanálise ERA5 (Open-Meteo) e agrega por semana epidemiológica.
    * **Fotos dos dados (`src/snapshot.py`):** ao fim de cada ingestão, guarda uma cópia compactada dos dados baixados em `data/snapshots/AAAA-MM-DD/`, com um manifesto (linhas, primeira e última semana e SHA-256 de cada município). Os dados do InfoDengue mudam de uma coleta para outra; as fotos permitem reproduzir resultados antigos e medir essas mudanças (`src/revisao_dados.py`, decisão 3).
 2. **Pré-processamento (`src/preprocessing.py`):** une casos e clima por semana, interpola valores faltantes apenas entre valores conhecidos e calcula as variáveis do modelo.
-3. **Treinamento e avaliação (`src/train.py`):** treina os dois modelos de produção, cada um único para todos os municípios de treino e com uma versão por antecedência (1 a 4 semanas): o **LightGBM classificador com clima**, para a tendência, e o **LightGBM por quantis**, para o número de casos com intervalo de 80%. Avalia os dois com validação *walk-forward* com retreino mensal contra o baseline de persistência e salva os modelos usados pelo painel (cerca de 20 minutos).
+3. **Treinamento e avaliação (`src/train.py`):** treina os dois modelos de produção, cada um único para todos os municípios de treino e com uma versão por antecedência (1 a 4 semanas): o **LightGBM classificador com clima**, para a tendência, e o **LightGBM por quantis**, para o número de casos com intervalo de 80%. Avalia os dois com validação *walk-forward* com retreino mensal contra o baseline de persistência (cerca de 20 minutos). Os modelos usados pelo painel são treinados na exportação (item 6).
 4. **Análise exploratória (`src/eda.py`):** gera matrizes de correlação e gráficos de casos contra clima.
 5. **Pipeline completo (`src/pipeline_completo.py`):** refaz, na ordem, tudo o que depende dos dados (pré-processamento, modelos de produção, análise exploratória, experimentos, comparação entre fotos e os números do relatório em `reports/relatorio/`, por `src/numeros_relatorio.py`). Retoma de onde parou se for interrompido (decisão 14).
 6. **Painel estático (`web/`, decisão 17):** site sem servidor de aplicação, publicado no Cloudflare Pages. `src/exportar_painel.py` treina os modelos de produção de níveis e de casos e grava um JSON por município em `web/public/dados/`, carregado só quando o município é escolhido. Seções **Indicadores** (último nível confirmado, alerta, casos notificados até o momento, limiares, próximas semanas e gráfico de casos), **Avaliação** (quadradinhos e casos previstos no passado, e as métricas gerais com intervalos de confiança) e **Ajuda** (em construção).
-7. **Painel anterior (`app.py` e `painel/`, Streamlit; a ser removido):** aviso de uso acadêmico na entrada; seção **Indicadores**, com a tendência e os casos previstos para as próximas 4 semanas e o gráfico de projeções; seção **Detalhes do Modelo**, com a explicação dos modelos, a comparação com as alternativas, o mapa dos municípios e os dados de cada município.
 
 **Experimentos** (cada um grava seus resultados em `reports/`; detalhes na seção "Decisões de Projeto"):
 
@@ -71,12 +70,11 @@ São 115 municípios, listados em [`data/config/cidades.csv`](data/config/cidade
 
 ## 📦 Tecnologias e Pacotes Utilizados
 
-* **Linguagem:** Python 3 (testado com 3.14; o Streamlit Community Cloud aceita 3.12 ou mais recente)
+* **Linguagem:** Python 3 (testado com 3.14) no pipeline; TypeScript no painel
 * **Dados:** `pandas`, `numpy`, `requests`
 * **Modelagem:** `lightgbm`, `scikit-learn`, `statsmodels`, `scipy`, `joblib`
 * **Gráficos dos experimentos:** `matplotlib`, `seaborn`
 * **Painel estático (`web/`):** TypeScript, Vite e Observable Plot (Node.js 20 ou mais recente)
-* **Painel anterior:** `streamlit`, `plotly`
 
 As versões estão fixadas em `requirements.txt`. O experimento de classificadores (decisão 15) usa também `xgboost`, `torch` e `pyarrow`, em `requirements-experimentos.txt`; o painel não precisa deles.
 
@@ -109,8 +107,9 @@ As versões estão fixadas em `requirements.txt`. O experimento de classificador
    python -m src.preprocessing
    python -m src.train
    python -m src.eda
-   streamlit run app.py
    ```
+
+   Depois, o painel estático (abaixo).
 
    Os experimentos são opcionais e rodam da mesma forma, por exemplo `python -m src.experimento_modelos` (cerca de 45 minutos).
 
@@ -176,6 +175,12 @@ Estado atual das decisões, com os números da base atual (115 municípios, dado
 * **Viés de seleção (limitação):** escolher municípios pelo histórico de surtos faz o treino ter mais epidemias do que um município típico teria, e o modelo pode ficar mais propenso a prever subidas. Os municípios de validação foram escolhidos por outros critérios (tamanho e região), sem olhar os surtos, e continuam sendo o teste sem esse viés. Avaliações feitas dentro do conjunto de treino (como a validação cruzada por município) refletem esse conjunto com mais surtos que o normal.
 * **Validação (4 novos):** para chegar a 15, o maior município restante de cada macrorregião fora do Sudeste, numa UF que ainda não tinha município de validação, pelo mesmo critério da etapa 2: Manacapuru (AM), Vitória da Conquista (BA), Sinop (MT) e Blumenau (SC). Foram escolhidos antes dos municípios de treino da etapa 3, para que a seleção por surtos não interferisse neles.
 
+**Etapa 4: substituição dos municípios sem nowcast (12, em 11/10/2026)**
+* **Por quê:** nos municípios em que o InfoDengue não publica o *nowcast* (a estimativa que corrige o atraso das notificações), as semanas recentes têm só os casos já notificados e ficam bem mais incompletas (decisão 3). O painel teria de partir de uma semana mais antiga nesses municípios; para que todos tenham o mesmo tratamento, o grupo decidiu trocá-los. Eram 12, todos de treino: Balsas, Barreiras, Caxias do Sul, Dourados, Imperatriz, Itacoatiara, Itaperuna, Ji-Paraná, Lagarto, Luís Eduardo Magalhães, Rondonópolis e Santarém (sem intervalo de nowcast em nenhuma das últimas 10 semanas).
+* **Como:** os critérios por tamanho e por histórico de surtos das etapas 2 e 3 escolhiam, na prática, entre candidatos equivalentes, então os substitutos foram **sorteados** (semente fixa) entre os elegíveis da mesma UF: mais de 100 mil habitantes, não capital, a mais de 50 km da capital e de qualquer município da lista, e com nowcast. Quando a UF não tinha elegível, o sorteio foi na macrorregião: no Maranhão nenhum elegível tem nowcast; no Amazonas, em Rondônia e em Sergipe não há outro município elegível; no Rio de Janeiro, nenhum elegível tem nowcast. Script: `scripts/substituir_sem_nowcast.py`; elegíveis de cada vaga e o sorteado em `reports/substituicao_municipios.csv`.
+* **Resultado:** Pelotas (RS, no lugar de Caxias do Sul), Três Lagoas (MS, Dourados), Sorriso (MT, Rondonópolis), Marabá (PA, Santarém), Porto Seguro (BA, Barreiras), Alagoinhas (BA, Luís Eduardo Magalhães), Eunápolis (BA, Imperatriz), Patos (PB, Balsas), Santo Antônio de Jesus (BA, Lagarto), Cametá (PA, Itacoatiara), Abaetetuba (PA, Ji-Paraná) e Itanhaém (SP, Itaperuna). Municípios de treino por UF: Bahia de 6 para 8, Pará de 4 para 6, Paraíba de 2 para 3 e São Paulo de 21 para 22; Maranhão de 3 para 1, Amazonas, Rondônia e Sergipe de 2 para 1 e Rio de Janeiro de 7 para 6. A proporção à população (etapa 3) deixa de valer exatamente.
+* **Se um município perder o nowcast:** a exportação do painel avisa no log (`src/exportar_painel.py`), e o script pode ser rodado de novo.
+
 ### 2. Período dos dados
 
 * **Decisão:** séries semanais de 2010 até a semana mais recente.
@@ -187,7 +192,7 @@ Estado atual das decisões, com os números da base atual (115 municípios, dado
 * **Motivo:** o número de casos das semanas mais recentes ainda é uma estimativa (*nowcast*), revisada pelo InfoDengue à medida que chegam notificações atrasadas.
 * **Como chegamos a 10:** o InfoDengue informa um intervalo de incerteza do nowcast para cada semana. Contamos, em cada município de treino, quantas semanas finais ainda têm esse intervalo aberto, e adotamos o máximo. Foram 10 semanas nas três bases (SP, 74 e 115 municípios), em municípios como Cosmópolis, Indaiatuba, Manaus, Teresina, Varginha e Sobral. Municípios sem nowcast publicado, como Campinas, também têm a última semana visivelmente incompleta.
 * **Quanto os números mudam depois** (`src/revisao_dados.py`, `reports/revisao_dados.csv`): comparando a foto dos dados de 27/09/2026 com a de 09/10/2026, 12 dias depois, a soma dos casos estimados dos 115 municípios na semana mais recente subiu 45%, na anterior 18%, 3 semanas antes 5% e 5 semanas antes 2%; de 8 semanas para trás, menos de 1%. Nenhuma semana com mais de 1 ano mudou. O corte de 10 semanas cobre o período em que os números ainda mudam. Mesmo com o nowcast, a última semana ainda subestimava os casos. **Limitação:** é uma única comparação, de 12 dias; cada nova coleta acrescenta uma comparação ao arquivo.
-* **Ponto de partida das previsões:** 39 dos 115 municípios (entre eles Campinas, Belo Horizonte, Rio de Janeiro e Salvador) não têm nowcast publicado nas semanas recentes, então essas semanas têm só os casos já notificados e estão incompletas. Em 09/2026, em relação ao nível das semanas anteriores, a última semana desses municípios tinha 23% dos casos, a penúltima 63% e a antepenúltima 76%, contra 84%, 82% e 87% nos municípios com nowcast. Partir de uma semana incompleta fazia o modelo "ver" uma subida que era só o número voltando ao normal. Por isso, nesses municípios, as previsões do painel partem da **última semana completa** (a 4ª mais recente; `SEMANAS_INCOMPLETAS_SEM_NOWCAST` em `src/predict.py`), e o painel avisa isso. Os municípios não foram descartados: o treino usa só semanas antigas, já completas.
+* **Ponto de partida das previsões:** em 09/2026, 39 dos 115 municípios não tinham nowcast publicado nas semanas recentes, e essas semanas tinham só os casos já notificados (em relação ao nível das semanas anteriores, a última semana desses municípios tinha 23% dos casos, a penúltima 63% e a antepenúltima 76%, contra 84%, 82% e 87% nos municípios com nowcast). O primeiro painel partia, nesses municípios, da última semana completa (a 4ª mais recente). Em 10/2026, só 12 continuavam sem nowcast, e o grupo decidiu substituí-los (decisão 1, etapa 4), para que todos tenham o mesmo tratamento: o painel parte da semana atual menos 2 em todos os municípios (decisão 17).
 * **Detalhe técnico:** o corte é feito depois de descartar as semanas sem alvo, para que também saiam as semanas cujo alvo (H semanas à frente) cai no período instável. Ele fica no treino, e não no pré-processamento, porque o painel precisa mostrar as semanas recentes.
 
 ### 4. Fonte dos dados climáticos: Open-Meteo (ERA5)
@@ -338,7 +343,7 @@ Estado atual das decisões, com os números da base atual (115 municípios, dado
 * **Detalhes do Modelo**, em cinco abas: o modelo atual (o que é, o que usa, desempenho, importância das variáveis e limitações); a comparação com os 11 modelos alternativos (acerto balanceado com intervalos de confiança, evolução por antecedência, tabela completa e matrizes de confusão, com gráficos e tabelas para baixar); os municípios (mapa, contagem por região e por UF, lista com critérios); os dados do município selecionado (indicadores da última semana, histórico completo desde 2010 e acerto de tendência); e o glossário e o dicionário de dados (`docs/glossario.md`).
 * **Granularidade semanal:** todos os dados e previsões são por **semana epidemiológica**, a unidade em que o InfoDengue publica os casos e em que a vigilância trabalha.
 * **Previsões passadas:** vêm da validação *walk-forward* (decisão 6), em que cada semana foi prevista por modelos retreinados a cada mês só com os dados disponíveis até então; nunca do modelo em produção, que já viu essas semanas. As 10 semanas mais recentes não têm previsão passada (decisão 3).
-* **Código:** `app.py` (aviso de entrada e menu) e `painel/` (`indicadores.py`, `detalhes.py`, `dados.py`).
+* **Substituído pela decisão 17** (painel estático, 11/10/2026). O código do painel em Streamlit (`app.py`, `painel/`, `src/predict.py` e os modelos de tendência salvos em `models/`) foi removido; continua no histórico do git.
 
 ### 14. Robustez da ingestão e reprodutibilidade
 
@@ -460,7 +465,7 @@ Estado atual das decisões, com os números da base atual (115 municípios, dado
 
   O modelo erra de 25% a 31% menos que repetir os casos da última semana confirmada, e a faixa de 80% contém o valor real em 78% a 82% das semanas.
 * **Avaliação no painel:** quadradinhos e casos previstos de cada município, feitos como o painel os faria (2 semanas de atraso, modelos que não viram o município), e as tabelas gerais de mobilização, desmobilização, nível, casos e efeito do atraso, com intervalos de confiança. O acerto de cada município é calculado no navegador a partir das previsões exportadas.
-* **Em aberto:** a seção Ajuda (depende das definições restantes) e a remoção do painel anterior em Streamlit (`app.py`, `painel/`, `src/predict.py` e os modelos de tendência em `models/`).
+* **Em aberto:** a seção Ajuda, que depende das definições restantes. O painel anterior, em Streamlit, foi removido (decisão 13).
 
 ### Nota sobre os municípios de validação
 

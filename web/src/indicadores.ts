@@ -17,17 +17,18 @@ function cardConfirmado(m: Municipio): HTMLElement {
     el('div', { class: 'destaque' }, seloNivel(c.nivel)),
     el('p', { class: 'valor' }, `${n(c.casos)} casos`),
     el('p', {}, `Semana de ${periodoSemana(c.semana)} (${se(c.se)}).`),
-    el('p', { class: 'nota' }, 'As 2 semanas seguintes ainda estão recebendo notificações; o nível só é confirmado depois disso.'));
+    el('p', { class: 'nota' }, `As ${m.lacuna} semanas seguintes ainda estão recebendo notificações; o nível só é ` +
+      'confirmado depois disso.'));
 }
 
 function cardAlerta(m: Municipio, av: AvaliacaoGeral): HTMLElement {
   const a = m.alerta;
   const ate = m.previsoes[m.previsoes.length - 1].semana;
-  const corretos = metrica(av, 'mobilizacao', 'validacao_cruzada', 2, 'Modelo: alerta de vermelho', 'alarmes_corretos');
-  const antes = metrica(av, 'mobilizacao', 'validacao_cruzada', 2, 'Modelo: alerta de vermelho', 'avisadas_antes_dos_dados');
-  const fins = metrica(av, 'desmobilizacao', 'validacao_cruzada', 2, 'Modelo: nível previsto em S+2 deixa o vermelho',
+  const corretos = metrica(av, 'mobilizacao', 'validacao_cruzada', m.lacuna, 'Modelo: alerta de vermelho', 'alarmes_corretos');
+  const antes = metrica(av, 'mobilizacao', 'validacao_cruzada', m.lacuna, 'Modelo: alerta de vermelho', 'avisadas_antes_dos_dados');
+  const fins = metrica(av, 'desmobilizacao', 'validacao_cruzada', m.lacuna, 'Modelo: nível previsto em S+2 deixa o vermelho',
     'fins_indicados_antes_dos_dados');
-  const prematuros = metrica(av, 'desmobilizacao', 'validacao_cruzada', 2,
+  const prematuros = metrica(av, 'desmobilizacao', 'validacao_cruzada', m.lacuna,
     'Modelo: nível previsto em S+2 deixa o vermelho', 'avisos_prematuros_por_episodio');
   const confianca = (texto: string) => el('p', { class: 'nota' }, texto);
   switch (a.estado) {
@@ -63,14 +64,17 @@ function cardAlerta(m: Municipio, av: AvaliacaoGeral): HTMLElement {
 
 function cardNotificados(m: Municipio): HTMLElement {
   const atual = m.recentes[m.recentes.length - 1];
-  const anterior = m.recentes.length > 1 ? m.recentes[0] : null;
+  const anteriores = m.recentes.slice(0, -1).reverse();
+  const estimativa = (r: (typeof m.recentes)[number]) => (m.tem_nowcast ? `; estimativa de ${n(r.estimados)}` : '');
   return card('Casos notificados até o momento', 'notificados',
     el('p', { class: 'valor' }, n(atual.notificados)),
     el('p', {}, `Semana de ${periodoSemana(atual.semana)} (${se(atual.se)}), ainda incompleta.`),
-    el('p', {}, `Estimativa do InfoDengue, que corrige o atraso das notificações: ${n(atual.estimados)} ` +
-      `(entre ${n(atual.estimados_min)} e ${n(atual.estimados_max)}).`),
-    anterior && el('p', {}, `Semana anterior (${diaMes(anterior.semana)}): ${n(anterior.notificados)} notificados; ` +
-      `estimativa de ${n(anterior.estimados)}.`),
+    m.tem_nowcast
+      ? el('p', {}, `Estimativa do InfoDengue, que corrige o atraso das notificações: ${n(atual.estimados)} ` +
+        `(entre ${n(atual.estimados_min)} e ${n(atual.estimados_max)}).`)
+      : el('p', {}, 'O InfoDengue não publica estimativa que corrija o atraso das notificações (nowcast) para este ' +
+        `município; por isso, o nível confirmado é o de ${m.lacuna} semanas atrás.`),
+    ...anteriores.map((r) => el('p', {}, `Semana de ${diaMes(r.semana)}: ${n(r.notificados)} notificados${estimativa(r)}.`)),
     el('p', { class: 'nota cuidado' }, 'Provavelmente subnotificado: as notificações de uma semana continuam chegando ' +
       'por várias semanas. Para a semana mais recente, o número de notificados pode mais que dobrar.'));
 }

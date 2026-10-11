@@ -3,15 +3,16 @@ Exporta os dados do painel estático (web/) em JSON: um arquivo por município, 
 avaliação geral.
 
 O painel parte do último nível confirmado: as 2 semanas mais recentes ainda estão incompletas
-(reports/revisao_dados.csv), então a semana confirmada é a antepenúltima (C = atual - 2). A
-partir dela, os modelos de produção preveem a semana atual e as 4 seguintes (2 a 6 semanas à
-frente de C), como avaliado com dados atrasados (decisão 16; experimento_niveis_robustez.py e
-experimento_casos_atraso.py):
+(reports/revisao_dados.csv), então a semana confirmada é a atual - 2. Todos os municípios têm o
+nowcast do InfoDengue (os que não tinham foram substituídos, decisão 1); se algum o perder numa
+atualização, a exportação avisa no log. A partir da semana confirmada, os modelos de produção
+preveem a semana atual e as 4 seguintes (2 a 6 semanas à frente), como avaliado com dados
+atrasados (decisões 16 e 17; experimento_niveis_robustez.py e experimento_casos_atraso.py):
   - níveis: NivelLightGBM (verde, amarelo, vermelho pelos limiares do MEM), nível mais provável;
   - casos aproximados: LightGBMQuantis (mediana e faixa de 80%);
   - alerta de mobilização (se o nível confirmado não é vermelho): maior probabilidade de
-    vermelho de 2 a 4 semanas à frente da semana atual acima do corte mais recente
-    (reports/niveis_robustez_cortes.csv, lacuna 2);
+    vermelho de 2 a 4 semanas à frente da semana atual acima do corte mais recente escolhido
+    com 2 semanas de atraso (reports/niveis_robustez_cortes.csv);
   - desmobilização (se o nível confirmado é vermelho): o nível mais provável 2 semanas à frente
     da semana atual deixa de ser vermelho.
 Os modelos de produção são treinados aqui com os municípios de treino e todos os dados até as
@@ -22,7 +23,7 @@ modo do painel (2 semanas de atraso): níveis (caches de experimento_niveis e
 experimento_niveis_robustez) e casos (cache de experimento_casos_atraso).
 
 Saídas (web/public/dados/):
-  indice.json             municípios, semanas de referência e situação de cada um
+  indice.json             municípios, semana atual, cortes do alerta e situação de cada município
   avaliacao.json          métricas gerais (níveis, alerta, desmobilização, casos), com IC 95%
   municipios/<chave>.json série semanal, situação atual, previsões e avaliação do município
 
@@ -51,13 +52,12 @@ from src.train import HORIZONTES, SEMANAS_INSTAVEIS, linhas_validas
 
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
 
-LACUNA = 2                      # semanas incompletas: a confirmada é a atual - 2
+LACUNA = 2  # semanas incompletas: a confirmada é a atual - 2
 ANTECEDENCIAS = [0, 1, 2, 3, 4]  # a partir da semana atual
 HORIZONTES_PAINEL = [a + LACUNA for a in ANTECEDENCIAS]  # a partir da semana confirmada
 ANTECEDENCIAS_ALERTA = [2, 3, 4]
 INICIO_SERIE = '2015-01-01'
 PASTA_SAIDA = 'web/public/dados'
-NOMES_NIVEIS = ['verde', 'amarelo', 'vermelho']
 
 
 # --------------------------------------------------------------- utilidades
@@ -91,6 +91,12 @@ def temporada_de(se):
     return se // 100 if se % 100 >= SEMANA_INICIO_TEMPORADA else se // 100 - 1
 
 
+def tem_nowcast(g):
+    """True se o InfoDengue publicou intervalo de nowcast em alguma das semanas recentes."""
+    recentes = g.dropna(subset=['casos_est']).tail(SEMANAS_INSTAVEIS)
+    return bool(((recentes['casos_est_max'] - recentes['casos_est_min']) > 0).any())
+
+
 # --------------------------------------------------------------- modelos de produção
 
 def treinar_producao(treino):
@@ -101,11 +107,13 @@ def treinar_producao(treino):
         niveis[h] = NivelLightGBM().treinar(tn, h)
         tc = tr[tr[f'target_h{h}'].notna()]
         casos[h] = LightGBMQuantis().treinar(tc, h)
-        logging.info(f"Produção H+{h}: níveis com {len(tn)} semanas, casos com {len(tc)} (até {tc['data_iniSE'].max():%d/%m/%Y}).")
+        logging.info(f"Produção H+{h}: níveis com {len(tn)} semanas, casos com {len(tc)} "
+                     f"(até {tc['data_iniSE'].max():%d/%m/%Y}).")
     return niveis, casos
 
 
 def corte_alerta_atual():
+    """Corte do alerta mais recente escolhido com 2 semanas de atraso: (corte, trimestre)."""
     c = pd.read_csv(enr.ARQUIVO_CORTES)
     c = c[(c['lacuna'] == LACUNA) & c['corte_alerta'].notna()].sort_values('trimestre')
     return float(c['corte_alerta'].iloc[-1]), c['trimestre'].iloc[-1]
@@ -129,7 +137,6 @@ def limiares_temporadas(g, temporadas):
 
 def situacao_atual(g, niveis, casos, corte):
     """Nível confirmado, semanas incompletas, previsões e alerta de um município (g ordenado por semana)."""
-    g = g[g['casos_est'].notna()]
     atual, confirmada = g.iloc[-1], g.iloc[-1 - LACUNA]
     linha_c = g.iloc[[-1 - LACUNA]]
     previsoes = []
@@ -159,6 +166,7 @@ def situacao_atual(g, niveis, casos, corte):
                  'estimados_max': limpo(r['casos_est_max'], 0)} for _, r in g.iloc[-LACUNA:].iterrows()]
     return {
         'semana_atual': limpo(atual['data_iniSE']), 'se_atual': int(atual['SE']),
+        'tem_nowcast': tem_nowcast(g), 'lacuna': LACUNA,
         'confirmada': {'semana': limpo(confirmada['data_iniSE']), 'se': int(confirmada['SE']),
                        'casos': limpo(confirmada['casos_est'], 0), 'notificados': limpo(confirmada['casos'], 0),
                        'nivel': limpo(confirmada['faixa'])},
@@ -172,7 +180,7 @@ def situacao_atual(g, niveis, casos, corte):
 # --------------------------------------------------------------- avaliação
 
 def niveis_fora_da_amostra(id_):
-    """Nível previsto para cada semana-alvo, com antecedência a partir da semana de consulta (2 semanas de atraso)."""
+    """Nível previsto para cada semana-alvo, com antecedência a partir da semana de consulta."""
     p = enr.rodar_previsoes(id_, en.PROCESSOS)
     p = p[p['h'].isin(HORIZONTES_PAINEL)].copy()
     p['antecedencia'] = p['h'] - LACUNA
@@ -182,8 +190,7 @@ def niveis_fora_da_amostra(id_):
 
 
 def casos_fora_da_amostra(id_):
-    p = eca.previsoes(id_)
-    p = p[p['antecedencia'].isin(ANTECEDENCIAS)]
+    p = eca.previsoes(id_, lacuna=LACUNA)
     return p.pivot_table(index=['cidade', 'data_alvo'], columns='antecedencia',
                          values=['previsto', 'inferior', 'superior'])
 
@@ -210,6 +217,12 @@ def run_exportacao():
     corte, trimestre_corte = corte_alerta_atual()
     niveis_oos, casos_oos = niveis_fora_da_amostra(id_), casos_fora_da_amostra(id_)
     base = pd.concat([treino, validacao], ignore_index=True).sort_values(['cidade', 'data_iniSE'])
+    # Recomeça a pasta dos municípios: quem saiu da lista (decisão 1) não deve continuar publicado
+    pasta_municipios = os.path.join(PASTA_SAIDA, 'municipios')
+    if os.path.isdir(pasta_municipios):
+        for arquivo in os.listdir(pasta_municipios):
+            if arquivo.endswith('.json'):
+                os.remove(os.path.join(pasta_municipios, arquivo))
 
     indice = []
     for cidade, g in base.groupby('cidade', sort=True):
@@ -229,7 +242,8 @@ def run_exportacao():
             'populacao': int(info['populacao']), **atual,
             'serie': {'semana': lista(semanas), 'se': lista(s['SE']), 'casos': lista(s['casos_est'], 0),
                       'notificados': lista(s['casos'], 0), 'nivel': lista(s['faixa']),
-                      'limiar_amarelo': lista(s['limiar_amarelo'], 0), 'limiar_vermelho': lista(s['limiar_vermelho'], 0)},
+                      'limiar_amarelo': lista(s['limiar_amarelo'], 0),
+                      'limiar_vermelho': lista(s['limiar_vermelho'], 0)},
             'avaliacao': avaliacao,
         }
         # As semanas incompletas não têm nível confirmado
@@ -237,15 +251,19 @@ def run_exportacao():
         dados['serie']['nivel'] = dados['serie']['nivel'][:corte_serie] + [None] * LACUNA
         gravar(os.path.join(PASTA_SAIDA, 'municipios', f'{cidade}.json'), dados)
         indice.append({'id': cidade, 'nome': info['nome'], 'uf': info['uf'], 'papel': info['papel'],
-                       'nivel_confirmado': atual['confirmada']['nivel'], 'alerta': atual['alerta']['estado']})
+                       'nivel_confirmado': atual['confirmada']['nivel'], 'alerta': atual['alerta']['estado'],
+                       'tem_nowcast': atual['tem_nowcast']})
 
     semana_atual = base['data_iniSE'].max()
     gravar(os.path.join(PASTA_SAIDA, 'indice.json'), {
         'gerado_em': datetime.datetime.now().strftime('%Y-%m-%d %H:%M'), 'versao_dados': id_[:12],
-        'semana_atual': limpo(semana_atual), 'semana_confirmada': limpo(semana_atual - pd.Timedelta(weeks=LACUNA)),
-        'semanas_instaveis_treino': SEMANAS_INSTAVEIS, 'lacuna': LACUNA,
-        'corte_alerta': corte, 'trimestre_corte': trimestre_corte, 'municipios': indice})
+        'semana_atual': limpo(semana_atual), 'semanas_instaveis_treino': SEMANAS_INSTAVEIS,
+        'lacuna': LACUNA, 'corte_alerta': corte, 'trimestre_corte': trimestre_corte, 'municipios': indice})
     gravar(os.path.join(PASTA_SAIDA, 'avaliacao.json'), avaliacao_geral())
+    sem = [m['nome'] for m in indice if not m['tem_nowcast']]
+    if sem:
+        logging.warning(f"Sem nowcast do InfoDengue ({len(sem)}): {', '.join(sem)}. As semanas recentes desses "
+                        "municípios estão mais incompletas; substituí-los (scripts/substituir_sem_nowcast.py).")
     logging.info(f"Painel exportado em {PASTA_SAIDA}: {len(indice)} municípios, semana atual {semana_atual:%d/%m/%Y}.")
 
 

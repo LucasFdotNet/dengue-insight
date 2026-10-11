@@ -39,37 +39,26 @@ curitiba,4106902,Curitiba,PR,-25.4195,-49.2646,treino,1773718,Treino nacional: c
 porto_alegre,4314902,Porto Alegre,RS,-30.0318,-51.2065,treino,1332845,Treino nacional: capital da UF
 florianopolis,4205407,Florianópolis,SC,-27.5945,-48.5477,treino,537211,Treino nacional: capital da UF
 anapolis,5201108,Anápolis,GO,-16.3281,-48.953,treino,398869,Treino nacional: maior município não capital da UF com >100 mil hab. a >50 km da capital
-dourados,5003702,Dourados,MS,-22.2231,-54.812,treino,243367,Treino nacional: maior município não capital da UF com >100 mil hab. a >50 km da capital
-rondonopolis,5107602,Rondonópolis,MT,-16.4673,-54.6372,treino,244911,Treino nacional: maior município não capital da UF com >100 mil hab. a >50 km da capital
 arapiraca,2700300,Arapiraca,AL,-9.7549,-36.6615,treino,234696,Treino nacional: maior município não capital da UF com >100 mil hab. a >50 km da capital
 feira_de_santana,2910800,Feira de Santana,BA,-12.2664,-38.9663,treino,616272,Treino nacional: maior município não capital da UF com >100 mil hab. a >50 km da capital
 juazeiro_do_norte,2307304,Juazeiro do Norte,CE,-7.1962,-39.3076,treino,286120,Treino nacional: maior município não capital da UF com >100 mil hab. a >50 km da capital
-imperatriz,2105302,Imperatriz,MA,-5.5185,-47.4777,treino,273110,Treino nacional: maior município não capital da UF com >100 mil hab. a >50 km da capital
 campina_grande,2504009,Campina Grande,PB,-7.222,-35.8731,treino,419379,Treino nacional: maior município não capital da UF com >100 mil hab. a >50 km da capital
 petrolina,2611101,Petrolina,PE,-9.3887,-40.5027,treino,386791,Treino nacional: maior município não capital da UF com >100 mil hab. a >50 km da capital
 parnaiba,2207702,Parnaíba,PI,-2.9059,-41.7754,treino,162159,Treino nacional: maior município não capital da UF com >100 mil hab. a >50 km da capital
 mossoro,2408003,Mossoró,RN,-5.1837,-37.3474,treino,264577,Treino nacional: maior município não capital da UF com >100 mil hab. a >50 km da capital
-lagarto,2803500,Lagarto,SE,-10.9136,-37.6689,treino,101579,Treino nacional: maior município não capital da UF com >100 mil hab. a >50 km da capital
-itacoatiara,1301902,Itacoatiara,AM,-3.1386,-58.4449,treino,103598,Treino nacional: maior município não capital da UF com >100 mil hab. a >50 km da capital
-santarem,1506807,Santarém,PA,-2.4385,-54.6996,treino,331942,Treino nacional: maior município não capital da UF com >100 mil hab. a >50 km da capital
-ji_parana,1100122,Ji-Paraná,RO,-10.8777,-61.9322,treino,124333,Treino nacional: maior município não capital da UF com >100 mil hab. a >50 km da capital
 araguaina,1702109,Araguaína,TO,-7.1924,-48.2044,treino,171301,Treino nacional: maior município não capital da UF com >100 mil hab. a >50 km da capital
 cachoeiro_de_itapemirim,3201209,Cachoeiro de Itapemirim,ES,-20.8462,-41.1198,treino,185786,Treino nacional: maior município não capital da UF com >100 mil hab. a >50 km da capital
 uberlandia,3170206,Uberlândia,MG,-18.9141,-48.2749,treino,713224,Treino nacional: maior município não capital da UF com >100 mil hab. a >50 km da capital
 campos_dos_goytacazes,3301009,Campos dos Goytacazes,RJ,-21.7622,-41.3181,treino,483540,Treino nacional: maior município não capital da UF com >100 mil hab. a >50 km da capital
 londrina,4113700,Londrina,PR,-23.304,-51.1691,treino,555965,Treino nacional: maior município não capital da UF com >100 mil hab. a >50 km da capital
-caxias_do_sul,4305108,Caxias do Sul,RS,-29.1629,-51.1792,treino,463501,Treino nacional: maior município não capital da UF com >100 mil hab. a >50 km da capital
 joinville,4209102,Joinville,SC,-26.3045,-48.8487,treino,616317,Treino nacional: maior município não capital da UF com >100 mil hab. a >50 km da capital
 juiz_de_fora,3136702,Juiz de Fora,MG,-21.7595,-43.3398,treino,540756,Treino nacional: maior município restante do país pelo mesmo critério (completa 50 cidades)
 montes_claros,3143302,Montes Claros,MG,-16.7282,-43.8578,treino,414240,Treino nacional: maior município restante do país pelo mesmo critério (completa 50 cidades)
 itabuna,2914802,Itabuna,BA,-14.7876,-39.2781,treino,186708,"Treino nacional: histórico de surtos na UF (incidência média anual de 1.751 casos/100 mil, 2010-2025)"
-luis_eduardo_magalhaes,2919553,Luís Eduardo Magalhães,BA,-12.0956,-45.7866,treino,107909,"Treino nacional: histórico de surtos na UF (incidência média anual de 1.448 casos/100 mil, 2010-2025)"
 teixeira_de_freitas,2931350,Teixeira de Freitas,BA,-17.5399,-39.74,treino,145216,"Treino nacional: histórico de surtos na UF (incidência média anual de 1.019 casos/100 mil, 2010-2025)"
-barreiras,2903201,Barreiras,BA,-12.1439,-44.9968,treino,159734,"Treino nacional: histórico de surtos na UF (incidência média anual de 954 casos/100 mil, 2010-2025)"
 sobral,2312908,Sobral,CE,-3.6891,-40.3482,treino,203023,"Treino nacional: histórico de surtos na UF (incidência média anual de 665 casos/100 mil, 2010-2025)"
 itapipoca,2306405,Itapipoca,CE,-3.4993,-39.5836,treino,131123,"Treino nacional: histórico de surtos na UF (incidência média anual de 578 casos/100 mil, 2010-2025)"
 jatai,5211909,Jataí,GO,-17.8784,-51.7204,treino,105729,"Treino nacional: histórico de surtos na UF (incidência média anual de 4.193 casos/100 mil, 2010-2025)"
-balsas,2101400,Balsas,MA,-7.5321,-46.0372,treino,101767,"Treino nacional: histórico de surtos na UF (incidência média anual de 538 casos/100 mil, 2010-2025)"
 varginha,3170701,Varginha,MG,-21.5556,-45.4364,treino,136467,"Treino nacional: histórico de surtos na UF (incidência média anual de 4.081 casos/100 mil, 2010-2025)"
 itabira,3131703,Itabira,MG,-19.6239,-43.2312,treino,113343,"Treino nacional: histórico de surtos na UF (incidência média anual de 3.226 casos/100 mil, 2010-2025)"
 passos,3147907,Passos,MG,-20.7193,-46.609,treino,111939,"Treino nacional: histórico de surtos na UF (incidência média anual de 2.934 casos/100 mil, 2010-2025)"
@@ -84,7 +73,6 @@ umuarama,4128104,Umuarama,PR,-23.7656,-53.3201,treino,117095,"Treino nacional: h
 cascavel,4104808,Cascavel,PR,-24.9573,-53.459,treino,348051,"Treino nacional: histórico de surtos na UF (incidência média anual de 2.025 casos/100 mil, 2010-2025)"
 resende,3304201,Resende,RJ,-22.4705,-44.4509,treino,129612,"Treino nacional: histórico de surtos na UF (incidência média anual de 2.677 casos/100 mil, 2010-2025)"
 angra_dos_reis,3300100,Angra dos Reis,RJ,-23.0011,-44.3196,treino,167434,"Treino nacional: histórico de surtos na UF (incidência média anual de 1.776 casos/100 mil, 2010-2025)"
-itaperuna,3302205,Itaperuna,RJ,-21.1997,-41.8799,treino,101041,"Treino nacional: histórico de surtos na UF (incidência média anual de 1.711 casos/100 mil, 2010-2025)"
 nova_friburgo,3303401,Nova Friburgo,RJ,-22.2932,-42.5377,treino,189939,"Treino nacional: histórico de surtos na UF (incidência média anual de 1.082 casos/100 mil, 2010-2025)"
 rio_das_ostras,3304524,Rio das Ostras,RJ,-22.5174,-41.9475,treino,156491,"Treino nacional: histórico de surtos na UF (incidência média anual de 1.002 casos/100 mil, 2010-2025)"
 santa_cruz_do_sul,4316808,Santa Cruz do Sul,RS,-29.722,-52.4343,treino,133230,"Treino nacional: histórico de surtos na UF (incidência média anual de 1.179 casos/100 mil, 2010-2025)"
@@ -114,3 +102,15 @@ vitoria_da_conquista,2933307,Vitória da Conquista,BA,-14.8615,-40.8442,validaca
 blumenau,4202404,Blumenau,SC,-26.9155,-49.0709,validacao,361261,"Validação espacial nacional: maior município restante da macrorregião em UF ainda sem município de validação (>100 mil hab., >50 km da capital)"
 sinop,5107909,Sinop,MT,-11.8604,-55.5091,validacao,196312,"Validação espacial nacional: maior município restante da macrorregião em UF ainda sem município de validação (>100 mil hab., >50 km da capital)"
 manacapuru,1302504,Manacapuru,AM,-3.2907,-60.6216,validacao,101883,"Validação espacial nacional: maior município restante da macrorregião em UF ainda sem município de validação (>100 mil hab., >50 km da capital)"
+patos,2510808,Patos,PB,-7.01743,-37.2747,treino,103165,"Treino nacional: sorteado entre os elegíveis da macrorregião Nordeste (sem elegível na UF) com nowcast (>100 mil hab., a >50 km da capital e dos já incluídos); substitui Balsas (MA), sem nowcast"
+porto_seguro,2925303,Porto Seguro,BA,-16.4435,-39.0643,treino,168326,"Treino nacional: sorteado entre os elegíveis da UF com nowcast (>100 mil hab., a >50 km da capital e dos já incluídos); substitui Barreiras (BA), sem nowcast"
+pelotas,4314407,Pelotas,RS,-31.7649,-52.3371,treino,325685,"Treino nacional: sorteado entre os elegíveis da UF com nowcast (>100 mil hab., a >50 km da capital e dos já incluídos); substitui Caxias do Sul (RS), sem nowcast"
+tres_lagoas,5008305,Três Lagoas,MS,-20.7849,-51.7007,treino,132152,"Treino nacional: sorteado entre os elegíveis da UF com nowcast (>100 mil hab., a >50 km da capital e dos já incluídos); substitui Dourados (MS), sem nowcast"
+eunapolis,2910727,Eunápolis,BA,-16.3715,-39.5821,treino,113710,"Treino nacional: sorteado entre os elegíveis da macrorregião Nordeste (sem elegível na UF) com nowcast (>100 mil hab., a >50 km da capital e dos já incluídos); substitui Imperatriz (MA), sem nowcast"
+cameta,1502103,Cametá,PA,-2.24295,-49.4979,treino,134184,"Treino nacional: sorteado entre os elegíveis da macrorregião Norte (sem elegível na UF) com nowcast (>100 mil hab., a >50 km da capital e dos já incluídos); substitui Itacoatiara (AM), sem nowcast"
+itanhaem,3522109,Itanhaém,SP,-24.1736,-46.788,treino,112476,"Treino nacional: sorteado entre os elegíveis da macrorregião Sudeste (sem elegível na UF) com nowcast (>100 mil hab., a >50 km da capital e dos já incluídos); substitui Itaperuna (RJ), sem nowcast"
+abaetetuba,1500107,Abaetetuba,PA,-1.72183,-48.8788,treino,158188,"Treino nacional: sorteado entre os elegíveis da macrorregião Norte (sem elegível na UF) com nowcast (>100 mil hab., a >50 km da capital e dos já incluídos); substitui Ji-Paraná (RO), sem nowcast"
+santo_antonio_de_jesus,2928703,Santo Antônio de Jesus,BA,-12.9614,-39.2584,treino,103055,"Treino nacional: sorteado entre os elegíveis da macrorregião Nordeste (sem elegível na UF) com nowcast (>100 mil hab., a >50 km da capital e dos já incluídos); substitui Lagarto (SE), sem nowcast"
+alagoinhas,2900702,Alagoinhas,BA,-12.1335,-38.4208,treino,151055,"Treino nacional: sorteado entre os elegíveis da UF com nowcast (>100 mil hab., a >50 km da capital e dos já incluídos); substitui Luís Eduardo Magalhães (BA), sem nowcast"
+sorriso,5107925,Sorriso,MT,-12.5425,-55.7211,treino,110635,"Treino nacional: sorteado entre os elegíveis da UF com nowcast (>100 mil hab., a >50 km da capital e dos já incluídos); substitui Rondonópolis (MT), sem nowcast"
+maraba,1504208,Marabá,PA,-5.38075,-49.1327,treino,266533,"Treino nacional: sorteado entre os elegíveis da UF com nowcast (>100 mil hab., a >50 km da capital e dos já incluídos); substitui Santarém (PA), sem nowcast"

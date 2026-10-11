@@ -1,7 +1,7 @@
 """
 Experimento: casos aproximados como o painel os mostra, com 2 semanas de dados atrasados.
 
-O painel parte do último nível confirmado (semana X-2, decisão 16): as duas semanas mais
+O painel parte do último nível confirmado (semana X-2, decisão 17): as duas semanas mais
 recentes ainda estão incompletas. A partir dela, mostra os casos aproximados (modelo de
 quantis, mediana e faixa de 80%) da semana atual X e das 4 seguintes, ou seja, de 2 a 6
 semanas à frente da semana confirmada.
@@ -39,15 +39,15 @@ from src.train import HORIZONTES, PRIMEIRO_ANO_TESTE, carregar, linhas_validas
 
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
 
-LACUNA = 2
+LACUNAS = [2]
 ANTECEDENCIAS = [0, 1, 2, 3, 4]  # a partir da semana atual
-HORIZONTES_CASOS = [a + LACUNA for a in ANTECEDENCIAS]  # a partir da semana confirmada
+HORIZONTES_CASOS = list(range(min(LACUNAS), max(LACUNAS) + max(ANTECEDENCIAS) + 1))  # a partir da confirmada
 INICIO_AVALIACAO = '2019-01-01'
 MESES_POR_RETREINO = 3
 PROCESSOS, THREADS = 8, 2
 N_BOOTSTRAP = 2000
 SEMENTE = 42
-VERSAO_CACHE = 1
+VERSAO_CACHE = 2  # 2: antecedências de 2 a 7 semanas (lacunas 2 e 3)
 PASTA_CACHE = 'reports/cache/casos_atraso'
 ARQUIVO_SAIDA = 'reports/casos_atraso.csv'
 
@@ -99,7 +99,7 @@ def executar_unidade(id_, conjunto, inicio):
     os.replace(destino + '.tmp', destino)
 
 
-def previsoes(id_, processos=PROCESSOS):
+def previsoes(id_, processos=PROCESSOS, lacuna=2):
     """Previsões de todas as unidades (roda as que faltam); data_alvo e antecedência a partir da semana atual."""
     fim = dados()[0]['data_iniSE'].max().to_period('M').strftime('%Y-%m')
     inicios = [str(p) for p in pd.period_range(f'{PRIMEIRO_ANO_TESTE}-01', fim, freq='M')[::MESES_POR_RETREINO]]
@@ -108,7 +108,8 @@ def previsoes(id_, processos=PROCESSOS):
     logging.info(f"{len(unidades)} unidades; {len(pendentes)} a rodar.")
     Parallel(n_jobs=processos, batch_size=1)(delayed(executar_unidade)(id_, *u) for u in pendentes)
     p = pd.concat([pd.read_parquet(caminho(id_, *u)) for u in unidades], ignore_index=True)
-    p['antecedencia'] = p['h'] - LACUNA
+    p['antecedencia'] = p['h'] - lacuna
+    p = p[p['antecedencia'].isin(ANTECEDENCIAS)]
     p['data_alvo'] = p['data_iniSE'] + pd.to_timedelta(7 * p['h'], unit='D')
     p['conjunto'] = np.where(p['cidade'].isin(list(cidades_por_papel('validacao'))), 'validacao_final',
                              'validacao_cruzada')
@@ -120,13 +121,22 @@ def metricas(c):
 
 
 def run_experimento(processos=PROCESSOS):
-    p = previsoes(id_dados_processados(), processos)
-    # Semana atual (emissão) = semana confirmada + LACUNA; avaliação pela semana de emissão
-    p = p[p['data_iniSE'] + pd.Timedelta(weeks=LACUNA) >= INICIO_AVALIACAO]
+    id_ = id_dados_processados()
+    rng = np.random.default_rng(SEMENTE)
+    linhas_saida = []
+    for lacuna in LACUNAS:
+        linhas_saida += avaliar(previsoes(id_, processos, lacuna), lacuna, rng)
+    r = pd.DataFrame(linhas_saida).round(3)
+    r.to_csv(ARQUIVO_SAIDA, index=False)
+    print(r.to_string(index=False))
+
+
+def avaliar(p, lacuna, rng):
+    # Semana atual (emissão) = semana confirmada + lacuna; avaliação pela semana de emissão
+    p = p[p['data_iniSE'] + pd.Timedelta(weeks=lacuna) >= INICIO_AVALIACAO].copy()
     p['erro_modelo'] = (p['real'] - p['previsto']).abs()
     p['erro_persistencia'] = (p['real'] - p['atual']).abs()
     p['dentro'] = (p['real'] >= p['inferior']) & (p['real'] <= p['superior'])
-    rng = np.random.default_rng(SEMENTE)
     linhas_saida = []
     for (conjunto, a), g in p.groupby(['conjunto', 'antecedencia']):
         comp = g.groupby('cidade').agg(erro_modelo=('erro_modelo', 'sum'), erro_persistencia=('erro_persistencia', 'sum'),
@@ -139,13 +149,11 @@ def run_experimento(processos=PROCESSOS):
             for k in pontual:
                 amostras[k].append(m[k])
         for k, valor in pontual.items():
-            linhas_saida.append({'conjunto': conjunto, 'lacuna': LACUNA, 'antecedencia': a, 'metrica': k,
+            linhas_saida.append({'conjunto': conjunto, 'lacuna': lacuna, 'antecedencia': a, 'metrica': k,
                                  'valor': valor, 'ic95_inf': np.percentile(amostras[k], 2.5),
                                  'ic95_sup': np.percentile(amostras[k], 97.5), 'municipios': len(v),
                                  'semanas': int(comp['semanas'].sum())})
-    r = pd.DataFrame(linhas_saida).round(3)
-    r.to_csv(ARQUIVO_SAIDA, index=False)
-    print(r.to_string(index=False))
+    return linhas_saida
 
 
 if __name__ == "__main__":

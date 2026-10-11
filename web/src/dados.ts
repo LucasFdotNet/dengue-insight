@@ -10,13 +10,13 @@ export interface ItemIndice {
   papel: 'treino' | 'validacao';
   nivel_confirmado: Nivel | null;
   alerta: EstadoAlerta;
+  tem_nowcast: boolean;
 }
 
 export interface Indice {
   gerado_em: string;
   versao_dados: string;
   semana_atual: string;
-  semana_confirmada: string;
   lacuna: number;
   corte_alerta: number;
   trimestre_corte: string;
@@ -61,6 +61,8 @@ export interface Municipio {
   populacao: number;
   semana_atual: string;
   se_atual: number;
+  tem_nowcast: boolean;
+  lacuna: number; // semanas incompletas: a confirmada é a atual - lacuna
   confirmada: { semana: string; se: number; casos: number; notificados: number; nivel: Nivel | null };
   recentes: SemanaRecente[];
   previsoes: Previsao[];
@@ -97,6 +99,7 @@ export interface LinhaRobustez {
 
 export interface LinhaCasos {
   conjunto: string;
+  lacuna: number;
   antecedencia: number;
   metrica: 'razao_erro' | 'cobertura_80';
   valor: number;

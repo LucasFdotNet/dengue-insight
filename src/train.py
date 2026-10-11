@@ -1,7 +1,7 @@
 """
-Treino, avaliação e modelos de produção do Dengue Insight (previsões de 1 a 4 semanas).
+Avaliação dos modelos de tendência e de casos do Dengue Insight (previsões de 1 a 4 semanas).
 
-Modelos de produção (escolhidos na comparação de modelos; ver README, decisões 9 e 11):
+Modelos (escolhidos na comparação de modelos; ver README, decisões 9 e 11):
   - tendência (sobe, estável, cai): LightGBM classificador com o clima das semanas
     S-1 a S-4 (src/modelos/lightgbm_classificador_clima.py);
   - número de casos, com intervalo de 80%: LightGBM por quantis, com alvo relativo
@@ -9,20 +9,20 @@ Modelos de produção (escolhidos na comparação de modelos; ver README, decis�
 Os dois são modelos únicos, treinados com todos os municípios de treino juntos, um por
 antecedência. Não usam o Rt.
 
-Etapas de run_training():
-  1. Avaliação walk-forward com retreino mensal, de 2015 em diante: no início de cada mês,
-     os dois modelos são treinados só com o que já era conhecido e preveem as semanas
-     daquele mês, nos municípios de treino e nos de validação (que nunca entram no treino).
-     As previsões ficam em reports/previsoes_walkforward.csv (usadas pelo painel) e geram
-     as métricas em reports/metricas_*.csv. Leva cerca de 25 minutos.
-  2. Modelos de produção: treinados com toda a série dos municípios de treino e salvos
-     para o predict.py e o painel.
+run_training(): avaliação walk-forward com retreino mensal, de 2015 em diante. No início de
+cada mês, os dois modelos são treinados só com o que já era conhecido e preveem as semanas
+daquele mês, nos municípios de treino e nos de validação (que nunca entram no treino). As
+previsões ficam em reports/previsoes_walkforward.csv (usadas nos gráficos de casos de
+experimento_niveis.py) e geram as métricas em reports/metricas_*.csv. Leva cerca de 25 minutos.
+
+O painel (decisão 17) mostra níveis e casos aproximados; os modelos que ele usa são treinados
+em src/exportar_painel.py.
 
 Este arquivo também guarda as definições comuns (variáveis, tendência, semanas instáveis) e
 a avaliação walk-forward do LightGBM de regressão usada pelos experimentos.
 """
 import os
-import joblib
+
 import pandas as pd
 import numpy as np
 import logging
@@ -53,13 +53,7 @@ LIMIAR_TENDENCIA = 0.20
 MIN_CASOS_TENDENCIA = 5
 TENDENCIAS = ['sobe', 'estável', 'cai']
 
-PASTA_MODELOS = 'models/trained_models'
 ARQUIVO_PREVISOES_PASSADAS = 'reports/previsoes_walkforward.csv'
-
-
-def caminho_modelo(tipo, horizonte):
-    """tipo: 'classificador' (tendência) ou 'quantis' (número de casos com intervalo)."""
-    return f"{PASTA_MODELOS}/{tipo}_h{horizonte}.joblib"
 
 
 def novo_modelo():
@@ -245,16 +239,6 @@ def resumir_tendencia_producao(prev):
     return resumo.astype({'Semanas': int})
 
 
-def treinar_producao(treino):
-    os.makedirs(PASTA_MODELOS, exist_ok=True)
-    for tipo, classe in _modelos_producao().items():
-        for horizonte in HORIZONTES:
-            tr = linhas_validas(treino, horizonte)
-            joblib.dump(classe().treinar(tr, horizonte), caminho_modelo(tipo, horizonte))
-            logging.info(f"Modelo de produção '{tipo}' H+{horizonte} salvo "
-                         f"({len(tr)} semanas, até {tr['data_iniSE'].max():%d/%m/%Y}).")
-
-
 def run_training():
     os.makedirs('reports', exist_ok=True)
     treino, validacao = carregar('treino'), carregar('validacao')
@@ -281,14 +265,11 @@ def run_training():
     logging.info("Métricas salvas em reports/metricas_modelos.csv, metricas_por_ano.csv, metricas_gerais.csv "
                  "e metricas_tendencia.csv.")
 
-    # Previsões fora da amostra (cada semana prevista por modelos que não a viram no treino),
-    # usadas pelo painel para mostrar como os modelos teriam se saído no passado
+    # Previsões fora da amostra (cada semana prevista por modelos que não a viram no treino)
     colunas = ['cidade', 'h', 'data_alvo', 'atual', 'real', 'previsto', 'inferior', 'superior', 'tend_real', 'tend_prev']
     saida = prev[colunas].round({'previsto': 1, 'inferior': 1, 'superior': 1})
     saida.sort_values(['cidade', 'h', 'data_alvo']).to_csv(ARQUIVO_PREVISOES_PASSADAS, index=False)
     logging.info(f"Previsões do walk-forward salvas em {ARQUIVO_PREVISOES_PASSADAS}.")
-
-    treinar_producao(treino)
 
 
 if __name__ == "__main__":

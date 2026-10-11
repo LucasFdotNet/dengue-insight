@@ -42,6 +42,7 @@ Este documento reconstrói, em ordem cronológica, as decisões técnicas tomada
 | 21 | Outros modelos e regra de decisão | 09–10/10/2026 | XGBoost, Random Forest, MLP e LSTM, com o mesmo ajuste, não superam o LightGBM; o peso por classe é só outra regra de decisão; a pergunta do projeto é revista | [21](#s21) |
 | 22 | Da tendência aos níveis de incidência | 10/10/2026 | Prever o nível (verde, amarelo, vermelho) com 2 a 4 semanas pelos limiares do MEM e alertar a entrada no vermelho; canal endêmico, percentis e previsão de 1 semana descartados | [22](#s22) |
 | 23 | Painel estático | 11/10/2026 | Site estático com um JSON por município; o painel parte do último nível confirmado (atual - 2) e prevê a semana atual e as 4 seguintes | [23](#s23) |
+| 24 | Substituição dos municípios sem nowcast | 11/10/2026 | Os 12 municípios sem nowcast do InfoDengue foram trocados por municípios sorteados entre os elegíveis com nowcast, para que todos tenham o mesmo tratamento no painel | [24](#s24) |
 
 Observação sobre as datas: o código herdado é de 21/09/2026 e quase todo o trabalho de revisão foi registrado em commits de 26/09/2026 (o último, que fixa versões do `scipy` e do `statsmodels`, é de 27/09/2026). A coluna de commits permite reconstruir a ordem exata com `git log --reverse`.
 
@@ -1144,4 +1145,28 @@ Com os níveis e o alerta definidos (seção 22), o grupo decidiu refazer o pain
 python -m src.experimento_casos_atraso
 python -m src.exportar_painel
 cd web && npm install && npm run dev
+```
+
+<a id="s24"></a>
+## 24. Substituição dos municípios sem nowcast
+
+### Contexto
+
+Ao remover o painel em Streamlit, apareceu um cuidado que ele tinha e o painel estático não: nos municípios em que o InfoDengue não publica o *nowcast*, as semanas recentes têm só os casos já notificados, e a antepenúltima semana, que o painel estático usa como "confirmada", ainda está incompleta. O painel anterior partia, nesses municípios, da 4ª semana mais recente. Em 10/2026, eram 12 municípios (eram 39 em 09/2026; o InfoDengue passou a publicar o nowcast para mais municípios), todos de treino.
+
+### Alternativas
+
+* **Tratamento diferente (adotado e depois descartado):** partir da semana atual menos 3 nesses municípios, com o alerta calibrado e a avaliação feita com 3 semanas de atraso. Com 3 semanas de atraso, o alerta avisava 49% das epidemias antes de começarem (contra 57% com 2 semanas) e 77% antes de os dados mostrarem o início. Funcionava, mas criava dois tipos de município no painel e na avaliação.
+* **Substituir os municípios (decisão):** para que todos tenham o mesmo tratamento. Como os critérios originais por tamanho e por histórico de surtos escolhiam entre candidatos praticamente equivalentes, os substitutos foram sorteados entre os elegíveis da mesma UF (ou da macrorregião, quando a UF não tinha elegível), com o nowcast como exigência a mais.
+
+### Resultado
+
+Lista, critérios e consequências na decisão 1 do README (etapa 4); elegíveis de cada vaga em `reports/substituicao_municipios.csv`. A troca mudou os dados de 12 dos 115 municípios, então o pipeline completo foi refeito com os dados novos, e os números das seções anteriores que vêm do README foram atualizados.
+
+### Como reproduzir
+
+```bash
+python -m scripts.substituir_sem_nowcast            # mostra os sorteados
+python -m scripts.substituir_sem_nowcast --aplicar  # troca em data/config/cidades.csv
+python -m src.pipeline_completo --baixar
 ```
