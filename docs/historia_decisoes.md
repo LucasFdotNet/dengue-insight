@@ -1060,6 +1060,15 @@ Na definição D, nos 15 municípios de validação, o alerta avisou 70% das epi
 * Avaliação pseudoprospectiva, como as anteriores (seção 5).
 * A desmobilização foi avaliada só na versão de dois estados.
 * O ganho semana a semana sobre a persistência é pequeno (cerca de 3 pontos com 4 semanas); o valor do modelo está nas mudanças de nível e no alerta.
+* **Municípios onde a dengue chegou ou mudou de patamar.** Nos quadradinhos, Blumenau aparece vermelha quase todo o período de 07/2023 a 07/2025. A cidade quase não tinha dengue até 2020 (picos de até 22 casos por semana) e teve 75 mil casos na temporada de 2023, com 360 mil habitantes; o limiar epidêmico, calculado com até 10 temporadas quase sem casos, ficou entre 10 e 69 casos por semana até 2024 e só subiu para 209 em 2025, quando a cidade passou ao amarelo. Nos 115 municípios, de 2015 em diante, 8 ficaram um ano ou mais seguidos no vermelho:
+
+  | Grupo | Municípios | Mais longo no vermelho |
+  |---|---|---|
+  | Chegada da dengue em Santa Catarina | Blumenau, Florianópolis, Joinville | 2,7 a 3,5 anos |
+  | De 5 a 10 vezes mais casos que o histórico | Macapá, Altamira, Cosmópolis, Rio das Ostras | 1,3 a 1,8 ano |
+  | Temporada de fato longa (limiar estável) | Sinop | 1,2 ano |
+
+  Outros 46 municípios tiveram episódios de 26 a 51 semanas, o que corresponde a uma temporada epidêmica normal. No Rio Grande do Sul, onde a dengue também chegou (Porto Alegre, Santa Maria, Santa Cruz do Sul, Erechim), o inverno interrompe a transmissão, e os episódios duram no máximo 40 semanas. O comportamento é o esperado de qualquer limiar baseado no histórico do município e se corrige em 1 a 4 temporadas. Alternativas consideradas: usar menos temporadas no MEM (ajuste mais rápido, mas foge da configuração do InfoDengue e deixa os limiares menos estáveis) e uma mensagem de "transmissão sustentada" no painel quando o vermelho dura mais de uma temporada. **Decisão:** registrar como limitação, sem mudar o método, e levar a mensagem de transmissão sustentada para a discussão do painel.
 
 ### Como reproduzir
 
