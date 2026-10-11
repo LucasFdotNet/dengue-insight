@@ -26,7 +26,8 @@ Métricas por episódio do vermelho (mobilização): como em experimento_estados
 
 Saídas:
   reports/niveis_semanas.csv, reports/niveis_episodios.csv, reports/niveis_cortes.csv
-  reports/figures/niveis/quadradinhos_*.png (e, com --resumo, a comparação das definições A e B)
+  reports/figures/niveis/quadradinhos_<município>_<definição>.png, com a definição pelo nome
+  (mem, percentis_80_97, canal_endemico); com --resumo, também a comparação das definições A e B
 
 Uso:
   python -m src.experimento_niveis              previsões, métricas e quadradinhos
@@ -69,6 +70,8 @@ ARQUIVO_CORTES = 'reports/niveis_cortes.csv'
 # Exemplos para os quadradinhos: um município de treino e um de validação, com epidemias recentes
 EXEMPLOS = [(c, '2023-07-01', '2025-07-01') for c in ('campinas', 'sorocaba', 'fortaleza', 'blumenau')]
 VARIANTES_QUADRADINHOS = ['B', 'C', 'D']
+# Nome da definição no arquivo dos quadradinhos (a letra é só o nome interno)
+ARQUIVO_VARIANTE = {'A': 'percentis_75_90', 'B': 'percentis_80_97', 'C': 'canal_endemico', 'D': 'mem'}
 
 # Cores (paleta de status do guia de visualização; sempre com legenda em texto)
 COR_NIVEL = {0: '#0ca30c', 1: '#fab219', 2: '#d03b3b'}
@@ -349,7 +352,7 @@ def grafico_quadradinhos(t, alertas, variante, cidade, inicio, fim):
     ax.legend(legenda, rotulos, ncol=4, frameon=False, fontsize=9, labelcolor=TINTA_SEC,
               loc='upper left', bbox_to_anchor=(0, -0.12))
     fig.tight_layout()
-    caminho_fig = os.path.join(PASTA_FIGURAS, f'quadradinhos_{cidade}_{variante}.png')
+    caminho_fig = os.path.join(PASTA_FIGURAS, f'quadradinhos_{cidade}_{ARQUIVO_VARIANTE[variante]}.png')
     fig.savefig(caminho_fig, dpi=150, facecolor=FUNDO)
     plt.close(fig)
     return caminho_fig
