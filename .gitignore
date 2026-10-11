@@ -5,3 +5,6 @@ __pycache__/
 # Cache dos experimentos (previsões por unidade de trabalho; recriado ao rodar)
 reports/cache/
 reports/logs/
+
+# Figuras geradas pelos scripts (src/eda.py e experimentos); recriadas ao rodar o pipeline
+reports/figures/
