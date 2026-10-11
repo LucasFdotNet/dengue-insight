@@ -8,3 +8,7 @@ reports/logs/
 
 # Figuras geradas pelos scripts (src/eda.py e experimentos); recriadas ao rodar o pipeline
 reports/figures/
+
+# Painel estático (web/): dependências e build; os dados em web/public/dados/ ficam no git (o deploy não roda o pipeline)
+web/node_modules/
+web/dist/

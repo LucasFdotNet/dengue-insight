@@ -22,7 +22,8 @@ validação cruzada por município e validação final):
    alerta, a desmobilização e o acerto do nível previsto, e para a diferença entre o modelo e a
    regra simples (ou a persistência), com os mesmos municípios em cada reamostragem.
 
-Saída: reports/niveis_robustez.csv (teste, conjunto, lacuna, método, métrica, valor e IC 95%)
+Saídas: reports/niveis_robustez.csv (teste, conjunto, lacuna, método, métrica, valor e IC 95%) e
+reports/niveis_robustez_cortes.csv (corte do alerta por trimestre e lacuna; o painel usa o da lacuna 2)
 
 Uso: python -m src.experimento_niveis_robustez [--processos N]
 """
@@ -50,6 +51,7 @@ SEMENTE = 42
 JANELA_SAIDA = 2  # a saída do vermelho conta se indicada nas 2 últimas semanas do episódio
 PASTA_CACHE = 'reports/cache/niveis_atraso'
 ARQUIVO_SAIDA = 'reports/niveis_robustez.csv'
+ARQUIVO_CORTES = 'reports/niveis_robustez_cortes.csv'  # corte do alerta por trimestre (o painel usa a lacuna 2)
 
 
 # --------------------------------------------------------------- previsões
@@ -111,6 +113,7 @@ def tabela_emissao(prev, base, lacuna):
     s = s.reset_index(drop=True)
     cortes = ee.escolher_cortes(s, estado='alto_conhecido', atraso=lacuna)
     s = ee.aplicar_cortes(s, cortes, estado='alto_conhecido')
+    s.attrs['cortes'] = cortes.assign(lacuna=lacuna)
     # Desmobilização: o município está (até onde se sabe) no vermelho e a indicação é de saída em X+2
     no_vermelho = s['alto_conhecido'] == True  # noqa: E712
     s['saida_modelo'] = no_vermelho & (s['nivel_h2'] != 2) & s['nivel_h2'].notna()
@@ -248,10 +251,13 @@ def run_experimento(processos=en.PROCESSOS):
     treino, validacao = en.dados(VARIANTE)
     base = pd.concat([treino, validacao], ignore_index=True)
     rng = np.random.default_rng(SEMENTE)
-    linhas = []
+    linhas, cortes = [], []
     for lacuna in LACUNAS:
         logging.info(f"Lacuna de {lacuna} semana(s)...")
-        linhas += avaliar_lacuna(tabela_emissao(prev, base, lacuna), lacuna, rng)
+        s = tabela_emissao(prev, base, lacuna)
+        cortes.append(s.attrs['cortes'])
+        linhas += avaliar_lacuna(s, lacuna, rng)
+    pd.concat(cortes).to_csv(ARQUIVO_CORTES, index=False)
     r = pd.DataFrame(linhas)
     colunas = ['teste', 'conjunto', 'lacuna', 'metodo', 'metrica', 'valor', 'ic95_inf', 'ic95_sup',
                'dif_vs_comparacao', 'dif_ic95_inf', 'dif_ic95_sup', 'municipios']

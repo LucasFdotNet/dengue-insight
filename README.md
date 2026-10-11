@@ -47,7 +47,8 @@ São 115 municípios, listados em [`data/config/cidades.csv`](data/config/cidade
 3. **Treinamento e avaliação (`src/train.py`):** treina os dois modelos de produção, cada um único para todos os municípios de treino e com uma versão por antecedência (1 a 4 semanas): o **LightGBM classificador com clima**, para a tendência, e o **LightGBM por quantis**, para o número de casos com intervalo de 80%. Avalia os dois com validação *walk-forward* com retreino mensal contra o baseline de persistência e salva os modelos usados pelo painel (cerca de 20 minutos).
 4. **Análise exploratória (`src/eda.py`):** gera matrizes de correlação e gráficos de casos contra clima.
 5. **Pipeline completo (`src/pipeline_completo.py`):** refaz, na ordem, tudo o que depende dos dados (pré-processamento, modelos de produção, análise exploratória, experimentos, comparação entre fotos e os números do relatório em `reports/relatorio/`, por `src/numeros_relatorio.py`). Retoma de onde parou se for interrompido (decisão 14).
-6. **Painel (`app.py` e `painel/`):** aviso de uso acadêmico na entrada; seção **Indicadores**, com a tendência e os casos previstos para as próximas 4 semanas e o gráfico de projeções; seção **Detalhes do Modelo**, com a explicação dos modelos, a comparação com as alternativas, o mapa dos municípios e os dados de cada município.
+6. **Painel estático (`web/`, decisão 17):** site sem servidor de aplicação, publicado no Cloudflare Pages. `src/exportar_painel.py` treina os modelos de produção de níveis e de casos e grava um JSON por município em `web/public/dados/`, carregado só quando o município é escolhido. Seções **Indicadores** (último nível confirmado, alerta, casos notificados até o momento, limiares, próximas semanas e gráfico de casos), **Avaliação** (quadradinhos e casos previstos no passado, e as métricas gerais com intervalos de confiança) e **Ajuda** (em construção).
+7. **Painel anterior (`app.py` e `painel/`, Streamlit; a ser removido):** aviso de uso acadêmico na entrada; seção **Indicadores**, com a tendência e os casos previstos para as próximas 4 semanas e o gráfico de projeções; seção **Detalhes do Modelo**, com a explicação dos modelos, a comparação com as alternativas, o mapa dos municípios e os dados de cada município.
 
 **Experimentos** (cada um grava seus resultados em `reports/`; detalhes na seção "Decisões de Projeto"):
 
@@ -58,6 +59,7 @@ São 115 municípios, listados em [`data/config/cidades.csv`](data/config/cidade
 | `src/experimento_clima_classificador.py` | O clima melhora o classificador de tendência? |
 | `src/experimento_estados.py` | Prevendo o nível (normal ou alto) em vez da tendência, o painel avisaria as epidemias a tempo? (decisão 16) |
 | `src/experimento_niveis_robustez.py` | Os níveis e o alerta resistem a dados atrasados? O modelo indica a desmobilização? Intervalos de confiança (decisão 16) |
+| `src/experimento_casos_atraso.py` | Quão bons são os casos aproximados que o painel mostra, previstos a partir da última semana confirmada? (decisão 17) |
 | `src/experimento_niveis.py` | Três níveis (verde, amarelo, vermelho): qual definição de limiares, e quão bem o modelo prevê e alerta? Gera os gráficos de quadradinhos e os de casos com os limiares e a previsão do modelo de quantis (decisão 16) |
 | `src/experimento_rt.py` | O melhor modelo é mais útil que o Rt do InfoDengue? |
 | `src/experimento_generalizacao.py` | O modelo generaliza para municípios não vistos? Mais municípios ajudam? O clima ajuda? |
@@ -72,7 +74,9 @@ São 115 municípios, listados em [`data/config/cidades.csv`](data/config/cidade
 * **Linguagem:** Python 3 (testado com 3.14; o Streamlit Community Cloud aceita 3.12 ou mais recente)
 * **Dados:** `pandas`, `numpy`, `requests`
 * **Modelagem:** `lightgbm`, `scikit-learn`, `statsmodels`, `scipy`, `joblib`
-* **Painel e gráficos:** `streamlit`, `plotly`, `matplotlib`, `seaborn`
+* **Gráficos dos experimentos:** `matplotlib`, `seaborn`
+* **Painel estático (`web/`):** TypeScript, Vite e Observable Plot (Node.js 20 ou mais recente)
+* **Painel anterior:** `streamlit`, `plotly`
 
 As versões estão fixadas em `requirements.txt`. O experimento de classificadores (decisão 15) usa também `xgboost`, `torch` e `pyarrow`, em `requirements-experimentos.txt`; o painel não precisa deles.
 
@@ -112,6 +116,16 @@ As versões estão fixadas em `requirements.txt`. O experimento de classificador
 
    **Tudo de uma vez (para atualizar os números com dados novos):** `python -m src.pipeline_completo --baixar` baixa os dados (com foto), refaz os modelos de produção, a análise exploratória, todos os experimentos e os números do relatório. Leva cerca de 7 horas, a maior parte no experimento de classificadores; precisa de `requirements-experimentos.txt`. Se for interrompido, rodar de novo continua do passo onde parou (sem `--baixar`, para não trocar os dados no meio). No Windows, `powershell -ExecutionPolicy Bypass -File scripts
 odar_pipeline.ps1 --baixar` roda o pipeline em segundo plano e impede que o computador suspenda até ele terminar; o andamento fica em `reports/logs/`.
+
+   **Painel estático** (depois dos experimentos de níveis e de casos, ou do pipeline completo):
+   ```bash
+   python -m src.exportar_painel     # treina os modelos de produção e grava web/public/dados/
+   cd web
+   npm install
+   npm run dev                       # abre o painel em http://localhost:5173
+   npm run build                     # gera o site em web/dist/
+   ```
+   No Cloudflare Pages: diretório raiz `web`, comando de build `npm run build`, diretório de saída `dist`. Os dados já vão no repositório, porque o deploy não roda o pipeline; cada atualização é "rodar o pipeline e publicar de novo".
 
    **Sobre a ingestão de clima:** a Open-Meteo limita o uso gratuito por minuto, por hora e por dia, e a série de 16 anos de cada município consome boa parte desses limites. O script espera sozinho nos limites por minuto e por hora, então a primeira execução completa (115 municípios) leva algumas horas e pode atingir o limite diário. Nesse caso, ele para, mantém o que já foi salvo e avisa para rodar de novo mais tarde; a nova execução continua de onde parou. Nas execuções seguintes, só as últimas 12 semanas de cada município são baixadas. Para baixar tudo de novo: `python -m src.ingestion_clima --completo`.
 
@@ -428,6 +442,25 @@ Estado atual das decisões, com os números da base atual (115 municípios, dado
 * **Limitações:** avaliação pseudoprospectiva (dados já revisados; em tempo real as semanas recentes estão incompletas, decisões 3 e 12); o atraso dos dados é simulado descartando semanas, já que não há fotos dos dados de cada semana do passado; as escolhas que o MEM e o InfoDengue deixam em aberto (mínimos de casos, população fixa do Censo 2022) estão registradas em `src/estados.py`.
 * **Limitação: municípios onde a dengue chegou ou mudou de patamar.** Como os limiares vêm do histórico do próprio município, quem tinha pouca dengue fica vermelho por muito tempo quando ela chega, até as novas temporadas entrarem no cálculo. De 2015 em diante, 8 dos 115 municípios ficaram um ano ou mais seguidos no vermelho: Blumenau, Florianópolis e Joinville (SC), com a chegada da dengue ao estado (de 2,7 a 3,5 anos; em Joinville, o limiar epidêmico só alcançou o novo patamar depois de 3 a 4 temporadas, indo de 10 para 2.801 casos por semana); Macapá, Altamira, Cosmópolis e Rio das Ostras, que passaram a ter de 5 a 10 vezes mais casos (de 1,3 a 1,8 ano); e Sinop, com uma temporada de fato longa em 2024. Nesses períodos, o vermelho indica "acima de tudo o que o município já viveu", mas não distingue "entrar em epidemia" de "continuar nela", e o alerta de entrada perde o sentido. No Rio Grande do Sul, onde a dengue também chegou, o inverno interrompe a transmissão e os episódios se encerram a cada ano. O comportamento é o esperado de qualquer limiar baseado no histórico (o MEM, os percentis e o canal endêmico) e se corrige em 1 a 4 temporadas; o grupo decidiu registrá-lo, sem mudar o método, e discutir na apresentação do painel uma mensagem de "transmissão sustentada" para esses casos.
 * **Em andamento:** o painel ainda mostra a tendência (decisões 11 e 13); a troca pelos níveis e pelo alerta será feita depois de definidos o que ele mostra, se haverá alerta de amarelo e se o número de casos (modelo por quantis) continua. Tabelas e gráficos de cada etapa: seção 22 de [`docs/historia_decisoes.md`](docs/historia_decisoes.md).
+
+### 17. Painel estático: último nível confirmado e próximas semanas
+
+* **Por que estático:** o painel só mostra resultados pré-calculados, então não precisa de servidor de aplicação. Um JSON por município (cerca de 85 KB, 20 KB comprimido), um índice e a avaliação geral são gerados por `src/exportar_painel.py` e servidos como arquivos; o site (`web/`, TypeScript, Vite e Observable Plot) carrega só o município escolhido. A versão dos dados vai no endereço dos arquivos, para o navegador não reaproveitar dados antigos.
+* **Último nível confirmado:** as 2 semanas mais recentes ainda estão incompletas (decisão 3), então o painel parte da semana atual menos 2, como no cenário de 2 semanas de atraso da decisão 16. As duas semanas incompletas aparecem à parte, no card "Casos notificados até o momento", com a estimativa do InfoDengue que corrige o atraso das notificações (o *nowcast*) e o aviso de que o número provavelmente está subnotificado.
+* **Próximas semanas:** a partir da semana confirmada, o nível mais provável, a chance de nível epidêmico e os casos aproximados (mediana e faixa de 80%) da semana atual e das 4 seguintes, ou seja, de 2 a 6 semanas à frente da semana confirmada. Os modelos de produção são treinados com os 100 municípios de treino, como em `src/train.py`.
+* **Alerta e desmobilização:** se o nível confirmado não é vermelho, o alerta acende quando a chance de nível epidêmico de 2 a 4 semanas à frente passa do corte mais recente escolhido com 2 semanas de atraso (`reports/niveis_robustez_cortes.csv`; 37% no 3º trimestre de 2026). Se é vermelho, o painel indica o fim quando o nível mais provável 2 semanas à frente deixa de ser vermelho. O card mostra a confiança medida nos testes ("cerca de 1 em cada 2 alertas se confirma"), lida da avaliação, e não escrita à mão.
+* **Limiares em número de casos:** os da temporada atual e, quando as semanas previstas entram na temporada seguinte (semana 41), os da próxima.
+* **Casos aproximados com 2 semanas de atraso** (`src/experimento_casos_atraso.py`, `reports/casos_atraso.csv`; validação cruzada, 2019 em diante):
+
+  | Previsão feita | Erro / erro de repetir os casos confirmados | Casos dentro da faixa de 80% | Nos 15 municípios de validação |
+  |---|---|---|---|
+  | Na própria semana | 0,75 (0,72 a 0,79) | 79% | 0,71; 82% |
+  | 2 semanas antes | 0,70 (0,67 a 0,74) | 78% | 0,66; 81% |
+  | 4 semanas antes | 0,69 (0,67 a 0,72) | 78% | 0,62; 82% |
+
+  O modelo erra de 25% a 31% menos que repetir os casos da última semana confirmada, e a faixa de 80% contém o valor real em 78% a 82% das semanas.
+* **Avaliação no painel:** quadradinhos e casos previstos de cada município, feitos como o painel os faria (2 semanas de atraso, modelos que não viram o município), e as tabelas gerais de mobilização, desmobilização, nível, casos e efeito do atraso, com intervalos de confiança. O acerto de cada município é calculado no navegador a partir das previsões exportadas.
+* **Em aberto:** a seção Ajuda (depende das definições restantes) e a remoção do painel anterior em Streamlit (`app.py`, `painel/`, `src/predict.py` e os modelos de tendência em `models/`).
 
 ### Nota sobre os municípios de validação
 

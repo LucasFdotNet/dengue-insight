@@ -41,6 +41,7 @@ Este documento reconstrói, em ordem cronológica, as decisões técnicas tomada
 | 20 | Dados atualizados, fotos e pipeline completo | 09–10/10/2026 (`4ba56f0` a `d906288`) | Guardar uma foto dos dados a cada coleta; medir quanto o InfoDengue revisa as semanas recentes; refazer todos os números com um comando retomável | [20](#s20) |
 | 21 | Outros modelos e regra de decisão | 09–10/10/2026 | XGBoost, Random Forest, MLP e LSTM, com o mesmo ajuste, não superam o LightGBM; o peso por classe é só outra regra de decisão; a pergunta do projeto é revista | [21](#s21) |
 | 22 | Da tendência aos níveis de incidência | 10/10/2026 | Prever o nível (verde, amarelo, vermelho) com 2 a 4 semanas pelos limiares do MEM e alertar a entrada no vermelho; canal endêmico, percentis e previsão de 1 semana descartados | [22](#s22) |
+| 23 | Painel estático | 11/10/2026 | Site estático com um JSON por município; o painel parte do último nível confirmado (atual - 2) e prevê a semana atual e as 4 seguintes | [23](#s23) |
 
 Observação sobre as datas: o código herdado é de 21/09/2026 e quase todo o trabalho de revisão foi registrado em commits de 26/09/2026 (o último, que fixa versões do `scipy` e do `statsmodels`, é de 27/09/2026). A coluna de commits permite reconstruir a ordem exata com `git log --reverse`.
 
@@ -1120,4 +1121,27 @@ python -m src.experimento_estados   # dois estados; reports/estados_*.csv
 python -m src.experimento_niveis    # três níveis, definições A a D; reports/niveis_*.csv e quadradinhos
 python -m src.experimento_niveis_robustez   # desmobilização, atraso dos dados e IC; reports/niveis_robustez.csv
 python -m src.mem <arquivo mem_mun_2010_2022_BR.csv do InfoDengue>   # validação do MEM
+```
+
+<a id="s23"></a>
+## 23. Painel estático
+
+### Contexto
+
+Com os níveis e o alerta definidos (seção 22), o grupo decidiu refazer o painel: sem depender do Streamlit, como um site 100% estático publicado no Cloudflare Pages, com um arquivo de dados por município carregado só quando ele é escolhido, e com três seções: **Indicadores** (para o gestor), **Avaliação** (para avaliar o modelo, o que pouco importa ao gestor) e **Ajuda** (documentação, a completar depois das definições restantes).
+
+### Decisões
+
+* **Último nível confirmado.** A etapa 6 da seção 22 mostrou que o nível "atual", calculado com as semanas mais recentes, é a informação menos confiável. O painel parte da semana atual menos 2 (cenário de 2 semanas de atraso, já avaliado) e mostra as duas semanas incompletas à parte, num card "Casos notificados até o momento", com a estimativa do InfoDengue (*nowcast*) e o aviso de que o número provavelmente está subnotificado (pela revisão dos dados, os notificados da última semana chegaram a quase triplicar em 12 dias).
+* **Próximas semanas:** nível mais provável, chance de nível epidêmico e casos aproximados da semana atual e das 4 seguintes (2 a 6 semanas à frente da semana confirmada); alerta de entrada no vermelho e sinal de fim, com o corte calibrado com 2 semanas de atraso; limiares do MEM em número de casos por semana.
+* **Casos aproximados avaliados no mesmo modo** (`src/experimento_casos_atraso.py`): o teste de atraso da decisão 12 usou o modelo de regressão, sem a faixa de 80%; o novo teste usa o modelo de quantis, com walk-forward trimestral e validação cruzada por município, como os níveis. O modelo erra de 25% a 31% menos que repetir os casos confirmados, e a faixa de 80% contém o real em 78% a 82% das semanas (tabela na decisão 17 do README).
+* **Confiança junto do alerta.** Mesmo com a avaliação numa seção separada, o card do alerta diz quanto confiar nele, com os números da avaliação lidos do arquivo exportado.
+* **Tecnologia:** TypeScript, Vite e Observable Plot; os gráficos seguem a paleta de status (verde, amarelo, vermelho, sempre com ícone e texto) e têm modo escuro.
+
+### Como reproduzir
+
+```bash
+python -m src.experimento_casos_atraso
+python -m src.exportar_painel
+cd web && npm install && npm run dev
 ```
