@@ -1,17 +1,17 @@
 variante,conjunto,metodo,episodios,epidemias_avisadas,antecedencia_mediana,antecedencia_media,alarmes,alarmes_corretos,alarmes_falsos_por_municipio_ano
-A,validacao_cruzada,Modelo: alerta de vermelho,502,0.663,2.0,2.495,724,0.521,0.462
-A,validacao_cruzada,Regra simples,502,0.647,2.0,2.372,946,0.362,0.804
-A,validacao_final,Modelo: alerta de vermelho,82,0.683,3.0,2.696,107,0.579,0.399
+A,validacao_cruzada,Modelo: alerta de vermelho,519,0.653,2.0,2.434,732,0.514,0.474
+A,validacao_cruzada,Regra simples,519,0.634,2.0,2.371,968,0.358,0.827
+A,validacao_final,Modelo: alerta de vermelho,82,0.671,3.0,2.655,98,0.622,0.328
 A,validacao_final,Regra simples,82,0.671,3.0,2.727,165,0.358,0.941
-B,validacao_cruzada,Modelo: alerta de vermelho,270,0.837,3.0,2.628,495,0.513,0.321
-B,validacao_cruzada,Regra simples,270,0.793,2.0,2.397,545,0.415,0.425
-B,validacao_final,Modelo: alerta de vermelho,44,0.75,3.0,3.242,86,0.465,0.408
+B,validacao_cruzada,Modelo: alerta de vermelho,282,0.759,3.0,2.523,444,0.536,0.274
+B,validacao_cruzada,Regra simples,282,0.77,2.0,2.475,572,0.4,0.457
+B,validacao_final,Modelo: alerta de vermelho,44,0.75,3.0,2.879,79,0.443,0.39
 B,validacao_final,Regra simples,44,0.864,3.0,2.711,105,0.371,0.586
-C,validacao_cruzada,Modelo: alerta de vermelho,905,0.043,2.0,2.231,81,0.481,0.056
-C,validacao_cruzada,Regra simples,905,0.361,2.0,2.456,1109,0.307,1.024
-C,validacao_final,Modelo: alerta de vermelho,140,0.043,2.0,1.833,14,0.5,0.062
+C,validacao_cruzada,Modelo: alerta de vermelho,924,0.022,2.0,2.35,47,0.447,0.035
+C,validacao_cruzada,Regra simples,924,0.363,2.0,2.445,1130,0.309,1.04
+C,validacao_final,Modelo: alerta de vermelho,140,0.021,2.0,1.667,8,0.375,0.044
 C,validacao_final,Regra simples,140,0.364,3.0,2.725,149,0.349,0.861
-D,validacao_cruzada,Modelo: alerta de vermelho,492,0.744,3.0,2.557,780,0.524,0.494
-D,validacao_cruzada,Regra simples,492,0.677,2.0,2.306,967,0.36,0.824
-D,validacao_final,Modelo: alerta de vermelho,79,0.709,3.0,2.839,113,0.54,0.461
+D,validacao_cruzada,Modelo: alerta de vermelho,506,0.723,3.0,2.552,809,0.511,0.527
+D,validacao_cruzada,Regra simples,506,0.66,2.0,2.332,1000,0.352,0.863
+D,validacao_final,Modelo: alerta de vermelho,79,0.709,3.0,2.875,111,0.568,0.426
 D,validacao_final,Regra simples,79,0.709,3.0,2.625,161,0.373,0.896

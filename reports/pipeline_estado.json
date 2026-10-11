@@ -1,37 +1,57 @@
 {
-  "id_dados": "098870c94e67",
+  "id_dados": "a77197ae7e4f",
   "passos": {
     "experimento_classificadores": {
-      "concluido": "2026-10-10T02:51:21",
-      "minutos": 222.4
+      "concluido": "2026-10-11T06:43:15",
+      "minutos": 198.6
     },
     "train": {
-      "concluido": "2026-10-10T03:10:08",
-      "minutos": 18.8
+      "concluido": "2026-10-11T07:00:17",
+      "minutos": 17.0
     },
     "eda": {
-      "concluido": "2026-10-10T03:10:57",
+      "concluido": "2026-10-11T07:01:07",
       "minutos": 0.8
     },
     "experimento_modelos": {
-      "concluido": "2026-10-10T03:53:07",
-      "minutos": 42.2
+      "concluido": "2026-10-11T07:40:38",
+      "minutos": 39.5
     },
     "experimento_clima_classificador": {
-      "concluido": "2026-10-10T04:15:04",
-      "minutos": 22.0
+      "concluido": "2026-10-11T08:02:42",
+      "minutos": 22.1
     },
     "experimento_rt": {
-      "concluido": "2026-10-10T04:22:32",
-      "minutos": 7.5
+      "concluido": "2026-10-11T08:10:27",
+      "minutos": 7.7
     },
     "experimento_generalizacao": {
-      "concluido": "2026-10-10T04:58:10",
-      "minutos": 35.6
+      "concluido": "2026-10-11T08:46:40",
+      "minutos": 36.2
     },
     "experimento_atraso": {
-      "concluido": "2026-10-10T05:04:19",
-      "minutos": 6.2
+      "concluido": "2026-10-11T08:52:59",
+      "minutos": 6.3
+    },
+    "experimento_estados": {
+      "concluido": "2026-10-11T08:59:05",
+      "minutos": 6.1
+    },
+    "experimento_niveis": {
+      "concluido": "2026-10-11T09:26:02",
+      "minutos": 27.0
+    },
+    "experimento_niveis_robustez": {
+      "concluido": "2026-10-11T09:35:40",
+      "minutos": 9.6
+    },
+    "experimento_casos_atraso": {
+      "concluido": "2026-10-11T09:51:16",
+      "minutos": 15.6
+    },
+    "exportar_painel": {
+      "concluido": "2026-10-11T09:52:09",
+      "minutos": 0.9
     }
   }
 }

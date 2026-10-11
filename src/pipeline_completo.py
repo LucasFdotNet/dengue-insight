@@ -32,7 +32,9 @@ logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(
 DOWNLOAD = ['ingestion', 'ingestion_clima']
 # (módulo em src/, argumentos); a ordem respeita as dependências entre os experimentos
 PASSOS = [
-    ('experimento_classificadores', []),     # o mais longo e o mais esperado: primeiro
+    # o mais longo e o mais esperado: primeiro; 6 processos (com 8, a comparação chegou ao limite de memória
+    # num computador de 28 GB: Random Forest profundo e LSTM ao mesmo tempo). Não muda os resultados.
+    ('experimento_classificadores', ['--processos', '6']),
     ('train', []),
     ('eda', []),
     ('experimento_modelos', ['--reajustar']),

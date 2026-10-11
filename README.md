@@ -142,7 +142,7 @@ Os resultados usam três tipos de número. Cada tabela abaixo indica qual está 
 | **Acerto de tendência** | Fração das semanas em que o modelo acertou se os casos iriam subir, ficar estáveis ou cair | **Maior é melhor.** Comparar com o "sempre estável", que já acerta muito porque a maioria das semanas é estável |
 | **Acerto balanceado** | Média do acerto em cada uma das três situações (subiu, ficou estável, caiu), calculado separadamente | **Maior é melhor**, de 0 a 1. O baseline tira 0,333. **Não** é uma divisão pelo baseline |
 
-**Exemplo de acerto balanceado** (LightGBM de regressão, 4 semanas de antecedência, semanas de 100 municípios somadas): o modelo acertou 41,6% das semanas em que os casos subiram, 75,3% das estáveis e 60,7% das que caíram. O acerto balanceado é a média: (41,6% + 75,3% + 60,7%) / 3 = **0,592**. O baseline, que sempre diz "estável", acerta 0%, 100% e 0%: média de **0,333**.
+**Exemplo de acerto balanceado** (LightGBM de regressão, 4 semanas de antecedência, semanas de 100 municípios somadas): o modelo acertou 41,4% das semanas em que os casos subiram, 74,3% das estáveis e 61,0% das que caíram. O acerto balanceado é a média: (41,4% + 74,3% + 61,0%) / 3 = **0,589**. O baseline, que sempre diz "estável", acerta 0%, 100% e 0%: média de **0,333**.
 
 **Baseline de persistência:** a previsão mais simples possível, "daqui a H semanas haverá o mesmo número de casos de hoje". Na tendência, equivale a dizer sempre "estável". Um modelo só é útil se for melhor que isso.
 
@@ -233,11 +233,11 @@ Estado atual das decisões, com os números da base atual (115 municípios, dado
 
   | Grupo | 1 sem. | 2 sem. | 3 sem. | 4 sem. |
   |---|---|---|---|---|
-  | Municípios de treino (100) | 0,83 | 0,76 | 0,73 | 0,71 |
-  | Municípios de validação (15) | 0,79 | 0,71 | 0,68 | 0,67 |
+  | Municípios de treino (100) | 0,83 | 0,77 | 0,73 | 0,71 |
+  | Municípios de validação (15) | 0,78 | 0,72 | 0,69 | 0,67 |
 
-* **Por ano** (`reports/metricas_por_ano.csv`): nos municípios de treino, a razão fica abaixo de 1 em todos os anos de 2015 a 2026. Os anos mais difíceis são os de transmissão baixa ou estável (2017, 2018 e o parcial de 2026, de 0,88 a 0,97), e os melhores, os de epidemia (2024, de 0,64 a 0,76). Nos municípios de validação, só 2017 fica acima de 1 (até 1,11 em 4 semanas).
-* **Por município de validação** (`reports/metricas_modelos.csv`): o modelo supera o baseline com folga em Blumenau, Sorocaba, Vitória da Conquista e Bauru (0,56 a 0,64 em 4 semanas), mas empata em Parauapebas e Manacapuru (Norte), Caruaru e Sinop (0,94 a 1,04). A generalização é mais fraca nas regiões com menos municípios parecidos no treino.
+* **Por ano** (`reports/metricas_por_ano.csv`): nos municípios de treino, a razão fica abaixo de 1 em todos os anos de 2015 a 2026. Os anos mais difíceis são os de transmissão baixa ou estável (2017, 2018 e o parcial de 2026, de 0,89 a 0,97), e os melhores, os de epidemia (2024, de 0,65 a 0,76). Nos municípios de validação, só 2017 fica acima de 1 (até 1,16 em 4 semanas).
+* **Por município de validação** (`reports/metricas_modelos.csv`): o modelo supera o baseline com folga em Blumenau, Vitória da Conquista e Sorocaba (0,57 a 0,60 em 4 semanas), mas empata em Parauapebas e Manacapuru (Norte), Caruaru e Sinop (0,95 a 1,03). A generalização é mais fraca nas regiões com menos municípios parecidos no treino.
 * **Pandemia (2020–2021):** num teste com a base de SP, treinar sem esses anos não mudou o resultado; todos os anos foram mantidos.
 * **Limitação: dados revisados.** A simulação usa os casos na versão revisada de hoje; em tempo real, as semanas recentes estariam incompletas. Por isso ela é otimista nesse ponto. O InfoDengue não guarda os dados como eram conhecidos em cada data, então isso não pode ser corrigido para o passado (avaliação pseudoprospectiva). A decisão 12 mede o tamanho desse efeito.
 
@@ -250,12 +250,12 @@ Estado atual das decisões, com os números da base atual (115 municípios, dado
 
   | Antecedência | Acerto balanceado | Acerto | Acerto do "sempre estável" | Subidas detectadas | Alarmes de subida corretos | Sentido oposto |
   |---|---|---|---|---|---|---|
-  | 1 semana | 0,43 | 68% | 67% | 17% | 50% | 1% |
-  | 2 semanas | 0,56 | 64% | 57% | 40% | 53% | 4% |
-  | 3 semanas | 0,62 | 65% | 52% | 51% | 55% | 6% |
-  | 4 semanas | 0,64 | 65% | 48% | 56% | 56% | 8% |
+  | 1 semana | 0,43 | 67% | 67% | 17% | 48% | 2% |
+  | 2 semanas | 0,56 | 64% | 57% | 39% | 53% | 4% |
+  | 3 semanas | 0,62 | 64% | 51% | 51% | 55% | 6% |
+  | 4 semanas | 0,64 | 65% | 47% | 56% | 56% | 8% |
 
-  Em 1 semana, os casos raramente mudam mais de 20%, e o ganho sobre o "sempre estável" é pequeno. De 2 a 4 semanas, o classificador acerta de 7 a 18 pontos a mais e detecta de 40% a 56% das subidas. Nos municípios de validação, o resultado é parecido (acerto balanceado de 0,43 a 0,62).
+  Em 1 semana, os casos raramente mudam mais de 20%, e o ganho sobre o "sempre estável" é pequeno. De 2 a 4 semanas, o classificador acerta de 7 a 18 pontos a mais e detecta de 39% a 56% das subidas. Nos municípios de validação, o resultado é parecido (acerto balanceado de 0,43 a 0,62).
 
 ### 8. Rt fora dos modelos, usado só para comparação
 
@@ -265,12 +265,12 @@ Estado atual das decisões, com os números da base atual (115 municípios, dado
 
   | Modelo | 1 sem. | 2 sem. | 3 sem. | 4 sem. |
   |---|---|---|---|---|
-  | **LightGBM classificador (melhor modelo)** | **0,419** | **0,554** | **0,605** | **0,623** |
-  | Classificador só com o Rt | 0,362 | 0,464 | 0,516 | 0,538 |
-  | Regra do `p_rt1` | 0,388 | 0,428 | 0,440 | 0,440 |
-  | Regra do Rt | 0,347 | 0,376 | 0,385 | 0,382 |
+  | **LightGBM classificador (melhor modelo)** | **0,418** | **0,549** | **0,600** | **0,619** |
+  | Classificador só com o Rt | 0,363 | 0,458 | 0,512 | 0,532 |
+  | Regra do `p_rt1` | 0,385 | 0,426 | 0,439 | 0,440 |
+  | Regra do Rt | 0,346 | 0,375 | 0,384 | 0,382 |
 
-* **Conclusões:** o nosso modelo é melhor que qualquer uso do Rt, em todos os horizontes, com intervalos de confiança de 95% que excluem zero; nos 15 municípios de validação o resultado se repete, com uma exceção: em 1 semana, a regra do `p_rt1` empata com o nosso modelo. Mesmo o classificador treinado só com o Rt perde de 6 a 9 pontos, então os casos recentes contêm mais informação sobre a tendência do que o Rt. As regras diretas pouco superam o "sempre estável" e dão muitos alarmes falsos (só 21% a 36% dos alarmes da regra do Rt se confirmam). **Ressalva:** o Rt mede a transmissão atual e não foi criado para prever a variação dos casos com o nosso critério; a conclusão vale para essa pergunta específica.
+* **Conclusões:** o nosso modelo é melhor que qualquer uso do Rt, em todos os horizontes, com intervalos de confiança de 95% que excluem zero; nos 15 municípios de validação o resultado se repete, com uma exceção: em 1 semana, a regra do `p_rt1` empata com o nosso modelo. Mesmo o classificador treinado só com o Rt perde de 5 a 9 pontos, então os casos recentes contêm mais informação sobre a tendência do que o Rt. As regras diretas pouco superam o "sempre estável" e dão muitos alarmes falsos (só 21% a 36% dos alarmes da regra do Rt se confirmam). **Ressalva:** o Rt mede a transmissão atual e não foi criado para prever a variação dos casos com o nosso critério; a conclusão vale para essa pergunta específica.
 
 ### 9. Clima no modelo
 
@@ -278,24 +278,24 @@ Estado atual das decisões, com os números da base atual (115 municípios, dado
 * **Clima usado:** temperatura média, chuva total e umidade média de cada uma das 4 semanas anteriores à semana atual S (o clima de S ainda não está disponível no momento da previsão, por causa do atraso do ERA5).
 * **Evidências:**
   * **Base de SP (13 municípios vizinhos, clima parecido):** todas as combinações de clima testadas pioraram a previsão.
-  * **Base nacional, LightGBM de regressão** (`reports/generalizacao_configuracoes.csv`; razão de erro, **menor é melhor**): o clima **piora** a previsão de 1 semana, não faz diferença em 2 e 3 semanas e **melhora** a de 4 semanas (−0,014 na razão, cerca de 2%).
+  * **Base nacional, LightGBM de regressão** (`reports/generalizacao_configuracoes.csv`; razão de erro, **menor é melhor**): o clima **piora** a previsão de 1 semana, não faz diferença em 2 e 3 semanas e **melhora** a de 4 semanas (de −0,007 a −0,009 na razão, cerca de 1%).
   * **Base nacional, LightGBM classificador** (`src/experimento_clima_classificador.py`, `reports/comparacao_clima_classificador.csv`; validação cruzada, 100 municípios; acerto balanceado, **de 0 a 1, maior é melhor, o baseline tira 0,333**):
 
     | Modelo | 1 sem. | 2 sem. | 3 sem. | 4 sem. |
     |---|---|---|---|---|
-    | Classificador sem clima | 0,419 | 0,554 | 0,605 | 0,623 |
-    | **Classificador com clima S-1 a S-4** | **0,430** | **0,560** | **0,611** | **0,633** |
-    | Classificador com clima S-1 a S-5 | 0,427 | 0,561 | 0,612 | 0,632 |
+    | Classificador sem clima | 0,418 | 0,549 | 0,600 | 0,619 |
+    | **Classificador com clima S-1 a S-4** | **0,423** | **0,556** | **0,608** | **0,628** |
+    | Classificador com clima S-1 a S-5 | 0,426 | 0,555 | 0,609 | 0,627 |
 
-    O clima de S-1 a S-4 melhora o acerto balanceado em todos os horizontes (de +0,006 a +0,010, com intervalos de confiança de 95% que excluem zero). Com 4 semanas, detecta mais subidas (57,0% contra 54,7%), tem mais alarmes corretos (58,1% contra 57,0%) e erra menos o sentido (8,2% contra 8,9%). Nos 15 municípios de validação, as diferenças vão na mesma direção (+0,002 a +0,009), mas só são significativas em 2 semanas (em 1 semana, o limite inferior do intervalo fica em zero).
+    O clima de S-1 a S-4 melhora o acerto balanceado em todos os horizontes (de +0,005 a +0,009, com intervalos de confiança de 95% que excluem zero). Com 4 semanas, detecta mais subidas (56,6% contra 54,7%), tem mais alarmes corretos (57,8% contra 56,5%) e erra menos o sentido (8,3% contra 9,2%). Nos 15 municípios de validação, as diferenças vão de −0,002 a +0,013 e só são significativas em 1 semana.
 * **Interpretação:** o ganho é pequeno (cerca de 1 ponto). O efeito do clima sobre os casos leva semanas para aparecer (desenvolvimento do mosquito, incubação e notificação). O classificador aproveita o clima também nos horizontes curtos porque prevê diretamente a mudança de tendência, onde o clima recente ajuda a distinguir uma subida real de uma oscilação.
 
 ### 10. Base nacional e generalização
 
 * **Decisão:** avaliar o projeto principalmente pela **generalização** para municípios não vistos, com uma base de todo o Brasil (decisão 1).
 * **Treino nacional melhora SP:** com a base de 74 municípios, treinar com todo o Brasil em vez de só SP reduziu o erro nos municípios de SP de 7% a 10% (treino) e de 18% a 23% (validação).
-* **O modelo generaliza** (`src/experimento_generalizacao.py`; validação cruzada, 100 municípios avaliados como desconhecidos; razão de erro, **menor é melhor**): 0,84 em 1 semana, 0,77 em 2, 0,74 em 3 e 0,73 em 4, com intervalos de confiança de 95% inteiramente abaixo de 1. O modelo erra de 16% a 27% menos que o baseline em municípios que não viu.
-* **Mais municípios ajudam cada vez menos** (curva de aprendizado; razão de erro com 4 semanas de antecedência): 0,81 com 10 municípios no treino, 0,77 com 20, 0,75 com 40, 0,73 com 60 e 80. De 10 para 40 municípios, o erro cai de 5% a 8%; de 40 para 80, de 2% a 3%. Pela curva ajustada (`erro = a + b·n^(-c)`), dobrar a base para 200 municípios reduziria o erro em cerca de 1%. Com 100 municípios, a quantidade de dados deixou de ser o principal limite. A curva usa 5 pontos e 3 sorteios por ponto, e o limite estimado é uma extrapolação.
+* **O modelo generaliza** (`src/experimento_generalizacao.py`; validação cruzada, 100 municípios avaliados como desconhecidos; razão de erro, **menor é melhor**): 0,84 em 1 semana, 0,77 em 2, 0,74 em 3 e 0,72 em 4, com intervalos de confiança de 95% inteiramente abaixo de 1. O modelo erra de 16% a 28% menos que o baseline em municípios que não viu.
+* **Mais municípios ajudam cada vez menos** (curva de aprendizado; razão de erro com 4 semanas de antecedência): 0,81 com 10 municípios no treino, 0,77 com 20, 0,74 com 40, 0,73 com 60 e 0,72 com 80. De 10 para 40 municípios, o erro cai de 6% a 10%; de 40 para 80, de 1% a 2%. Pela curva ajustada (`erro = a + b·n^(-c)`), dobrar a base para 200 municípios reduziria o erro em cerca de 1%. Com 100 municípios, a quantidade de dados deixou de ser o principal limite. A curva usa 5 pontos e 3 sorteios por ponto, e o limite estimado é uma extrapolação.
 
 ### 11. Comparação de modelos para a tendência
 
@@ -305,17 +305,17 @@ Estado atual das decisões, com os números da base atual (115 municípios, dado
   | Modelo | 1 sem. | 2 sem. | 3 sem. | 4 sem. |
   |---|---|---|---|---|
   | Baseline de persistência | 0,333 | 0,333 | 0,333 | 0,333 |
-  | Regressão linear | 0,367 | 0,429 | 0,496 | 0,536 |
-  | Binomial negativa | 0,368 | 0,444 | 0,521 | 0,565 |
-  | Ensemble (média de linear, binomial negativa e LightGBM) | 0,363 | 0,463 | 0,546 | 0,586 |
-  | LightGBM por quantis | 0,373 | 0,499 | 0,554 | 0,587 |
-  | LightGBM de regressão (usado no painel antes desta decisão) | 0,387 | 0,510 | 0,563 | 0,592 |
-  | LightGBM ajustado | 0,398 | 0,507 | 0,562 | 0,589 |
-  | **LightGBM classificador** | **0,419** | **0,554** | **0,605** | **0,623** |
+  | Regressão linear | 0,367 | 0,423 | 0,491 | 0,531 |
+  | Binomial negativa | 0,368 | 0,436 | 0,510 | 0,558 |
+  | Ensemble (média de linear, binomial negativa e LightGBM) | 0,362 | 0,454 | 0,540 | 0,580 |
+  | LightGBM por quantis | 0,374 | 0,494 | 0,552 | 0,583 |
+  | LightGBM de regressão (usado no painel antes desta decisão) | 0,387 | 0,506 | 0,559 | 0,589 |
+  | LightGBM ajustado | 0,389 | 0,507 | 0,562 | 0,590 |
+  | **LightGBM classificador** | **0,418** | **0,549** | **0,600** | **0,619** |
 
 * **Conclusões:**
   * As relações não lineares fazem diferença: regressão linear e binomial negativa (o modelo clássico da epidemiologia para contagens) ficaram bem abaixo. Combinar modelos e ajustar hiperparâmetros não trouxe ganho.
-  * O **classificador**, que prevê a tendência diretamente, é o único significativamente melhor que o LightGBM de regressão (3 a 4 pontos a mais). Ele detecta mais subidas (55% contra 42% em 4 semanas), mas com mais alarmes falsos (57% dos alarmes corretos, contra 65%) e não produz número de casos.
+  * O **classificador**, que prevê a tendência diretamente, é o único significativamente melhor que o LightGBM de regressão (3 a 4 pontos a mais). Ele detecta mais subidas (55% contra 41% em 4 semanas), mas com mais alarmes falsos (56% dos alarmes corretos, contra 65%) e não produz número de casos.
   * O **LightGBM por quantis** tem o menor erro em número de casos e um intervalo de previsão de 80% bem calibrado (o valor real caiu dentro dele em 78% a 82% das semanas).
 * **Decisão:** usar os dois modelos, cada um no que faz melhor. O **classificador com clima** (decisão 9) dá a tendência: no contexto do projeto, o mais importante é alertar uma subida, e ele detecta mais subidas que as alternativas. O **LightGBM por quantis** dá o número de casos, com uma faixa de 80% ("entre X e Y casos"). Os dois são independentes e podem divergir; o painel mostra os dois como são e avisa isso. Tabelas completas e limitações nas seções 16 a 19 de [`docs/historia_decisoes.md`](docs/historia_decisoes.md). Outros tipos de modelo (XGBoost, Random Forest e redes neurais) foram comparados depois, na decisão 15.
 
@@ -327,12 +327,12 @@ Estado atual das decisões, com os números da base atual (115 municípios, dado
 
   | Antecedência | Modelo sem lacuna | Modelo com lacuna de 4 semanas | Baseline com lacuna de 4 semanas | Razão de erro com lacuna |
   |---|---|---|---|---|
-  | 1 semana | 25 | 70 (2,8×) | 99 | 0,70 |
+  | 1 semana | 25 | 69 (2,8×) | 99 | 0,70 |
   | 2 semanas | 37 | 78 (2,1×) | 113 | 0,69 |
   | 3 semanas | 48 | 87 (1,8×) | 127 | 0,68 |
   | 4 semanas | 59 | 94 (1,6×) | 140 | 0,67 |
 
-  Nos municípios de validação, o erro do modelo cresce de 1,6 a 2,9 vezes com lacuna de 4 semanas, e a razão de erro fica entre 0,63 e 0,64. Com lacuna de 5 semanas, os erros crescem um pouco mais (de 1,7 a 3,3 vezes), com as mesmas conclusões.
+  Nos municípios de validação, o erro do modelo cresce de 1,6 a 2,8 vezes com lacuna de 4 semanas, e a razão de erro fica entre 0,62 e 0,64. Com lacuna de 5 semanas, os erros crescem um pouco mais (de 1,7 a 3,2 vezes), com as mesmas conclusões.
 * **Conclusões:** o atraso dos dados custa caro: sem as 4 semanas mais recentes, o erro do modelo aumenta de 1,6 a 2,8 vezes, mais nas antecedências curtas. Mas o modelo continua útil, e sua vantagem sobre o baseline aumenta (erra de 30% a 33% menos, contra 16% a 29% sem lacuna): quanto mais incerta a situação, mais vale um modelo que antecipa a tendência. Em uso real, as previsões devem ser lidas como estimativas de tendência, com margem de erro maior do que a validação sugere.
 
 ### 13. Painel
@@ -368,20 +368,20 @@ Estado atual das decisões, com os números da base atual (115 municípios, dado
 
   | Modelo | 1 sem. | 2 sem. | 3 sem. | 4 sem. |
   |---|---|---|---|---|
-  | **LightGBM classificador com clima (em produção)** | **0,430** | **0,560** | **0,611** | **0,633** |
-  | LightGBM ajustado | 0,429 | 0,561 | 0,611 | 0,635 |
-  | LightGBM com janela de 12 semanas | 0,433 | 0,565* | 0,615* | 0,635 |
-  | XGBoost | 0,427 | 0,562 | 0,612 | 0,634 |
-  | Random Forest | 0,418* | 0,554* | 0,607* | 0,631 |
-  | MLP | 0,419* | 0,554* | 0,611 | 0,632 |
-  | LSTM | 0,419* | 0,557 | 0,609 | 0,630 |
-  | LightGBM com peso igual para as três tendências | 0,581* | 0,610* | 0,628* | 0,638 |
-  | **Em produção + decisão balanceada** | **0,580*** | **0,612*** | **0,630*** | **0,640** |
+  | **LightGBM classificador com clima (em produção)** | **0,423** | **0,556** | **0,608** | **0,628** |
+  | LightGBM ajustado | 0,427* | 0,556 | 0,609 | 0,631* |
+  | LightGBM com janela de 12 semanas | 0,434* | 0,561* | 0,610 | 0,630 |
+  | XGBoost | 0,420 | 0,556 | 0,608 | 0,628 |
+  | Random Forest | 0,413* | 0,549* | 0,605* | 0,626 |
+  | MLP | 0,414* | 0,550* | 0,602* | 0,625* |
+  | LSTM | 0,418 | 0,553 | 0,604 | 0,624 |
+  | LightGBM com peso igual para as três tendências | 0,575* | 0,606* | 0,624* | 0,633 |
+  | **Em produção + decisão balanceada** | **0,573*** | **0,610*** | **0,626*** | **0,635** |
 
 * **Conclusões:**
-  * **Nenhum modelo supera o de produção de forma relevante.** XGBoost e LightGBM ajustado empatam; a janela de 12 semanas ganha menos de meio ponto; Random Forest e as redes neurais ficam um pouco abaixo nos horizontes curtos e têm probabilidades piores (log loss de 0,790 contra 0,780 em 4 semanas). Nos 15 municípios de validação e de 2022 em diante, o quadro é o mesmo. Com estas variáveis, o limite está na informação disponível, e não no modelo.
+  * **Nenhum modelo supera o de produção de forma relevante.** O XGBoost empata; o LightGBM ajustado e a janela de 12 semanas ganham no máximo 1 ponto, só em alguns horizontes; Random Forest e as redes neurais ficam um pouco abaixo nos horizontes curtos, e as redes neurais têm probabilidades piores (log loss de 0,802 e 0,806 contra 0,791 em 4 semanas). Nos 15 municípios de validação e de 2022 em diante, o quadro é o mesmo. Com estas variáveis, o limite está na informação disponível, e não no modelo.
   * **Ajustar hiperparâmetros não trouxe ganho** (a não ser para o Random Forest, cujo padrão era ruim), como já tinha acontecido na decisão 11.
-  * **O peso por classe não é um modelo melhor, é outra regra de decisão.** Aplicar a decisão balanceada às probabilidades do modelo em produção, sem treinar de novo, dá o mesmo resultado, com probabilidades melhores (log loss de 0,738 contra 0,957 em 1 semana). A troca: em 1 semana, as subidas detectadas passam de 18% para 63%, mas os alarmes de subida corretos caem de 50% para 35% e o acerto simples de 66% para 49%; em 4 semanas, de 57% para 69% das subidas, com 52% dos alarmes corretos contra 58%. Nos 15 municípios de validação, a decisão balanceada piora 3 e 4 semanas (0,590 contra 0,616 em 4 semanas).
+  * **O peso por classe não é um modelo melhor, é outra regra de decisão.** Aplicar a decisão balanceada às probabilidades do modelo em produção, sem treinar de novo, dá o mesmo resultado, com probabilidades melhores (log loss de 0,749 contra 0,973 em 1 semana). A troca: em 1 semana, as subidas detectadas passam de 17% para 63%, mas os alarmes de subida corretos caem de 49% para 34% e o acerto simples de 65% para 48%; em 4 semanas, de 57% para 69% das subidas, com 52% dos alarmes corretos contra 58%. Nos 15 municípios de validação, a decisão balanceada piora 3 e 4 semanas (0,588 contra 0,616 em 4 semanas, significativo só em 4).
   * **Exigir mais confiança nos alarmes não resolve.** Em 2015–2018, nenhum ponto de corte da probabilidade de subida chega a 2 alarmes corretos para cada falso, a não ser avisando menos de 8% das subidas; em 1 semana, nem isso.
 * **Ruído numérico:** mudar só o último dígito (10⁻¹⁵) das variações de casos, ao recalculá-las, mudou o acerto balanceado de 1 semana em até 0,004 (o LightGBM escolhe alguns cortes diferentes). Diferenças desse tamanho entre modelos não devem ser interpretadas. O experimento foi refeito com as variáveis exatamente iguais às do pré-processamento.
 * **Decisão:** manter o LightGBM classificador com clima, sem ajuste. Estes resultados levaram a rever a pergunta do projeto: a tendência relativa (variação de 20%) não diz se o município precisa mobilizar recursos; ver a decisão 16.
@@ -395,17 +395,17 @@ Estado atual das decisões, com os números da base atual (115 municípios, dado
   * **amarelo:** acima do limiar pré-epidêmico (a temporada de transmissão começou);
   * **vermelho:** acima do limiar epidêmico.
 * **Limiares pelo MEM** (*Moving Epidemic Method*; Vega et al., 2013 e 2015), o método que o InfoDengue usa e que o Plano de Contingência do Ministério da Saúde cita como apoio. Reimplementado em Python (`src/mem.py`), seguindo o pacote R `mem` e as configurações do InfoDengue: temporada da semana epidemiológica 41 à 40; até 10 temporadas anteriores; período epidêmico de cada temporada pela curva MAP; limiares como limite superior do intervalo de confiança de 95% da média geométrica das semanas pré-epidêmicas e epidêmicas; segundo passe sem as temporadas que não passaram do limiar pré-epidêmico; mínimos de 5 e 10 casos. Os limiares de cada temporada usam só as anteriores (as temporadas antes de 2014-2015 usam as de 2010-2011 a 2013-2014), sobre a incidência por 100 mil habitantes (população do Censo 2022). Referências e o que tiramos de cada uma: [`docs/referencias.md`](docs/referencias.md).
-* **Validação da reimplementação:** com os dados de 2010 a 2022, os limiares do projeto têm correlação de 0,996 (pré-epidêmico) e 0,992 (epidêmico) com os publicados pelo InfoDengue para os mesmos municípios, e ficam em média 5% abaixo (os dados foram revisados desde então). Nenhum indicador calculado pelo InfoDengue entra nos modelos: os limiares são calculados pelo projeto, só a partir dos casos.
+* **Validação da reimplementação:** com os dados de 2010 a 2022, os limiares do projeto têm correlação de 0,995 (pré-epidêmico) e 0,992 (epidêmico) com os publicados pelo InfoDengue para os mesmos municípios, e ficam em média 5% abaixo (os dados foram revisados desde então). Nenhum indicador calculado pelo InfoDengue entra nos modelos: os limiares são calculados pelo projeto, só a partir dos casos.
 * **Alternativas consideradas e por que foram descartadas** (`src/estados.py`, `src/experimento_estados.py`, `src/experimento_niveis.py`):
 
   | Alternativa | O que é | Por que não, frente ao objetivo |
   |---|---|---|
   | Tendência relativa (decisão 7) | Sobe, estável ou cai, por variação de 20% e 5 casos | Não diz o nível nem quando manter ou desmobilizar |
   | Nível do InfoDengue (`nivel_inc`) | Os limiares MEM calculados pelo InfoDengue | Regra do projeto: nenhum dado calculado pelo InfoDengue nos modelos; usado só para validar |
-  | Dois estados (normal e alto, percentil 90 do histórico do município) | Primeira versão por níveis | Funciona (avisa 67% das epidemias com 52% de alarmes corretos), mas não separa "alta que merece atenção" de epidemia |
+  | Dois estados (normal e alto, percentil 90 do histórico do município) | Primeira versão por níveis | Funciona (avisa 66% das epidemias com 49% de alarmes corretos), mas não separa "alta que merece atenção" de epidemia |
   | Percentis 75 e 90 (definição A) | Aproximação dos limiares por percentis | Sem base direta na literatura; resultado parecido com o MEM |
-  | Percentis 80 e 97 (definição B) | Vermelho só nos 3% de semanas mais altas | O alerta funciona bem (84% das epidemias), mas o vermelho vira um evento raro (7% das semanas), diferente do nível epidêmico usado na vigilância, e a definição não tem base direta na literatura |
-  | Canal endêmico do Ministério da Saúde (definição C) | Mediana e Q3 da mesma semana nos 5 anos anteriores (Plano de Contingência, 2025, seção 5) | Mede "acima do esperado para a época". Com o aumento da dengue de 2022 a 2025, municípios ficaram vermelhos por anos seguidos (Campinas e Blumenau, quase 2 anos, inclusive no inverno); 36% das semanas ficam vermelhas; o modelo quase não supera a persistência, e o alerta praticamente nunca acende. Útil para acompanhar a temporada, não para decidir quando mobilizar |
+  | Percentis 80 e 97 (definição B) | Vermelho só nos 3% de semanas mais altas | O alerta funciona bem (76% das epidemias), mas o vermelho vira um evento raro (7% das semanas), diferente do nível epidêmico usado na vigilância, e a definição não tem base direta na literatura |
+  | Canal endêmico do Ministério da Saúde (definição C) | Mediana e Q3 da mesma semana nos 5 anos anteriores (Plano de Contingência, 2025, seção 5) | Mede "acima do esperado para a época". Com o aumento da dengue de 2022 a 2025, municípios ficaram vermelhos por anos seguidos (Campinas e Blumenau, quase 2 anos, inclusive no inverno); 37% das semanas ficam vermelhas; o modelo quase não supera a persistência, e o alerta praticamente nunca acende. Útil para acompanhar a temporada, não para decidir quando mobilizar |
 
 * **Modelo:** LightGBM com as mesmas variáveis do classificador de tendência e a distância da semana atual a cada limiar (`src/modelos/nivel_lightgbm.py`); dá a probabilidade de cada nível em S+2, S+3 e S+4. O nível previsto é o **mais provável**. (Prever vermelho sempre que a chance passa de um corte calibrado prevê vermelho demais semana a semana e perde para a persistência; foi descartado.)
 * **Alerta de mobilização:** acende numa semana em que o município não está no vermelho, se a maior probabilidade de vermelho em S+2 a S+4 passa de um corte. O corte é escolhido a cada trimestre só com o passado: o menor em que pelo menos metade dos alarmes anteriores se confirmou (**1 alarme correto para cada falso**; o critério de 2 para 1, testado antes, é inatingível com estas informações, decisão 15). Os cortes ficaram estáveis ao longo do tempo.
@@ -414,36 +414,36 @@ Estado atual das decisões, com os números da base atual (115 municípios, dado
 
   | | Validação cruzada (100 municípios) | Validação (15 municípios nunca vistos) |
   |---|---|---|
-  | Epidemias no vermelho (episódios) | 492 | 79 |
-  | **Alerta: epidemias avisadas antes de começar** | **74%** (69% a 79%) | **71%** (58% a 84%) |
+  | Epidemias no vermelho (episódios) | 506 | 79 |
+  | **Alerta: epidemias avisadas antes de começar** | **72%** (68% a 76%) | **71%** (59% a 84%) |
   | Alerta: antecedência (mediana) | 3 semanas | 3 semanas |
-  | Alerta: alarmes que se confirmaram | 52% (49% a 56%) | 54% (44% a 64%) |
-  | Alerta: alarmes falsos por município por ano | 0,49 (0,44 a 0,55) | 0,46 (0,32 a 0,61) |
-  | Regra simples (casos subindo há 2 semanas e acima de metade do limiar): avisadas / corretos / falsos por ano | 68% / 36% / 0,82 | 71% / 37% / 0,90 |
+  | Alerta: alarmes que se confirmaram | 51% (47% a 55%) | 57% (45% a 70%) |
+  | Alerta: alarmes falsos por município por ano | 0,53 (0,46 a 0,59) | 0,43 (0,27 a 0,61) |
+  | Regra simples (casos subindo há 2 semanas e acima de metade do limiar): avisadas / corretos / falsos por ano | 66% / 35% / 0,86 | 71% / 37% / 0,90 |
   | Nível previsto: acerto com 4 semanas (modelo / persistência) | 79% / 76% | 81% / 77% |
-  | Nível previsto: ganho sobre a persistência com 4 semanas | +3,4 pontos (2,6 a 4,1) | +3,3 pontos (1,6 a 5,2) |
-  | **Desmobilização: fins de epidemia indicados nas 2 semanas antes** | **79%** (75% a 83%) | **81%** (69% a 91%) |
-  | Desmobilização: avisos prematuros por epidemia | 1,0 (0,8 a 1,1) | 1,2 (0,8 a 1,7) |
-  | Regra simples de queda (casos caindo há 2 semanas): fins indicados / avisos prematuros | 54% / 3,1 | 60% / 3,9 |
+  | Nível previsto: ganho sobre a persistência com 4 semanas | +3,2 pontos (2,5 a 3,8) | +3,4 pontos (1,8 a 5,1) |
+  | **Desmobilização: fins de epidemia indicados nas 2 semanas antes** | **78%** (74% a 82%) | **81%** (69% a 90%) |
+  | Desmobilização: avisos prematuros por epidemia | 1,0 (0,9 a 1,2) | 1,1 (0,7 a 1,5) |
+  | Regra simples de queda (casos caindo há 2 semanas): fins indicados / avisos prematuros | 53% / 3,2 | 60% / 3,9 |
 
-  Entre parênteses, os intervalos de confiança de 95% por bootstrap sobre municípios (`src/experimento_niveis_robustez.py`, `reports/niveis_robustez.csv`). As diferenças do modelo para a regra simples são significativas na validação cruzada (epidemias avisadas: +7 pontos, de 2 a 12; alarmes corretos: +16 pontos; alarmes falsos: −0,33 por ano); nos 15 municípios de validação, o modelo empata em epidemias avisadas e é melhor em alarmes corretos e falsos.
+  Entre parênteses, os intervalos de confiança de 95% por bootstrap sobre municípios (`src/experimento_niveis_robustez.py`, `reports/niveis_robustez.csv`). As diferenças do modelo para a regra simples são significativas na validação cruzada (epidemias avisadas: +6 pontos, de 2 a 11; alarmes corretos: +16 pontos; alarmes falsos: −0,34 por ano); nos 15 municípios de validação, o modelo empata em epidemias avisadas e é melhor em alarmes corretos e falsos.
   | Nível previsto: mudanças de nível acertadas com 4 semanas (a persistência nunca acerta) | 41% | 46% |
 
   O modelo avisa mais epidemias que a regra simples, com bem menos alarmes falsos, e o resultado se mantém nos municípios que ele nunca viu. A persistência (o nível de hoje continua) acerta muito semana a semana, porque os níveis mudam pouco, mas nunca antecipa uma epidemia; o valor do modelo está nas mudanças de nível e no alerta.
-* **Sem a previsão de 1 semana:** os níveis são previstos com 2, 3 e 4 semanas de antecedência, e o alerta usa só essas três. A previsão de 1 semana é quase uma cópia do nível atual (ganho de 0,7 ponto sobre a persistência, contra 3,3 com 4 semanas) e dá pouco tempo para mobilizar; o nível atual já cumpre esse papel. Sem ela, o alerta ficou praticamente igual (74% das epidemias avisadas, 52% de alarmes corretos, 0,49 alarme falso por ano, contra 74%, 52% e 0,50 com ela) e a antecedência mediana passou de 2 para 3 semanas. O modelo de tendência e o painel atual (decisões 11 e 13) continuam com 1 a 4 semanas.
-* **Desmobilização** (manter e desmobilizar): o modelo indica o fim da epidemia quando o nível mais provável em S+2 deixa de ser vermelho, numa semana em que o município está no vermelho. Ele indicou 79% dos fins nas 2 semanas anteriores à saída do vermelho, com 1 aviso prematuro por epidemia (uma semana em que indicou o fim antes da hora); a regra de queda indica 54%, com 3 avisos prematuros.
+* **Sem a previsão de 1 semana:** os níveis são previstos com 2, 3 e 4 semanas de antecedência, e o alerta usa só essas três. A previsão de 1 semana é quase uma cópia do nível atual (ganho de 0,7 ponto sobre a persistência, contra cerca de 3 com 4 semanas) e dá pouco tempo para mobilizar; o nível atual já cumpre esse papel. Sem ela, o alerta ficou praticamente igual (medido antes da troca de municípios da decisão 1: 74% das epidemias avisadas, 52% de alarmes corretos e 0,49 alarme falso por ano, contra 74%, 52% e 0,50 com ela) e a antecedência mediana passou de 2 para 3 semanas. O modelo de tendência e o painel atual (decisões 11 e 13) continuam com 1 a 4 semanas.
+* **Desmobilização** (manter e desmobilizar): o modelo indica o fim da epidemia quando o nível mais provável em S+2 deixa de ser vermelho, numa semana em que o município está no vermelho. Ele indicou 78% dos fins nas 2 semanas anteriores à saída do vermelho, com 1 aviso prematuro por epidemia (uma semana em que indicou o fim antes da hora); a regra de queda indica 53%, com 3 avisos prematuros.
 * **Dados atrasados** (`src/experimento_niveis_robustez.py`): em tempo real, a última semana ainda sobe cerca de 45% nos 12 dias seguintes, a de 2 semanas antes, 8%, e a de 4 semanas antes, 3% (`reports/revisao_dados.csv`). Como na decisão 12, a simulação descarta as últimas 2 semanas (cenário realista) ou 4 (pior caso), inclusive para saber o nível atual. Como o gestor só saberia do início da epidemia quando os dados o mostrassem, um alarme também conta como correto se o vermelho começou nas semanas que os dados ainda não mostravam.
 
   | Validação cruzada | Sem atraso | Atraso de 2 semanas | Atraso de 4 semanas |
   |---|---|---|---|
-  | Alerta: epidemias avisadas antes de começar (regra simples) | 74% (68%) | 57% (36%) | 40% (22%) |
-  | Alerta: avisadas antes de os dados mostrarem o início | 74% | 80% | 76% |
-  | Alerta: alarmes corretos / falsos por município por ano | 52% / 0,49 | 52% / 0,60 | 54% / 0,59 |
-  | Desmobilização: fins indicados nas 2 semanas antes / antes de os dados mostrarem | 79% / 79% | 72% / 90% | 69% / 94% |
-  | Nível previsto com 4 semanas: modelo / persistência | 79% / 76% | 75% / 70% | 71% / 65% |
+  | Alerta: epidemias avisadas antes de começar (regra simples) | 72% (66%) | 56% (37%) | 42% (23%) |
+  | Alerta: avisadas antes de os dados mostrarem o início | 72% | 80% | 77% |
+  | Alerta: alarmes corretos / falsos por município por ano | 51% / 0,53 | 54% / 0,59 | 53% / 0,62 |
+  | Desmobilização: fins indicados nas 2 semanas antes / antes de os dados mostrarem | 78% / 78% | 70% / 91% | 67% / 94% |
+  | Nível previsto com 4 semanas: modelo / persistência | 79% / 76% | 74% / 70% | 70% / 65% |
 
-  Com atraso, todos perdem antecedência, mas o modelo perde menos que a regra simples e que a persistência, e a sua vantagem cresce (de +3,4 para +5,7 pontos no nível com 4 semanas). A credibilidade do alerta se mantém (cerca de 1 alarme correto para cada falso). Em 76% a 80% das epidemias, o alerta chega antes de os dados mostrarem o início; em 90% a 94% dos fins, o modelo indica a saída antes de os dados a mostrarem. Nos 15 municípios de validação, o resultado é parecido (62% e 57% das epidemias avisadas antes de começar, com atraso de 2 e 4 semanas).
-* **Alertas por antecedência** (`reports/niveis_alertas_antecedencia.csv`): de cada previsão que acendeu o alerta, de 53% a 55% das semanas previstas foram vermelhas, de 43% a 46% amarelas e de 1% a 2% verdes, nas três antecedências. O alarme falso quase sempre cai num amarelo, não numa semana normal.
+  Com atraso, todos perdem antecedência, mas o modelo perde menos que a regra simples e que a persistência, e a sua vantagem cresce (de +3,2 para +5,2 pontos no nível com 4 semanas). A credibilidade do alerta se mantém (cerca de 1 alarme correto para cada falso). Em 77% a 80% das epidemias, o alerta chega antes de os dados mostrarem o início; em 91% a 94% dos fins, o modelo indica a saída antes de os dados a mostrarem. Nos 15 municípios de validação, o resultado é parecido (65% e 53% das epidemias avisadas antes de começar, com atraso de 2 e 4 semanas).
+* **Alertas por antecedência** (`reports/niveis_alertas_antecedencia.csv`): de cada previsão que acendeu o alerta, de 54% a 55% das semanas previstas foram vermelhas, de 44% a 45% amarelas e de 1% a 2% verdes, nas três antecedências. O alarme falso quase sempre cai num amarelo, não numa semana normal.
 * **Limitações:** avaliação pseudoprospectiva (dados já revisados; em tempo real as semanas recentes estão incompletas, decisões 3 e 12); o atraso dos dados é simulado descartando semanas, já que não há fotos dos dados de cada semana do passado; as escolhas que o MEM e o InfoDengue deixam em aberto (mínimos de casos, população fixa do Censo 2022) estão registradas em `src/estados.py`.
 * **Limitação: municípios onde a dengue chegou ou mudou de patamar.** Como os limiares vêm do histórico do próprio município, quem tinha pouca dengue fica vermelho por muito tempo quando ela chega, até as novas temporadas entrarem no cálculo. De 2015 em diante, 8 dos 115 municípios ficaram um ano ou mais seguidos no vermelho: Blumenau, Florianópolis e Joinville (SC), com a chegada da dengue ao estado (de 2,7 a 3,5 anos; em Joinville, o limiar epidêmico só alcançou o novo patamar depois de 3 a 4 temporadas, indo de 10 para 2.801 casos por semana); Macapá, Altamira, Cosmópolis e Rio das Ostras, que passaram a ter de 5 a 10 vezes mais casos (de 1,3 a 1,8 ano); e Sinop, com uma temporada de fato longa em 2024. Nesses períodos, o vermelho indica "acima de tudo o que o município já viveu", mas não distingue "entrar em epidemia" de "continuar nela", e o alerta de entrada perde o sentido. No Rio Grande do Sul, onde a dengue também chegou, o inverno interrompe a transmissão e os episódios se encerram a cada ano. O comportamento é o esperado de qualquer limiar baseado no histórico (o MEM, os percentis e o canal endêmico) e se corrige em 1 a 4 temporadas; o grupo decidiu registrá-lo, sem mudar o método, e discutir na apresentação do painel uma mensagem de "transmissão sustentada" para esses casos.
 * **Em andamento:** o painel ainda mostra a tendência (decisões 11 e 13); a troca pelos níveis e pelo alerta será feita depois de definidos o que ele mostra, se haverá alerta de amarelo e se o número de casos (modelo por quantis) continua. Tabelas e gráficos de cada etapa: seção 22 de [`docs/historia_decisoes.md`](docs/historia_decisoes.md).
@@ -459,9 +459,9 @@ Estado atual das decisões, com os números da base atual (115 municípios, dado
 
   | Previsão feita | Erro / erro de repetir os casos confirmados | Casos dentro da faixa de 80% | Nos 15 municípios de validação |
   |---|---|---|---|
-  | Na própria semana | 0,75 (0,72 a 0,79) | 79% | 0,71; 82% |
-  | 2 semanas antes | 0,70 (0,67 a 0,74) | 78% | 0,66; 81% |
-  | 4 semanas antes | 0,69 (0,67 a 0,72) | 78% | 0,62; 82% |
+  | Na própria semana | 0,75 (0,71 a 0,79) | 79% | 0,71; 82% |
+  | 2 semanas antes | 0,71 (0,68 a 0,74) | 79% | 0,66; 81% |
+  | 4 semanas antes | 0,69 (0,66 a 0,72) | 78% | 0,63; 81% |
 
   O modelo erra de 25% a 31% menos que repetir os casos da última semana confirmada, e a faixa de 80% contém o valor real em 78% a 82% das semanas.
 * **Avaliação no painel:** quadradinhos e casos previstos de cada município, feitos como o painel os faria (2 semanas de atraso, modelos que não viram o município), e as tabelas gerais de mobilização, desmobilização, nível, casos e efeito do atraso, com intervalos de confiança. O acerto de cada município é calculado no navegador a partir das previsões exportadas.

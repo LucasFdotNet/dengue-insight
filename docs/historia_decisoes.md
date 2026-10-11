@@ -904,6 +904,8 @@ A primeira versão do pipeline incluía `experimento_variaveis.py` e `experiment
 <a id="s21"></a>
 ## 21. Outros modelos e regra de decisão
 
+> **Números desta seção:** calculados com a lista de municípios anterior à troca da seção 24 (12 dos 115 municípios mudaram). As conclusões se mantiveram; os números atuais estão na decisão 15 do README.
+
 ### Contexto e pergunta
 
 Com os modelos em produção definidos (seção 19), o grupo quis testar se modelos de outros tipos dariam resultados melhores: Random Forest, XGBoost e, se fizesse sentido, redes neurais. A comparação também serve para mostrar no relatório que outras hipóteses foram testadas.
@@ -984,6 +986,8 @@ Na primeira execução, o modelo em produção teve 0,426 de acerto balanceado e
 
 <a id="s22"></a>
 ## 22. Da tendência aos níveis de incidência
+
+> **Números desta seção:** calculados com a lista de municípios anterior à troca da seção 24 (12 dos 115 municípios mudaram). As conclusões se mantiveram; os números atuais estão na decisão 16 do README.
 
 ### Contexto
 
@@ -1127,6 +1131,8 @@ python -m src.mem <arquivo mem_mun_2010_2022_BR.csv do InfoDengue>   # validaç�
 <a id="s23"></a>
 ## 23. Painel estático
 
+> **Números desta seção:** calculados com a lista de municípios anterior à troca da seção 24 (12 dos 115 municípios mudaram). As conclusões se mantiveram; os números atuais estão na decisão 17 do README.
+
 ### Contexto
 
 Com os níveis e o alerta definidos (seção 22), o grupo decidiu refazer o painel: sem depender do Streamlit, como um site 100% estático publicado no Cloudflare Pages, com um arquivo de dados por município carregado só quando ele é escolhido, e com três seções: **Indicadores** (para o gestor), **Avaliação** (para avaliar o modelo, o que pouco importa ao gestor) e **Ajuda** (documentação, a completar depois das definições restantes).
@@ -1161,7 +1167,21 @@ Ao remover o painel em Streamlit, apareceu um cuidado que ele tinha e o painel e
 
 ### Resultado
 
-Lista, critérios e consequências na decisão 1 do README (etapa 4); elegíveis de cada vaga em `reports/substituicao_municipios.csv`. A troca mudou os dados de 12 dos 115 municípios, então o pipeline completo foi refeito com os dados novos, e os números das seções anteriores que vêm do README foram atualizados.
+Lista, critérios e consequências na decisão 1 do README (etapa 4); elegíveis de cada vaga em `reports/substituicao_municipios.csv`. A troca mudou os dados de 12 dos 115 municípios, então o pipeline completo foi refeito em 11/10/2026, e todos os números do README foram atualizados. As seções anteriores desta história ficam como registro do que foi visto em cada etapa, com a lista de municípios da época.
+
+As conclusões não mudaram. Os números mudaram pouco, a maioria em menos de 1 ponto. Os principais:
+
+| | Antes da troca | Depois da troca |
+|---|---|---|
+| Classificador de tendência em produção, acerto balanceado com 4 semanas (validação cruzada) | 0,633 | 0,628 |
+| Modelo de quantis, razão de erro com 4 semanas (treino / validação) | 0,71 / 0,67 | 0,71 / 0,67 |
+| Alerta de entrada no vermelho (MEM): epidemias avisadas / alarmes corretos / falsos por município por ano | 74% / 52% / 0,49 | 72% / 51% / 0,53 |
+| Alerta nos 15 municípios de validação | 71% / 54% / 0,46 | 71% / 57% / 0,43 |
+| Desmobilização: fins indicados nas 2 semanas antes | 79% | 78% |
+| Casos aproximados com 2 semanas de atraso, 4 semanas à frente: erro / faixa de 80% | 0,69 / 78% | 0,69 / 78% |
+| Validação do MEM contra o InfoDengue: correlação dos limiares pré-epidêmico / epidêmico | 0,996 / 0,992 | 0,995 / 0,992 |
+
+O experimento de classificadores estourou a memória na primeira tentativa (8 processos treinando Random Forest e LSTM ao mesmo tempo num computador de 28 GB); passou a rodar com 6 processos, o que não muda os resultados.
 
 ### Como reproduzir
 
