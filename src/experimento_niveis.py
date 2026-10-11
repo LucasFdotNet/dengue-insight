@@ -82,6 +82,8 @@ ARQUIVO_CORTES = 'reports/niveis_cortes.csv'
 ARQUIVO_ALERTAS_H = 'reports/niveis_alertas_antecedencia.csv'
 # Sem a previsão de 1 semana: quase uma cópia do nível atual, com pouco tempo para mobilizar (decisão 16)
 HORIZONTES_NIVEIS = [h for h in HORIZONTES if h >= 2]
+# Alvos até 8 semanas: o teste de atraso (experimento_niveis_robustez.py) prevê antecedência + lacuna
+HORIZONTE_MAXIMO = 8
 # Exemplos para os quadradinhos: um município de treino e um de validação, com epidemias recentes
 EXEMPLOS = [(c, '2023-07-01', '2025-07-01') for c in ('campinas', 'sorocaba', 'fortaleza', 'blumenau')]
 VARIANTES_QUADRADINHOS = ['B', 'C', 'D']
@@ -98,15 +100,17 @@ TINTA, TINTA_SEC, MUDO, GRADE, FUNDO = '#0b0b0b', '#52514e', '#898781', '#e1e0d9
 
 @functools.lru_cache(maxsize=2)
 def dados(variante):
-    return adicionar_niveis(carregar('treino'), variante), adicionar_niveis(carregar('validacao'), variante)
+    return (adicionar_niveis(carregar('treino'), variante, HORIZONTE_MAXIMO),
+            adicionar_niveis(carregar('validacao'), variante, HORIZONTE_MAXIMO))
 
 
 def caminho(id_, variante, conjunto, inicio):
     return os.path.join(PASTA_CACHE, f'{id_}_v{VERSAO_CACHE}', variante, f'{conjunto}_{inicio}.parquet')
 
 
-def executar_unidade(id_, variante, conjunto, inicio):
-    destino = caminho(id_, variante, conjunto, inicio)
+def executar_unidade(id_, variante, conjunto, inicio, horizontes=None, destino=None):
+    horizontes = horizontes or HORIZONTES_NIVEIS
+    destino = destino or caminho(id_, variante, conjunto, inicio)
     if os.path.exists(destino):
         return
     treino, validacao = dados(variante)
@@ -119,10 +123,10 @@ def executar_unidade(id_, variante, conjunto, inicio):
     fim = (pd.Period(inicio, freq='M') + MESES_POR_RETREINO).start_time
     partes = []
     with threadpool_limits(THREADS):
-        for h in HORIZONTES_NIVEIS:
-            tr = linhas_validas(tr_base, h)
+        for h in horizontes:
+            tr = linhas_validas(tr_base, min(h, max(HORIZONTES)))  # o alvo de fato é faixa_h<H>, filtrado abaixo
             tr = tr[tr[f'faixa_h{h}'].notna() & (tr['data_iniSE'] + pd.Timedelta(weeks=h) < ini)]
-            te = linhas_validas(te_base, h)
+            te = linhas_validas(te_base, min(h, max(HORIZONTES)))
             te = te[te[f'faixa_h{h}'].notna() & (te['data_iniSE'] >= ini) & (te['data_iniSE'] < fim)]
             if te.empty:
                 continue

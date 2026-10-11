@@ -1048,6 +1048,35 @@ O InfoDengue calcula os seus limiares pelo MEM (*Moving Epidemic Method*; Vega e
 
   A precisão é a mesma nas três antecedências; a de 4 semanas acende mais vezes. Quando o alerta erra, a semana prevista quase sempre está no amarelo, e não no normal. Nos 15 municípios de validação, de 58% a 59% das semanas previstas foram vermelhas.
 
+### Etapa 6: desmobilização, dados atrasados e intervalos de confiança
+
+(`src/experimento_niveis_robustez.py`; resultados em `reports/niveis_robustez.csv`; definição D.)
+
+Três pontos ficaram em aberto antes do relatório: a desmobilização só tinha sido avaliada com dois estados; o alerta tinha sido medido com dados já revisados; e as métricas dos níveis não tinham intervalo de confiança, ao contrário das demais.
+
+* **Desmobilização.** O fim é indicado quando o nível mais provável em S+2 deixa de ser vermelho, numa semana em que o município está no vermelho; conta se a indicação vier nas 2 últimas semanas da epidemia. Comparação: regra de queda (casos caindo há 2 semanas).
+* **Atraso dos dados.** Pela revisão dos dados entre as duas fotos (seção 20), a última semana ainda sobe 45% em 12 dias, a de 2 semanas antes, 8%, e a de 4 semanas antes, 3%. Como na seção sobre atraso (decisão 12), a simulação descarta as últimas semanas: na semana X, o último dado usado é o de X-2 (cenário realista) ou X-4 (pior caso), inclusive para saber o nível atual; a previsão para X+H vem do modelo de H+2 ou H+4 semanas, treinado para isso (antecedências de 5 a 8 semanas, só na definição D). **Correção:** na primeira rodada, o alerta com atraso nunca acendia. Um alarme emitido logo depois de o vermelho começar contava como falso ("o episódio começou antes do alarme"), embora o gestor ainda não pudesse vê-lo nos dados; nenhum corte chegava a 1 alarme correto para cada falso. O critério passou a aceitar o episódio que começou nas semanas que os dados ainda não mostravam, e a avaliação mede a antecipação de duas formas: antes do início e antes de os dados mostrarem o início (ou o fim).
+* **Intervalos de confiança.** Bootstrap sobre municípios (2.000 reamostragens), como nas outras seções, com a diferença pareada para a regra simples.
+
+| Validação cruzada (100 municípios) | Sem atraso | Atraso de 2 semanas | Atraso de 4 semanas |
+|---|---|---|---|
+| Alerta: epidemias avisadas antes de começar | 74% (69% a 79%) | 57% (52% a 62%) | 40% (36% a 45%) |
+| Regra simples: epidemias avisadas antes de começar | 68% | 36% | 22% |
+| Alerta: avisadas antes de os dados mostrarem o início | 74% | 80% (76% a 84%) | 76% (72% a 81%) |
+| Alerta: alarmes corretos | 52% (49% a 56%) | 52% (49% a 56%) | 54% (51% a 57%) |
+| Alerta: alarmes falsos por município por ano | 0,49 (0,44 a 0,55) | 0,60 (0,54 a 0,66) | 0,59 (0,53 a 0,65) |
+| Desmobilização: fins indicados nas 2 semanas antes | 79% (75% a 83%) | 72% (67% a 76%) | 69% (64% a 74%) |
+| Regra de queda: fins indicados nas 2 semanas antes | 54% | 47% | 41% |
+| Desmobilização: indicados antes de os dados mostrarem o fim | 79% | 90% (87% a 93%) | 94% (92% a 96%) |
+| Desmobilização: avisos prematuros por epidemia (regra de queda) | 1,0 (3,1) | 1,4 (2,4) | 1,8 (1,8) |
+| Nível com 4 semanas: modelo / persistência | 79% / 76% | 75% / 70% | 71% / 65% |
+| Nível com 4 semanas: ganho sobre a persistência | +3,4 (2,6 a 4,1) | +4,6 (3,8 a 5,4) | +5,7 (4,6 a 6,8) |
+
+Nos 15 municípios de validação: sem atraso, 71% das epidemias avisadas (58% a 84%), 54% de alarmes corretos e 81% dos fins indicados; com atraso de 2 e 4 semanas, 62% e 57% das epidemias avisadas antes de começar (regra simples: 49% e 25%), com 56% e 61% de alarmes corretos.
+
+* **Leitura.** O atraso tira antecedência de todos os métodos, mas o modelo perde menos: a sua vantagem sobre a regra simples e sobre a persistência cresce com o atraso, porque ele antecipa o que os dados ainda não mostram. A credibilidade do alerta se mantém (cerca de 1 alarme correto para cada falso), com um pouco mais de alarmes falsos. Na desmobilização, o modelo indica 79% dos fins, contra 54% da regra de queda, com um terço dos avisos prematuros; com atraso de 4 semanas, a regra passa a ter tantos avisos prematuros quanto o modelo, mas indica bem menos fins.
+* **Consequência para o painel.** O nível "atual" que o painel mostra, calculado com as semanas mais recentes, é incerto; com 2 semanas de atraso, o nível conhecido acerta o nível de 4 semanas depois em 70% das vezes, contra 75% do modelo. A decisão sobre usar ou não as semanas mais recentes no painel fica para a reformulação do painel.
+
 ### Comparação das definições
 
 Validação cruzada, 2019 em diante; alerta de entrada no vermelho:
@@ -1072,7 +1101,7 @@ Os números do alerta já são os da versão sem a previsão de 1 semana (etapa 
 ### Limitações
 
 * Avaliação pseudoprospectiva, como as anteriores (seção 5).
-* A desmobilização foi avaliada só na versão de dois estados.
+* O atraso dos dados é simulado descartando as semanas recentes (etapa 6); não há fotos dos dados de cada semana do passado para reproduzir o que se via em tempo real.
 * O ganho semana a semana sobre a persistência é pequeno (cerca de 3 pontos com 4 semanas); o valor do modelo está nas mudanças de nível e no alerta.
 * **Municípios onde a dengue chegou ou mudou de patamar.** Nos quadradinhos, Blumenau aparece vermelha quase todo o período de 07/2023 a 07/2025. A cidade quase não tinha dengue até 2020 (picos de até 22 casos por semana) e teve 75 mil casos na temporada de 2023, com 360 mil habitantes; o limiar epidêmico, calculado com até 10 temporadas quase sem casos, ficou entre 10 e 69 casos por semana até 2024 e só subiu para 209 em 2025, quando a cidade passou ao amarelo. Nos 115 municípios, de 2015 em diante, 8 ficaram um ano ou mais seguidos no vermelho:
 
@@ -1089,5 +1118,6 @@ Os números do alerta já são os da versão sem a previsão de 1 semana (etapa 
 ```bash
 python -m src.experimento_estados   # dois estados; reports/estados_*.csv
 python -m src.experimento_niveis    # três níveis, definições A a D; reports/niveis_*.csv e quadradinhos
+python -m src.experimento_niveis_robustez   # desmobilização, atraso dos dados e IC; reports/niveis_robustez.csv
 python -m src.mem <arquivo mem_mun_2010_2022_BR.csv do InfoDengue>   # validação do MEM
 ```

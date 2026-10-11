@@ -127,7 +127,7 @@ def limiares_mem_por_temporada(df):
     return pd.DataFrame(linhas)
 
 
-def adicionar_niveis(df, variante):
+def adicionar_niveis(df, variante, horizonte_maximo=max(HORIZONTES)):
     """Acrescenta limiar_amarelo, limiar_vermelho, faixa (0 verde, 1 amarelo, 2 vermelho), faixa_h1 a faixa_h4 e as
     distâncias aos limiares. "faixa", e não "nivel", porque nivel é o alerta do InfoDengue nos dados."""
     metodo = VARIANTES_NIVEIS[variante]
@@ -160,7 +160,7 @@ def adicionar_niveis(df, variante):
     faixa = acima['amarelo'].astype(float) + acima['vermelho']
     df['faixa'] = faixa.where(df['casos_est'].notna())
     por_cidade = df.groupby('cidade', sort=False)['faixa']
-    for h in HORIZONTES:
+    for h in range(1, horizonte_maximo + 1):
         df[f'faixa_h{h}'] = por_cidade.shift(-h)
     return df
 

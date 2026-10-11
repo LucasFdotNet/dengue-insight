@@ -57,6 +57,7 @@ São 115 municípios, listados em [`data/config/cidades.csv`](data/config/cidade
 | `src/experimento_classificadores.py` | Outros classificadores (XGBoost, Random Forest, redes neurais MLP e LSTM) ou outra regra de decisão superam o classificador em produção? (decisão 15) |
 | `src/experimento_clima_classificador.py` | O clima melhora o classificador de tendência? |
 | `src/experimento_estados.py` | Prevendo o nível (normal ou alto) em vez da tendência, o painel avisaria as epidemias a tempo? (decisão 16) |
+| `src/experimento_niveis_robustez.py` | Os níveis e o alerta resistem a dados atrasados? O modelo indica a desmobilização? Intervalos de confiança (decisão 16) |
 | `src/experimento_niveis.py` | Três níveis (verde, amarelo, vermelho): qual definição de limiares, e quão bem o modelo prevê e alerta? Gera os gráficos de quadradinhos e os de casos com os limiares e a previsão do modelo de quantis (decisão 16) |
 | `src/experimento_rt.py` | O melhor modelo é mais útil que o Rt do InfoDengue? |
 | `src/experimento_generalizacao.py` | O modelo generaliza para municípios não vistos? Mais municípios ajudam? O clima ajuda? |
@@ -395,18 +396,36 @@ Estado atual das decisões, com os números da base atual (115 municípios, dado
   | | Validação cruzada (100 municípios) | Validação (15 municípios nunca vistos) |
   |---|---|---|
   | Epidemias no vermelho (episódios) | 492 | 79 |
-  | **Alerta: epidemias avisadas antes de começar** | **74%** | **71%** |
+  | **Alerta: epidemias avisadas antes de começar** | **74%** (69% a 79%) | **71%** (58% a 84%) |
   | Alerta: antecedência (mediana) | 3 semanas | 3 semanas |
-  | Alerta: alarmes que se confirmaram | 52% | 54% |
-  | Alerta: alarmes falsos por município por ano | 0,49 | 0,46 |
+  | Alerta: alarmes que se confirmaram | 52% (49% a 56%) | 54% (44% a 64%) |
+  | Alerta: alarmes falsos por município por ano | 0,49 (0,44 a 0,55) | 0,46 (0,32 a 0,61) |
   | Regra simples (casos subindo há 2 semanas e acima de metade do limiar): avisadas / corretos / falsos por ano | 68% / 36% / 0,82 | 71% / 37% / 0,90 |
   | Nível previsto: acerto com 4 semanas (modelo / persistência) | 79% / 76% | 81% / 77% |
+  | Nível previsto: ganho sobre a persistência com 4 semanas | +3,4 pontos (2,6 a 4,1) | +3,3 pontos (1,6 a 5,2) |
+  | **Desmobilização: fins de epidemia indicados nas 2 semanas antes** | **79%** (75% a 83%) | **81%** (69% a 91%) |
+  | Desmobilização: avisos prematuros por epidemia | 1,0 (0,8 a 1,1) | 1,2 (0,8 a 1,7) |
+  | Regra simples de queda (casos caindo há 2 semanas): fins indicados / avisos prematuros | 54% / 3,1 | 60% / 3,9 |
+
+  Entre parênteses, os intervalos de confiança de 95% por bootstrap sobre municípios (`src/experimento_niveis_robustez.py`, `reports/niveis_robustez.csv`). As diferenças do modelo para a regra simples são significativas na validação cruzada (epidemias avisadas: +7 pontos, de 2 a 12; alarmes corretos: +16 pontos; alarmes falsos: −0,33 por ano); nos 15 municípios de validação, o modelo empata em epidemias avisadas e é melhor em alarmes corretos e falsos.
   | Nível previsto: mudanças de nível acertadas com 4 semanas (a persistência nunca acerta) | 41% | 46% |
 
   O modelo avisa mais epidemias que a regra simples, com bem menos alarmes falsos, e o resultado se mantém nos municípios que ele nunca viu. A persistência (o nível de hoje continua) acerta muito semana a semana, porque os níveis mudam pouco, mas nunca antecipa uma epidemia; o valor do modelo está nas mudanças de nível e no alerta.
 * **Sem a previsão de 1 semana:** os níveis são previstos com 2, 3 e 4 semanas de antecedência, e o alerta usa só essas três. A previsão de 1 semana é quase uma cópia do nível atual (ganho de 0,7 ponto sobre a persistência, contra 3,3 com 4 semanas) e dá pouco tempo para mobilizar; o nível atual já cumpre esse papel. Sem ela, o alerta ficou praticamente igual (74% das epidemias avisadas, 52% de alarmes corretos, 0,49 alarme falso por ano, contra 74%, 52% e 0,50 com ela) e a antecedência mediana passou de 2 para 3 semanas. O modelo de tendência e o painel atual (decisões 11 e 13) continuam com 1 a 4 semanas.
+* **Desmobilização** (manter e desmobilizar): o modelo indica o fim da epidemia quando o nível mais provável em S+2 deixa de ser vermelho, numa semana em que o município está no vermelho. Ele indicou 79% dos fins nas 2 semanas anteriores à saída do vermelho, com 1 aviso prematuro por epidemia (uma semana em que indicou o fim antes da hora); a regra de queda indica 54%, com 3 avisos prematuros.
+* **Dados atrasados** (`src/experimento_niveis_robustez.py`): em tempo real, a última semana ainda sobe cerca de 45% nos 12 dias seguintes, a de 2 semanas antes, 8%, e a de 4 semanas antes, 3% (`reports/revisao_dados.csv`). Como na decisão 12, a simulação descarta as últimas 2 semanas (cenário realista) ou 4 (pior caso), inclusive para saber o nível atual. Como o gestor só saberia do início da epidemia quando os dados o mostrassem, um alarme também conta como correto se o vermelho começou nas semanas que os dados ainda não mostravam.
+
+  | Validação cruzada | Sem atraso | Atraso de 2 semanas | Atraso de 4 semanas |
+  |---|---|---|---|
+  | Alerta: epidemias avisadas antes de começar (regra simples) | 74% (68%) | 57% (36%) | 40% (22%) |
+  | Alerta: avisadas antes de os dados mostrarem o início | 74% | 80% | 76% |
+  | Alerta: alarmes corretos / falsos por município por ano | 52% / 0,49 | 52% / 0,60 | 54% / 0,59 |
+  | Desmobilização: fins indicados nas 2 semanas antes / antes de os dados mostrarem | 79% / 79% | 72% / 90% | 69% / 94% |
+  | Nível previsto com 4 semanas: modelo / persistência | 79% / 76% | 75% / 70% | 71% / 65% |
+
+  Com atraso, todos perdem antecedência, mas o modelo perde menos que a regra simples e que a persistência, e a sua vantagem cresce (de +3,4 para +5,7 pontos no nível com 4 semanas). A credibilidade do alerta se mantém (cerca de 1 alarme correto para cada falso). Em 76% a 80% das epidemias, o alerta chega antes de os dados mostrarem o início; em 90% a 94% dos fins, o modelo indica a saída antes de os dados a mostrarem. Nos 15 municípios de validação, o resultado é parecido (62% e 57% das epidemias avisadas antes de começar, com atraso de 2 e 4 semanas).
 * **Alertas por antecedência** (`reports/niveis_alertas_antecedencia.csv`): de cada previsão que acendeu o alerta, de 53% a 55% das semanas previstas foram vermelhas, de 43% a 46% amarelas e de 1% a 2% verdes, nas três antecedências. O alarme falso quase sempre cai num amarelo, não numa semana normal.
-* **Limitações:** avaliação pseudoprospectiva (dados já revisados; em tempo real as semanas recentes estão incompletas, decisões 3 e 12); a desmobilização foi avaliada só na versão de dois estados (77% dos fins de epidemia indicados nas 2 semanas anteriores); as escolhas que o MEM e o InfoDengue deixam em aberto (mínimos de casos, população fixa do Censo 2022) estão registradas em `src/estados.py`.
+* **Limitações:** avaliação pseudoprospectiva (dados já revisados; em tempo real as semanas recentes estão incompletas, decisões 3 e 12); o atraso dos dados é simulado descartando semanas, já que não há fotos dos dados de cada semana do passado; as escolhas que o MEM e o InfoDengue deixam em aberto (mínimos de casos, população fixa do Censo 2022) estão registradas em `src/estados.py`.
 * **Limitação: municípios onde a dengue chegou ou mudou de patamar.** Como os limiares vêm do histórico do próprio município, quem tinha pouca dengue fica vermelho por muito tempo quando ela chega, até as novas temporadas entrarem no cálculo. De 2015 em diante, 8 dos 115 municípios ficaram um ano ou mais seguidos no vermelho: Blumenau, Florianópolis e Joinville (SC), com a chegada da dengue ao estado (de 2,7 a 3,5 anos; em Joinville, o limiar epidêmico só alcançou o novo patamar depois de 3 a 4 temporadas, indo de 10 para 2.801 casos por semana); Macapá, Altamira, Cosmópolis e Rio das Ostras, que passaram a ter de 5 a 10 vezes mais casos (de 1,3 a 1,8 ano); e Sinop, com uma temporada de fato longa em 2024. Nesses períodos, o vermelho indica "acima de tudo o que o município já viveu", mas não distingue "entrar em epidemia" de "continuar nela", e o alerta de entrada perde o sentido. No Rio Grande do Sul, onde a dengue também chegou, o inverno interrompe a transmissão e os episódios se encerram a cada ano. O comportamento é o esperado de qualquer limiar baseado no histórico (o MEM, os percentis e o canal endêmico) e se corrige em 1 a 4 temporadas; o grupo decidiu registrá-lo, sem mudar o método, e discutir na apresentação do painel uma mensagem de "transmissão sustentada" para esses casos.
 * **Em andamento:** o painel ainda mostra a tendência (decisões 11 e 13); a troca pelos níveis e pelo alerta será feita depois de definidos o que ele mostra, se haverá alerta de amarelo e se o número de casos (modelo por quantis) continua. Tabelas e gráficos de cada etapa: seção 22 de [`docs/historia_decisoes.md`](docs/historia_decisoes.md).
 

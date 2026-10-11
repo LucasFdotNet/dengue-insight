@@ -42,6 +42,7 @@ PASSOS = [
     ('experimento_atraso', []),
     ('experimento_estados', []),             # níveis: dois estados (decisão 16)
     ('experimento_niveis', []),              # níveis: verde, amarelo, vermelho e quadradinhos (decisão 16)
+    ('experimento_niveis_robustez', []),     # desmobilização, atraso dos dados e intervalos de confiança (decisão 16)
 ]
 # Fora do pipeline: experimento_variaveis.py (base de SP) e experimento_clima_semanal.py (base de 63
 # municípios) são históricos; os resultados citados em docs/historia_decisoes.md são os dos commits

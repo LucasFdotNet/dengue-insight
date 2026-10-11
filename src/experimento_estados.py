@@ -152,25 +152,29 @@ def tabela_semanal(id_, percentil, unidades):
 
 # --------------------------------------------------------------- cortes escolhidos com o passado
 
-def escolher_cortes(t):
+def escolher_cortes(t, estado='alto', atraso=0):
     """Corte de atenção e de alerta para cada trimestre, só com as previsões anteriores (validação cruzada).
 
     Atenção: frequência, no passado, de entrar no nível alto em até 4 semanas a partir de uma
     semana normal. Alerta: menor corte cujos alarmes do passado foram corretos pelo menos
     PRECISAO_ALERTA das vezes (com ao menos 20 alarmes), com alarme e correto definidos como na
     avaliação; só entram alarmes cujo resultado já era conhecido no início do trimestre.
+
+    'estado' é a coluna com o estado conhecido na semana do alarme ('alto', ou o estado de
+    semanas antes, quando os dados recentes estão atrasados); 'atraso' (semanas) adia o
+    momento em que o resultado de um alarme passa a ser conhecido.
     """
     cv = t[t['conjunto'] == 'validacao_cruzada'].copy()
-    semanas_normais = cv[(cv['alto'] == False) & cv['p_max'].notna() & cv['entra_4sem'].notna()]  # noqa: E712
-    normal = cv['alto'] == False  # noqa: E712
+    semanas_normais = cv[(cv[estado] == False) & cv['p_max'].notna() & cv['entra_4sem'].notna()]  # noqa: E712
+    normal = cv[estado] == False  # noqa: E712
     alarmes_por_corte = {}
     for c in CORTES:
         cv['_sinal'] = normal & (cv['p_max'] >= c)
-        alarmes_por_corte[c] = alarmes(cv, '_sinal', desde=f'{PRIMEIRO_ANO_TESTE}-01-01')
+        alarmes_por_corte[c] = alarmes(cv, '_sinal', desde=f'{PRIMEIRO_ANO_TESTE}-01-01', atraso=atraso)
     linhas = []
     for trimestre in pd.period_range(INICIO_AVALIACAO[:7], t['data_iniSE'].max(), freq='Q'):
         # O resultado de um alarme só é conhecido 4 semanas depois do seu fim
-        limite = trimestre.start_time - pd.Timedelta(weeks=JANELA_AVISO)
+        limite = trimestre.start_time - pd.Timedelta(weeks=JANELA_AVISO + atraso)
         y = semanas_normais.loc[semanas_normais['data_iniSE'] < limite, 'entra_4sem'].to_numpy(bool)
         alerta = np.nan
         for c in CORTES:
@@ -184,12 +188,12 @@ def escolher_cortes(t):
     return pd.DataFrame(linhas)
 
 
-def aplicar_cortes(t, cortes):
+def aplicar_cortes(t, cortes, estado='alto'):
     tri = t['data_iniSE'].dt.to_period('Q').astype(str)
     c = cortes.set_index('trimestre')
     t['corte_atencao'] = tri.map(c['corte_atencao'])
     t['corte_alerta'] = tri.map(c['corte_alerta'])
-    normal = t['alto'] == False  # noqa: E712
+    normal = t[estado] == False  # noqa: E712
     t['modelo_alerta'] = normal & (t['p_max'] >= t['corte_alerta'])
     t['modelo_atencao_ou_alerta'] = normal & (t['p_max'] >= t['corte_atencao'])
     t['regra'] = normal & t['regra']
@@ -199,11 +203,13 @@ def aplicar_cortes(t, cortes):
 
 # --------------------------------------------------------------- métricas por episódio
 
-def alarmes(t, sinal, desde=INICIO_AVALIACAO):
+def alarmes(t, sinal, desde=INICIO_AVALIACAO, atraso=0):
     """Alarmes de um sinal: sequências de semanas seguidas com sinal (início, fim, correto).
 
     Um alarme é correto se um episódio de nível alto começa durante ele ou até JANELA_AVISO
-    semanas depois do seu fim. As semanas mais recentes (estado ainda incerto) ficam de fora.
+    semanas depois do seu fim. Com dados atrasados ('atraso' semanas), também conta o episódio
+    que começou até atraso-1 semanas antes do alarme, quando os dados ainda não o mostravam.
+    As semanas mais recentes (estado ainda incerto) ficam de fora.
     """
     linhas = []
     for cidade, g in t.groupby('cidade', sort=False):
@@ -218,7 +224,7 @@ def alarmes(t, sinal, desde=INICIO_AVALIACAO):
                 while j + 1 < len(s) and s[j + 1]:
                     j += 1
                 linhas.append({'cidade': cidade, 'inicio': datas[i], 'fim': datas[j],
-                               'correto': any(i < e <= j + JANELA_AVISO for e in inicios)})
+                               'correto': any(i - atraso < e <= j + JANELA_AVISO for e in inicios)})
                 i = j + 1
             else:
                 i += 1
