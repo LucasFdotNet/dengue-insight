@@ -13,19 +13,26 @@ anos anteriores:
 Previsões: como em experimento_estados.py (walk-forward com retreino trimestral desde 2015,
 validação cruzada por município e validação final), com o modelo de src/modelos/nivel_lightgbm.py.
 
+Antecedências: 2, 3 e 4 semanas (HORIZONTES_NIVEIS). A previsão de 1 semana ficou de fora: é quase
+uma cópia do nível atual (ganho de menos de 1 ponto sobre a persistência) e dá pouco tempo para
+mobilizar.
+
 Nível previsto para S+H: o mais provável. (Testada e descartada: escolher vermelho quando a
 probabilidade de vermelho passa de um corte em que, no passado, pelo menos metade das previsões
 de vermelho se confirmou; semana a semana, prevê vermelho demais e perde para a persistência.)
-Alerta de mobilização: entrada no vermelho, com o corte calibrado por alarme, como em
-experimento_estados.py. Comparação: persistência (o nível de S se mantém em S+H).
+Alerta de mobilização: entrada no vermelho (maior probabilidade de vermelho em S+2 a S+4), com o
+corte calibrado por alarme, como em experimento_estados.py. Comparação: persistência (o nível de S se mantém em S+H).
 
 Métricas por semana (2019 em diante): acerto, acerto balanceado, acerto nas semanas em que o
 nível muda entre S e S+H, vermelho detectado, previsões de vermelho corretas, epidemias
 perdidas (previu verde, veio vermelho) e alarmes graves (previu vermelho, veio verde).
-Métricas por episódio do vermelho (mobilização): como em experimento_estados.py.
+Métricas por episódio do vermelho (mobilização): como em experimento_estados.py. Alertas por
+antecedência: semanas, a partir de uma semana não vermelha, em que a probabilidade de vermelho em
+S+H passou do corte do alerta, e o nível que de fato veio em S+H.
 
 Saídas:
-  reports/niveis_semanas.csv, reports/niveis_episodios.csv, reports/niveis_cortes.csv
+  reports/niveis_semanas.csv, reports/niveis_episodios.csv, reports/niveis_cortes.csv,
+  reports/niveis_alertas_antecedencia.csv
   reports/figures/niveis/quadradinhos_<município>_<definição>.png, com a definição pelo nome
   (mem, percentis_80_97, canal_endemico); com --resumo, também a comparação das definições A e B
 
@@ -67,6 +74,9 @@ PASTA_FIGURAS = 'reports/figures/niveis'
 ARQUIVO_SEMANAS = 'reports/niveis_semanas.csv'
 ARQUIVO_EPISODIOS = 'reports/niveis_episodios.csv'
 ARQUIVO_CORTES = 'reports/niveis_cortes.csv'
+ARQUIVO_ALERTAS_H = 'reports/niveis_alertas_antecedencia.csv'
+# Sem a previsão de 1 semana: quase uma cópia do nível atual, com pouco tempo para mobilizar (decisão 16)
+HORIZONTES_NIVEIS = [h for h in HORIZONTES if h >= 2]
 # Exemplos para os quadradinhos: um município de treino e um de validação, com epidemias recentes
 EXEMPLOS = [(c, '2023-07-01', '2025-07-01') for c in ('campinas', 'sorocaba', 'fortaleza', 'blumenau')]
 VARIANTES_QUADRADINHOS = ['B', 'C', 'D']
@@ -104,7 +114,7 @@ def executar_unidade(id_, variante, conjunto, inicio):
     fim = (pd.Period(inicio, freq='M') + MESES_POR_RETREINO).start_time
     partes = []
     with threadpool_limits(THREADS):
-        for h in HORIZONTES:
+        for h in HORIZONTES_NIVEIS:
             tr = linhas_validas(tr_base, h)
             tr = tr[tr[f'faixa_h{h}'].notna() & (tr['data_iniSE'] + pd.Timedelta(weeks=h) < ini)]
             te = linhas_validas(te_base, h)
@@ -132,9 +142,10 @@ def rodar_previsoes(id_, fim, processos):
 def tabela_longa(id_, variante, unidades):
     """Uma linha por município, semana S e antecedência: probabilidades, faixa em S e faixa real em S+H (nivel_futuro)."""
     prev = pd.concat([pd.read_parquet(caminho(id_, *u)) for u in unidades if u[0] == variante], ignore_index=True)
+    prev = prev[prev['h'].isin(HORIZONTES_NIVEIS)]  # unidades antigas do cache também têm a de 1 semana
     treino, validacao = dados(variante)
     base = pd.concat([treino, validacao], ignore_index=True)
-    futuro = base.melt(id_vars=['cidade', 'data_iniSE', 'faixa'], value_vars=[f'faixa_h{h}' for h in HORIZONTES],
+    futuro = base.melt(id_vars=['cidade', 'data_iniSE', 'faixa'], value_vars=[f'faixa_h{h}' for h in HORIZONTES_NIVEIS],
                        var_name='h', value_name='nivel_futuro')
     futuro['h'] = futuro['h'].str[-1].astype(int)
     t = prev.merge(futuro, on=['cidade', 'data_iniSE', 'h'], how='left')
@@ -149,7 +160,7 @@ def escolher_cortes(t):
     """Cortes de amarelo e vermelho por antecedência e trimestre, só com o passado (validação cruzada)."""
     linhas = []
     cv = t[(t['conjunto'] == 'validacao_cruzada') & t['nivel_futuro'].notna()]
-    for h in HORIZONTES:
+    for h in HORIZONTES_NIVEIS:
         g = cv[cv['h'] == h]
         for trimestre in pd.period_range(INICIO_AVALIACAO[:7], t['data_iniSE'].max(), freq='Q'):
             passado = g[g['data_iniSE'] + pd.Timedelta(weeks=h) < trimestre.start_time]
@@ -216,6 +227,25 @@ def episodios_vermelho(t, variante):
     return linhas, s
 
 
+def alertas_por_antecedencia(t, alertas):
+    """Previsões que acenderam o alerta: em S não vermelho, probabilidade de vermelho em S+H acima do corte."""
+    s = alertas[['cidade', 'data_iniSE', 'alto', 'corte_alerta']]
+    a = t.merge(s, on=['cidade', 'data_iniSE'], how='left')
+    a['alerta_h'] = (a['alto'] == False) & (a['p2'] >= a['corte_alerta'])  # noqa: E712
+    return a
+
+
+def resumo_alertas_por_antecedencia(a, variante):
+    linhas = []
+    x = a[a['alerta_h'] & (a['data_iniSE'] >= INICIO_AVALIACAO) & a['nivel_futuro'].notna()]
+    for (conjunto, h), g in x.groupby(['conjunto', 'h']):
+        linhas.append({'variante': variante, 'conjunto': conjunto, 'h': h, 'semanas_com_alerta': len(g),
+                       'veio_vermelho': (g['nivel_futuro'] == 2).mean(),
+                       'veio_amarelo': (g['nivel_futuro'] == 1).mean(),
+                       'veio_verde': (g['nivel_futuro'] == 0).mean()})
+    return linhas
+
+
 # --------------------------------------------------------------- gráficos
 
 def estilo(ax):
@@ -246,7 +276,7 @@ def grafico_comparacao(semanas):
                         marker='o', markersize=6, markeredgecolor=FUNDO, markeredgewidth=1.5,
                         label=f"{v}: {'modelo' if metodo == 'modelo' else 'persistência'}")
         ax.set_title(titulo, loc='left', fontsize=11, color=TINTA)
-        ax.set_xticks(HORIZONTES, [f'{h} sem.' for h in HORIZONTES])
+        ax.set_xticks(HORIZONTES_NIVEIS, [f'{h} sem.' for h in HORIZONTES_NIVEIS])
         ax.set_ylim(0, 100)
         ax.yaxis.set_major_formatter(lambda v, _: f'{v:.0f}%')
     eixos[0, 0].legend(frameon=False, fontsize=9, labelcolor=TINTA_SEC, loc='lower left', handlelength=3.5)
@@ -294,8 +324,8 @@ def grafico_alertas(episodios_):
     return caminho_fig
 
 
-def grafico_quadradinhos(t, alertas, variante, cidade, inicio, fim):
-    """O que aconteceu, o alerta de mobilização e, para cada antecedência, o nível mais provável, com os erros marcados."""
+def grafico_quadradinhos(t, variante, cidade, inicio, fim):
+    """O que aconteceu e, para cada antecedência, o nível mais provável, com os erros e os alertas de vermelho."""
     alvo = t[(t['cidade'] == cidade)].copy()
     alvo['data_alvo'] = alvo['data_iniSE'] + pd.to_timedelta(7 * alvo['h'], unit='D')
     alvo = alvo[(alvo['data_alvo'] >= inicio) & (alvo['data_alvo'] < fim)]
@@ -304,33 +334,31 @@ def grafico_quadradinhos(t, alertas, variante, cidade, inicio, fim):
     real = base[(base['cidade'] == cidade) & (base['data_iniSE'] >= inicio) & (base['data_iniSE'] < fim)]
     semanas = sorted(real['data_iniSE'])
     pos = {d: i for i, d in enumerate(semanas)}
-    fig, ax = plt.subplots(figsize=(14, 4.9), facecolor=FUNDO)
+    fig, ax = plt.subplots(figsize=(14, 4.3), facecolor=FUNDO)
     ax.set_facecolor(FUNDO)
-    linhas = ['Aconteceu', 'Alerta de vermelho'] + [f'Previsto {h} sem. antes' for h in HORIZONTES]
+    linhas = ['Aconteceu'] + [f'Previsto {h} sem. antes' for h in HORIZONTES_NIVEIS]
+    linha_y = {h: (i + 1) * 1.15 + 0.25 for i, h in enumerate(HORIZONTES_NIVEIS)}
     for _, r in real.iterrows():
         if pd.notna(r['faixa']):
             ax.add_patch(plt.Rectangle((pos[r['data_iniSE']], 0), 0.86, 0.86, color=COR_NIVEL[int(r['faixa'])]))
-    # Alerta emitido na semana: triângulo cheio se um episódio vermelho começou nas 4 semanas seguintes ao alerta
-    a = ee.alarmes(alertas[alertas['cidade'] == cidade], 'modelo_alerta', desde=inicio)
-    for _, r in a.iterrows():
-        for d in pd.date_range(r['inicio'], r['fim'], freq='7D'):
-            if d in pos:
-                ax.plot(pos[d] + 0.43, 1.15 + 0.43, marker='^', markersize=7, linestyle='',
-                        color=TINTA if r['correto'] else FUNDO, markeredgecolor=TINTA, markeredgewidth=1)
     for _, r in alvo.iterrows():
         if pd.isna(r['nivel_previsto']) or r['data_alvo'] not in pos:
             continue
-        y = (r['h'] + 1) * 1.15 + 0.25
-        x = pos[r['data_alvo']]
+        y, x = linha_y[r['h']], pos[r['data_alvo']]
         ax.add_patch(plt.Rectangle((x, y), 0.86, 0.86, color=COR_NIVEL[int(r['nivel_previsto'])]))
-        if pd.notna(r['nivel_futuro']) and r['nivel_previsto'] != r['nivel_futuro']:
+        if r['alerta_h']:
+            # Esta previsão acendeu o alerta de vermelho: cheio se a semana foi vermelha, vazado se não foi
+            confirmou = r['nivel_futuro'] == 2
+            ax.plot(x + 0.43, y + 0.43, marker='^', markersize=7, linestyle='',
+                    color=TINTA if confirmou else FUNDO, markeredgecolor=TINTA, markeredgewidth=1)
+        elif pd.notna(r['nivel_futuro']) and r['nivel_previsto'] != r['nivel_futuro']:
             grave = abs(r['nivel_previsto'] - r['nivel_futuro']) == 2
             ax.text(x + 0.43, y + 0.43, '×' if grave else '•', ha='center', va='center',
                     fontsize=9 if grave else 7, color=TINTA, fontweight='bold')
     ax.set_xlim(-0.5, len(semanas) + 0.5)
-    ax.set_ylim(-0.3, 5 * 1.15 + 1.3)
+    ax.set_ylim(-0.3, len(HORIZONTES_NIVEIS) * 1.15 + 1.3)
     ax.invert_yaxis()
-    ax.set_yticks([0.43, 1.58] + [(h + 1) * 1.15 + 0.68 for h in HORIZONTES], linhas)
+    ax.set_yticks([0.43] + [linha_y[h] + 0.43 for h in HORIZONTES_NIVEIS], linhas)
     meses = [(i, d) for i, d in enumerate(semanas) if d.day <= 7 and d.month in (1, 4, 7, 10)]
     ax.set_xticks([i for i, _ in meses], [d.strftime('%m/%Y') for _, d in meses])
     ax.tick_params(colors=TINTA_SEC, labelsize=9, length=0)
@@ -340,7 +368,8 @@ def grafico_quadradinhos(t, alertas, variante, cidade, inicio, fim):
     papel = 'validação' if cidade in cidades_por_papel('validacao') else 'treino'
     ax.set_title(f'{nome} ({papel}) · definição {variante} ({DESCRICAO_VARIANTES[variante]})\n'
                  'Cada coluna é uma semana. Nas linhas "Previsto x sem. antes", o quadrado mostra o nível mais provável '
-                 'previsto x semanas antes para aquela semana;\no alerta de vermelho aparece na semana em que foi emitido.',
+                 'previsto x semanas antes para aquela semana;\no triângulo marca a previsão que acendeu o alerta de '
+                 'vermelho (feita numa semana que não era vermelha).',
                  loc='left', fontsize=10, color=TINTA)
     legenda = [plt.Rectangle((0, 0), 1, 1, color=COR_NIVEL[k]) for k in range(3)]
     rotulos = ['verde: normal', 'amarelo: elevado', 'vermelho: epidêmico']
@@ -348,7 +377,8 @@ def grafico_quadradinhos(t, alertas, variante, cidade, inicio, fim):
                 plt.Line2D([], [], marker='$×$', color=TINTA, linestyle='', markersize=8),
                 plt.Line2D([], [], marker='^', color=TINTA, linestyle='', markersize=7),
                 plt.Line2D([], [], marker='^', color=FUNDO, markeredgecolor=TINTA, linestyle='', markersize=7)]
-    rotulos += ['errou por 1 nível', 'erro grave (verde × vermelho)', 'alerta que se confirmou', 'alarme falso']
+    rotulos += ['errou por 1 nível', 'erro grave (verde × vermelho)', 'alerta: a semana foi vermelha',
+                'alerta: a semana não foi vermelha']
     ax.legend(legenda, rotulos, ncol=4, frameon=False, fontsize=9, labelcolor=TINTA_SEC,
               loc='upper left', bbox_to_anchor=(0, -0.12))
     fig.tight_layout()
@@ -366,7 +396,7 @@ def run_experimento(processos=PROCESSOS, resumo=False):
     unidades = rodar_previsoes(id_, fim, processos)
     os.makedirs(PASTA_FIGURAS, exist_ok=True)
 
-    semanas, episodios_, cortes_todos = [], [], []
+    semanas, episodios_, cortes_todos, alertas_h = [], [], [], []
     for variante in VARIANTES_NIVEIS:
         t = tabela_longa(id_, variante, unidades)
         cortes = escolher_cortes(t)
@@ -382,19 +412,23 @@ def run_experimento(processos=PROCESSOS, resumo=False):
                                 **metricas_semana(g['nivel_futuro'], prev, g['faixa'])})
         linhas_ep, alertas = episodios_vermelho(t, variante)
         episodios_ += linhas_ep
+        t = alertas_por_antecedencia(t, alertas)
+        alertas_h += resumo_alertas_por_antecedencia(t, variante)
         for cidade, inicio, fim_ex in (EXEMPLOS if variante in VARIANTES_QUADRADINHOS else []):
-            logging.info(f"Figura: {grafico_quadradinhos(t, alertas, variante, cidade, inicio, fim_ex)}")
+            logging.info(f"Figura: {grafico_quadradinhos(t, variante, cidade, inicio, fim_ex)}")
 
     semanas = pd.DataFrame(semanas)
     semanas.round(3).to_csv(ARQUIVO_SEMANAS, index=False)
     pd.DataFrame(episodios_).round(3).to_csv(ARQUIVO_EPISODIOS, index=False)
     pd.concat(cortes_todos).to_csv(ARQUIVO_CORTES, index=False)
+    pd.DataFrame(alertas_h).round(3).to_csv(ARQUIVO_ALERTAS_H, index=False)
     if resumo:  # gráficos de comparação das definições A e B (python -m src.experimento_niveis --resumo)
         logging.info(f"Figura: {grafico_comparacao(semanas[semanas['variante'].isin(['A', 'B'])])}")
         logging.info(f"Figura: {grafico_alertas(pd.DataFrame(episodios_).query('variante in [\"A\", \"B\"]'))}")
     pd.set_option('display.width', 250)
     print(semanas[semanas['conjunto'] == 'validacao_cruzada'].round(3).to_string(index=False))
     print(pd.DataFrame(episodios_).round(3).to_string(index=False))
+    print(pd.DataFrame(alertas_h).round(3).to_string(index=False))
 
 
 if __name__ == "__main__":

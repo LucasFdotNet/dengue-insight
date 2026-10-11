@@ -40,7 +40,7 @@ Este documento reconstrói, em ordem cronológica, as decisões técnicas tomada
 | 19 | Modelos em produção e painel | 27/09/2026 | Classificador com clima para a tendência e quantis para os casos; painel com aviso, Indicadores e Detalhes do Modelo | [19](#s19) |
 | 20 | Dados atualizados, fotos e pipeline completo | 09–10/10/2026 (`4ba56f0` a `d906288`) | Guardar uma foto dos dados a cada coleta; medir quanto o InfoDengue revisa as semanas recentes; refazer todos os números com um comando retomável | [20](#s20) |
 | 21 | Outros modelos e regra de decisão | 09–10/10/2026 | XGBoost, Random Forest, MLP e LSTM, com o mesmo ajuste, não superam o LightGBM; o peso por classe é só outra regra de decisão; a pergunta do projeto é revista | [21](#s21) |
-| 22 | Da tendência aos níveis de incidência | 10/10/2026 | Prever o nível (verde, amarelo, vermelho) pelos limiares do MEM e alertar a entrada no vermelho; canal endêmico e percentis descartados | [22](#s22) |
+| 22 | Da tendência aos níveis de incidência | 10/10/2026 | Prever o nível (verde, amarelo, vermelho) com 2 a 4 semanas pelos limiares do MEM e alertar a entrada no vermelho; canal endêmico, percentis e previsão de 1 semana descartados | [22](#s22) |
 
 Observação sobre as datas: o código herdado é de 21/09/2026 e quase todo o trabalho de revisão foi registrado em commits de 26/09/2026 (o último, que fixa versões do `scipy` e do `statsmodels`, é de 27/09/2026). A coluna de commits permite reconstruir a ordem exata com `git log --reverse`.
 
@@ -1034,6 +1034,20 @@ O InfoDengue calcula os seus limiares pelo MEM (*Moving Epidemic Method*; Vega e
 * **Validação:** com os dados de 2010 a 2022, os limiares do projeto têm correlação de 0,996 (pré-epidêmico) e 0,992 (epidêmico) com os publicados pelo InfoDengue para os 115 municípios (`parameters/mem/mem_mun_2010_2022_BR.csv`), e ficam em média 5% abaixo, provavelmente pela revisão dos dados desde então.
 * **Uso:** limiares recalculados a cada temporada só com as anteriores, sobre a incidência por 100 mil habitantes (Censo 2022). De 2015 em diante, 42% das semanas ficam verdes, 42% amarelas e 16% vermelhas, com cerca de 0,6 epidemia por município por ano. Em Campinas, o amarelo começa perto de 130 casos por semana e o vermelho perto de 1.000.
 
+### Etapa 5: sem a previsão de 1 semana e triângulos por antecedência
+
+* **Sem a previsão de 1 semana.** Ela é quase uma cópia do nível atual (etapa 2) e dá pouco tempo para mobilizar; o nível atual já informa o gestor sobre a semana corrente. Os níveis passaram a ser previstos com 2, 3 e 4 semanas, e o alerta passou a usar a maior probabilidade de vermelho em S+2 a S+4. Na definição D (validação cruzada), o alerta ficou praticamente igual: 74% das epidemias avisadas, 52% de alarmes corretos e 0,49 alarme falso por município por ano, contra 74%, 52% e 0,50 com a de 1 semana; a antecedência mediana passou de 2 para 3 semanas. O modelo de tendência e o painel atual continuam com 1 a 4 semanas.
+* **Triângulos por antecedência.** Na primeira versão dos quadradinhos, o alerta tinha uma linha própria, na semana em que foi emitido, e não dava para saber qual antecedência o tinha acendido. Agora o triângulo fica na linha "Previsto x sem. antes", na coluna da semana prevista, quando a probabilidade de vermelho daquela previsão passou do corte do alerta (a partir de uma semana que não era vermelha): cheio se a semana foi vermelha, vazado se não foi. Um triângulo vazado logo antes de uma epidemia é um alerta adiantado: na avaliação por episódio, ele conta como correto se o vermelho começa até 4 semanas depois do alarme.
+* **Alertas por antecedência** (`reports/niveis_alertas_antecedencia.csv`; definição D, validação cruzada, 2019 em diante):
+
+  | Antecedência | Semanas com alerta | Veio vermelho | Veio amarelo | Veio verde |
+  |---|---|---|---|---|
+  | 2 semanas | 731 | 54% | 44% | 1% |
+  | 3 semanas | 1.071 | 53% | 46% | 1% |
+  | 4 semanas | 1.355 | 55% | 43% | 2% |
+
+  A precisão é a mesma nas três antecedências; a de 4 semanas acende mais vezes. Quando o alerta erra, a semana prevista quase sempre está no amarelo, e não no normal. Nos 15 municípios de validação, de 58% a 59% das semanas previstas foram vermelhas.
+
 ### Comparação das definições
 
 Validação cruzada, 2019 em diante; alerta de entrada no vermelho:
@@ -1043,12 +1057,12 @@ Validação cruzada, 2019 em diante; alerta de entrada no vermelho:
 | Semanas vermelhas (2015+) | 16% | 7% | 36% | 16% |
 | Ganho sobre a persistência, 4 semanas | +3,1 pontos | +2,9 | +1,0 | +3,3 |
 | Mudanças de nível acertadas, 4 semanas | 44% | 48% | 22% | 41% |
-| Alerta: epidemias avisadas | 63% | 84% | 3% | **74%** |
-| Alerta: antecedência (mediana) | 2 semanas | 3 semanas | — | 2 semanas |
-| Alerta: alarmes corretos | 53% | 50% | — | 52% |
-| Alerta: falsos por município por ano | 0,43 | 0,33 | — | 0,50 |
+| Alerta: epidemias avisadas | 66% | 84% | 4% | **74%** |
+| Alerta: antecedência (mediana) | 2 semanas | 3 semanas | 2 semanas | 3 semanas |
+| Alerta: alarmes corretos | 52% | 51% | 48% | 52% |
+| Alerta: falsos por município por ano | 0,46 | 0,32 | 0,06 | 0,49 |
 
-Na definição D, nos 15 municípios de validação, o alerta avisou 70% das epidemias, com 3 semanas de antecedência, 53% de alarmes corretos e 0,47 alarme falso por ano; a regra simples avisou 71%, com 37% de alarmes corretos e 0,89 falso por ano. Nos quadradinhos, as epidemias de 2024 e de 2025 em Campinas e em Sorocaba (validação) foram avisadas de 2 a 3 semanas antes.
+Os números do alerta já são os da versão sem a previsão de 1 semana (etapa 5). Na definição D, nos 15 municípios de validação, o alerta avisou 71% das epidemias, com 3 semanas de antecedência, 54% de alarmes corretos e 0,46 alarme falso por ano; a regra simples avisou 71%, com 37% de alarmes corretos e 0,90 falso por ano. Nos quadradinhos, as epidemias de 2024 e de 2025 em Campinas e em Sorocaba (validação) foram avisadas de 2 a 3 semanas antes.
 
 ### Decisão
 
