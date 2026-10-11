@@ -340,12 +340,12 @@ def grafico_quadradinhos(t, variante, cidade, inicio, fim):
     linha_y = {h: (i + 1) * 1.15 + 0.25 for i, h in enumerate(HORIZONTES_NIVEIS)}
     for _, r in real.iterrows():
         if pd.notna(r['faixa']):
-            ax.add_patch(plt.Rectangle((pos[r['data_iniSE']], 0), 0.86, 0.86, color=COR_NIVEL[int(r['faixa'])]))
+            ax.add_patch(plt.Rectangle((pos[r['data_iniSE']], 0), 0.86, 0.86, facecolor=COR_NIVEL[int(r['faixa'])], linewidth=0))
     for _, r in alvo.iterrows():
         if pd.isna(r['nivel_previsto']) or r['data_alvo'] not in pos:
             continue
         y, x = linha_y[r['h']], pos[r['data_alvo']]
-        ax.add_patch(plt.Rectangle((x, y), 0.86, 0.86, color=COR_NIVEL[int(r['nivel_previsto'])]))
+        ax.add_patch(plt.Rectangle((x, y), 0.86, 0.86, facecolor=COR_NIVEL[int(r['nivel_previsto'])], linewidth=0))
         if r['alerta_h']:
             # Esta previsão acendeu o alerta de vermelho: cheio se a semana foi vermelha, vazado se não foi
             confirmou = r['nivel_futuro'] == 2
