@@ -64,12 +64,15 @@ def limiares(df, percentil=PERCENTIL_ALTO, minimo=MIN_CASOS_ALTO):
 #      limiar pré-epidêmico e vermelho a partir do limiar epidêmico, recalculados a cada temporada
 #      (semana 41 à 40) com as temporadas anteriores, sobre a incidência por 100 mil habitantes
 #      (população do Censo 2022), com os mínimos de 5 e 10 casos do InfoDengue.
-VARIANTES_NIVEIS = {'A': ('percentis', 0.75, 0.90), 'B': ('percentis', 0.80, 0.97), 'C': ('canal',), 'D': ('mem',)}
+VARIANTES_NIVEIS = {'A': ('percentis', 0.75, 0.90), 'B': ('percentis', 0.80, 0.97), 'C': ('canal',), 'D': ('mem',),
+                    'E': ('incidencia', 100, 300), 'F': ('incidencia_4sem', 100, 300)}
 DESCRICAO_VARIANTES = {
     'A': 'percentis: amarelo ≥ p75, vermelho ≥ p90',
     'B': 'percentis: amarelo ≥ p80, vermelho ≥ p97',
     'C': 'canal endêmico (MS): amarelo > mediana, vermelho > Q3 dos 5 anos anteriores',
     'D': 'MEM (como o InfoDengue): amarelo ≥ limiar pré-epidêmico, vermelho ≥ limiar epidêmico',
+    'E': 'incidência fixa do Ministério da Saúde, aplicada à semana: amarelo ≥ 100, vermelho ≥ 300 casos por 100 mil',
+    'F': 'Ministério da Saúde: incidência acumulada nas 4 últimas semanas, média ≥ 100, alta ≥ 300 casos por 100 mil',
 }
 MIN_CASOS_AMARELO = 5
 NOMES_NIVEIS = ['verde', 'amarelo', 'vermelho']
@@ -147,6 +150,17 @@ def adicionar_niveis(df, variante, horizonte_maximo=max(HORIZONTES)):
         df['limiar_amarelo'] = np.maximum(df['mem_pre'], MIN_CASOS_AMARELO)
         df['limiar_vermelho'] = np.maximum(df['mem_epi'], MIN_CASOS_ALTO)
         acima = {'amarelo': df['casos_est'] >= df['limiar_amarelo'], 'vermelho': df['casos_est'] >= df['limiar_vermelho']}
+    elif metodo[0] in ('incidencia', 'incidencia_4sem'):
+        # Limiares fixos do Ministério da Saúde (baixa < 100, média 100 a 300, alta >= 300 casos por 100 mil), sobre a
+        # incidência acumulada nas 4 últimas semanas, como nos boletins (F), ou, para comparação, sobre a da semana (E)
+        from src.cidades import CIDADES
+        pop = df['cidade'].map(lambda c: CIDADES[c]['populacao'])
+        df['limiar_amarelo'] = metodo[1] * pop / 1e5
+        df['limiar_vermelho'] = metodo[2] * pop / 1e5
+        ref = df['casos_est']
+        if metodo[0] == 'incidencia_4sem':
+            ref = df.groupby('cidade', sort=False)['casos_est'].transform(lambda s: s.rolling(4, min_periods=4).sum())
+        acima = {'amarelo': ref >= df['limiar_amarelo'], 'vermelho': ref >= df['limiar_vermelho']}
     else:
         df['ano'], df['semana'] = df['SE'] // 100, np.minimum(df['SE'] % 100, 52)
         df = df.merge(canal_endemico(df), on=['cidade', 'ano', 'semana'], how='left').drop(columns=['ano', 'semana'])
@@ -155,10 +169,11 @@ def adicionar_niveis(df, variante, horizonte_maximo=max(HORIZONTES)):
                  'vermelho': (df['casos_est'] > df['q3']) & (df['casos_est'] >= MIN_CASOS_ALTO)}
         df['limiar_amarelo'] = np.maximum(df['mediana'], MIN_CASOS_AMARELO)
         df['limiar_vermelho'] = np.maximum(df['q3'], MIN_CASOS_ALTO)
+    ref = ref if metodo[0] in ('incidencia', 'incidencia_4sem') else df['casos_est']  # o que vai contra os limiares
     for nome in ('amarelo', 'vermelho'):
-        df[f'razao_{nome}'] = np.log1p(df['casos_est']) - np.log1p(df[f'limiar_{nome}'])
+        df[f'razao_{nome}'] = np.log1p(ref) - np.log1p(df[f'limiar_{nome}'])
     faixa = acima['amarelo'].astype(float) + acima['vermelho']
-    df['faixa'] = faixa.where(df['casos_est'].notna())
+    df['faixa'] = faixa.where(ref.notna())
     por_cidade = df.groupby('cidade', sort=False)['faixa']
     for h in range(1, horizonte_maximo + 1):
         df[f'faixa_h{h}'] = por_cidade.shift(-h)

@@ -12,3 +12,10 @@ reports/figures/
 # Painel estático (web/): dependências e build; os dados em web/public/dados/ ficam no git (o deploy não roda o pipeline)
 web/node_modules/
 web/dist/
+
+
+
+.playwright-mcp/
+temp/
+
+prompt.txt

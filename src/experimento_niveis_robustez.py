@@ -1,8 +1,13 @@
 """
 Experimento: robustez dos níveis pelo MEM (definição D) e do alerta de mobilização.
 
-Três testes, com as previsões de experimento_niveis.py (walk-forward com retreino trimestral,
-validação cruzada por município e validação final):
+Modelo: o do painel desde a decisão 18, quantis de casos com o clima, com a chance de cada nível
+lida nos limiares (experimento_niveis_quantis.previsoes_producao). Comparação: o classificador de
+níveis usado antes (src/modelos/nivel_lightgbm.py; previsões de experimento_niveis.py e as de 5 a 8
+semanas, rodadas aqui), nas mesmas semanas e municípios. Os dois com walk-forward e retreino
+trimestral, validação cruzada por município e validação final.
+
+Três testes:
 
 1. Desmobilização: no fim de cada episódio vermelho, o modelo indicou a saída do vermelho
    (nível mais provável em S+2 deixa de ser vermelho) nas 2 semanas antes da volta ao amarelo
@@ -12,18 +17,20 @@ validação cruzada por município e validação final):
    ainda sobe cerca de 45% nos 12 dias seguintes, a de 2 semanas antes, 8%, e a de 4 semanas
    antes, 3%; reports/revisao_dados.csv). Como em experimento_atraso.py, a simulação descarta
    as últimas LACUNA semanas: na semana X, o último dado usado é o de X-LACUNA, inclusive para
-   saber o nível atual, e a previsão para X+H vem do modelo de H+LACUNA semanas. Lacuna 2:
-   cenário realista; lacuna 4: pior caso (o mesmo da decisão 12). Com atraso, um alarme também
+   saber o nível atual, e a previsão para X+H vem do modelo de H+LACUNA semanas. Lacunas de 0 a
+   4; 2: cenário realista (o do painel); 4: pior caso (o mesmo da decisão 12). Com atraso, um alarme também
    é correto se o vermelho começou até lacuna-1 semanas antes dele (os dados ainda não o
    mostravam), e há duas medidas de antecipação: antes do início do episódio e antes de os
    dados mostrarem o início (ou o fim, na desmobilização), que é quando o gestor saberia sem o
    modelo.
 3. Intervalos de confiança de 95% por bootstrap sobre municípios (2.000 reamostragens), para o
    alerta, a desmobilização e o acerto do nível previsto, e para a diferença entre o modelo e a
-   regra simples (ou a persistência), com os mesmos municípios em cada reamostragem.
+   regra simples (ou a persistência), com os mesmos municípios em cada reamostragem. Nas linhas
+   do classificador anterior, a diferença é classificador - modelo.
 
 Saídas: reports/niveis_robustez.csv (teste, conjunto, lacuna, método, métrica, valor e IC 95%) e
-reports/niveis_robustez_cortes.csv (corte do alerta por trimestre e lacuna; o painel usa o da lacuna 2)
+reports/niveis_robustez_cortes.csv (corte do alerta do modelo por trimestre e lacuna; o painel usa o
+da lacuna 2)
 
 Uso: python -m src.experimento_niveis_robustez [--processos N]
 """
@@ -44,7 +51,8 @@ from src.snapshot import id_dados_processados
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
 
 VARIANTE = 'D'
-LACUNAS = [0, 2, 4]
+LACUNAS = [0, 1, 2, 3, 4]
+CLASSIFICADOR = 'Classificador de níveis (anterior)'
 HORIZONTES_EXTRAS = [h for h in range(1, en.HORIZONTE_MAXIMO + 1) if h > max(en.HORIZONTES_NIVEIS)]
 N_BOOTSTRAP = 2000
 SEMENTE = 42
@@ -221,42 +229,62 @@ def com_ic(comp, metricas, comp_ref=None, rng=None):
     return linhas
 
 
-def avaliar_lacuna(s, lacuna, rng):
+def avaliar_lacuna(s, lacuna, rng, s_classificador):
     linhas = []
     for conjunto, gc in s.groupby('conjunto'):
         cidades = gc.groupby('cidade', sort=True)
+        cidades_c = s_classificador[s_classificador['conjunto'] == conjunto].groupby('cidade', sort=True)
         base = {'conjunto': conjunto, 'lacuna': lacuna}
         alerta = {m: pd.DataFrame({c: componentes_alerta(g, m, lacuna) for c, g in cidades}).T
                   for m in ('modelo_alerta', 'regra')}
+        alerta['classificador'] = pd.DataFrame({c: componentes_alerta(g, 'modelo_alerta', lacuna)
+                                                for c, g in cidades_c}).T
         for metodo, ref, nome in [('modelo_alerta', 'regra', 'Modelo: alerta de vermelho'),
-                                  ('regra', None, 'Regra simples (subindo há 2 semanas)')]:
+                                  ('regra', None, 'Regra simples (subindo há 2 semanas)'),
+                                  ('classificador', 'modelo_alerta', f'{CLASSIFICADOR}: alerta de vermelho')]:
             for linha in com_ic(alerta[metodo], metricas_alerta, alerta.get(ref) if ref else None, rng):
                 linhas.append({**base, 'teste': 'mobilizacao', 'metodo': nome, **linha})
         desm = {m: pd.DataFrame({c: componentes_desmobilizacao(g, m, lacuna) for c, g in cidades}).T
                 for m in ('saida_modelo', 'saida_regra')}
+        desm['classificador'] = pd.DataFrame({c: componentes_desmobilizacao(g, 'saida_modelo', lacuna)
+                                              for c, g in cidades_c}).T
         for metodo, ref, nome in [('saida_modelo', 'saida_regra', 'Modelo: nível previsto em S+2 deixa o vermelho'),
-                                  ('saida_regra', None, 'Regra simples (caindo há 2 semanas)')]:
+                                  ('saida_regra', None, 'Regra simples (caindo há 2 semanas)'),
+                                  ('classificador', 'saida_modelo',
+                                   f'{CLASSIFICADOR}: nível previsto em S+2 deixa o vermelho')]:
             for linha in com_ic(desm[metodo], metricas_desmobilizacao, desm.get(ref) if ref else None, rng):
                 linhas.append({**base, 'teste': 'desmobilizacao', 'metodo': nome, **linha})
         for h in en.HORIZONTES_NIVEIS:
             comp = pd.DataFrame({c: componentes_nivel(g, h) for c, g in cidades}).T
+            comp_c = pd.DataFrame({c: componentes_nivel(g, h) for c, g in cidades_c}).T
             for linha in com_ic(comp, metricas_nivel, rng=rng):
                 linhas.append({**base, 'teste': f'nivel_{h}_semanas', 'metodo': 'Modelo e persistência', **linha})
+            for linha in com_ic(comp_c, metricas_nivel, comp, rng):
+                linhas.append({**base, 'teste': f'nivel_{h}_semanas', 'metodo': f'{CLASSIFICADOR} e persistência',
+                               **linha})
     return linhas
 
 
 def run_experimento(processos=en.PROCESSOS):
+    from src import experimento_niveis_quantis as enq  # importa este módulo; aqui, para não haver ciclo
     id_ = id_dados_processados()
-    prev = rodar_previsoes(id_, processos)
+    chave = ['cidade', 'data_iniSE', 'h']
+    modelo = enq.previsoes_producao(id_, processos)[chave + ['p0', 'p1', 'p2']]
+    classificador = rodar_previsoes(id_, processos)[chave + ['p0', 'p1', 'p2']]
+    # Mesmas semanas, municípios e antecedências nos dois
+    comuns = modelo[chave].merge(classificador[chave], on=chave)
+    modelo, classificador = modelo.merge(comuns, on=chave), classificador.merge(comuns, on=chave)
+    logging.info(f"{len(comuns)} previsões em comum de {comuns['h'].min()} a {comuns['h'].max()} semanas.")
     treino, validacao = en.dados(VARIANTE)
     base = pd.concat([treino, validacao], ignore_index=True)
     rng = np.random.default_rng(SEMENTE)
     linhas, cortes = [], []
     for lacuna in LACUNAS:
         logging.info(f"Lacuna de {lacuna} semana(s)...")
-        s = tabela_emissao(prev, base, lacuna)
+        s = tabela_emissao(modelo, base, lacuna)
+        s_c = tabela_emissao(classificador, base, lacuna)
         cortes.append(s.attrs['cortes'])
-        linhas += avaliar_lacuna(s, lacuna, rng)
+        linhas += avaliar_lacuna(s, lacuna, rng, s_c)
     pd.concat(cortes).to_csv(ARQUIVO_CORTES, index=False)
     r = pd.DataFrame(linhas)
     colunas = ['teste', 'conjunto', 'lacuna', 'metodo', 'metrica', 'valor', 'ic95_inf', 'ic95_sup',

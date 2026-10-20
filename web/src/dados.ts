@@ -107,19 +107,9 @@ export interface LinhaCasos {
   ic95_sup: number;
 }
 
-export interface LinhaAlertaH {
-  conjunto: string;
-  h: number;
-  semanas_com_alerta: number;
-  veio_vermelho: number;
-  veio_amarelo: number;
-  veio_verde: number;
-}
-
 export interface AvaliacaoGeral {
   niveis_robustez: LinhaRobustez[];
   casos_atraso: LinhaCasos[];
-  alertas_por_antecedencia: LinhaAlertaH[];
 }
 
 const BASE = `${import.meta.env.BASE_URL}dados/`;

@@ -95,7 +95,7 @@ function blocoMunicipio(m: Municipio): HTMLElement {
   };
   desenhar();
   const papel = m.papel === 'validacao'
-    ? 'Município de validação: o modelo nunca viu os seus dados durante o desenvolvimento.'
+    ? 'Município do conjunto de teste: o modelo nunca viu os seus dados durante o desenvolvimento.'
     : 'Município de treino: as previsões vêm de modelos treinados sem ele (validação cruzada por município).';
   return el('section', { class: 'card largo' }, el('h3', {}, `${m.nome} (${m.uf})`), el('p', { class: 'nota' }, papel),
     corpo);
@@ -114,7 +114,7 @@ function blocoGeral(av: AvaliacaoGeral, lacuna: number): HTMLElement {
   const falsos = (x: number | null) => decimal(x);
   const nAvisos = (x: number | null) => decimal(x, 1);
 
-  const mobilizacao = tabela(['', '100 municípios', '15 nunca vistos', 'Regra simples (100 municípios)'], [
+  const mobilizacao = tabela(['', '100 municípios', '15 municípios de teste', 'Regra simples (100 municípios)'], [
     ['Epidemias avisadas antes de os dados mostrarem o início',
       g('mobilizacao', cv, lacuna, M, 'avisadas_antes_dos_dados', pct), g('mobilizacao', vf, lacuna, M, 'avisadas_antes_dos_dados', pct),
       g('mobilizacao', cv, lacuna, R, 'avisadas_antes_dos_dados', pct)],
@@ -126,7 +126,7 @@ function blocoGeral(av: AvaliacaoGeral, lacuna: number): HTMLElement {
       g('mobilizacao', vf, lacuna, M, 'alarmes_falsos_por_municipio_ano', falsos),
       g('mobilizacao', cv, lacuna, R, 'alarmes_falsos_por_municipio_ano', falsos)],
   ]);
-  const desmobilizacao = tabela(['', '100 municípios', '15 nunca vistos', 'Regra de queda (100 municípios)'], [
+  const desmobilizacao = tabela(['', '100 municípios', '15 municípios de teste', 'Regra de queda (100 municípios)'], [
     ['Fins indicados antes de os dados os mostrarem', g('desmobilizacao', cv, lacuna, D, 'fins_indicados_antes_dos_dados', pct),
       g('desmobilizacao', vf, lacuna, D, 'fins_indicados_antes_dos_dados', pct),
       g('desmobilizacao', cv, lacuna, Q, 'fins_indicados_antes_dos_dados', pct)],
@@ -136,16 +136,19 @@ function blocoGeral(av: AvaliacaoGeral, lacuna: number): HTMLElement {
       g('desmobilizacao', vf, lacuna, D, 'avisos_prematuros_por_episodio', nAvisos),
       g('desmobilizacao', cv, lacuna, Q, 'avisos_prematuros_por_episodio', nAvisos)],
   ]);
-  const atraso = tabela(['100 municípios', 'Sem atraso', '2 semanas', '3 semanas', '4 semanas'], [
-    ['Epidemias avisadas antes de começar', ...[0, 2, 3, 4].map((l) => g('mobilizacao', cv, l, M, 'epidemias_avisadas', pct))],
-    ['Regra simples: avisadas antes de começar', ...[0, 2, 3, 4].map((l) => g('mobilizacao', cv, l, R, 'epidemias_avisadas', pct))],
-    ['Alertas que se confirmaram', ...[0, 2, 3, 4].map((l) => g('mobilizacao', cv, l, M, 'alarmes_corretos', pct))],
-    ['Nível em 4 semanas: acerto do modelo', ...[0, 2, 3, 4].map((l) => g('nivel_4_semanas', cv, l, 'Modelo e persistência', 'acerto', pct))],
+  const LACUNAS = [0, 1, 2, 3, 4];
+  const atraso = tabela(['100 municípios', 'Sem atraso', '1 semana', '2 semanas', '3 semanas', '4 semanas'], [
+    ['Epidemias avisadas antes de começar', ...LACUNAS.map((l) => g('mobilizacao', cv, l, M, 'epidemias_avisadas', pct))],
+    ['Avisadas antes de os dados mostrarem o início',
+      ...LACUNAS.map((l) => g('mobilizacao', cv, l, M, 'avisadas_antes_dos_dados', pct))],
+    ['Regra simples: avisadas antes de começar', ...LACUNAS.map((l) => g('mobilizacao', cv, l, R, 'epidemias_avisadas', pct))],
+    ['Alertas que se confirmaram', ...LACUNAS.map((l) => g('mobilizacao', cv, l, M, 'alarmes_corretos', pct))],
+    ['Nível em 4 semanas: acerto do modelo', ...LACUNAS.map((l) => g('nivel_4_semanas', cv, l, 'Modelo e persistência', 'acerto', pct))],
     ['Nível em 4 semanas: repetir o nível conhecido',
-      ...[0, 2, 3, 4].map((l) => g('nivel_4_semanas', cv, l, 'Modelo e persistência', 'acerto_persistencia', pct))],
+      ...LACUNAS.map((l) => g('nivel_4_semanas', cv, l, 'Modelo e persistência', 'acerto_persistencia', pct))],
   ]);
   const nivel = tabela(['Previsão feita', 'Acerto (100 municípios)', 'Repetir o nível confirmado', 'Acerto quando o nível muda',
-    'Acerto (15 nunca vistos)'], [2, 3, 4].map((h) => {
+    'Acerto (15 de teste)'], [2, 3, 4].map((h) => {
     const t = `nivel_${h}_semanas`;
     return [ROTULOS_LINHA[h], g(t, cv, lacuna, 'Modelo e persistência', 'acerto', pct),
       g(t, cv, lacuna, 'Modelo e persistência', 'acerto_persistencia', pct), g(t, cv, lacuna, 'Modelo e persistência', 'acerto_quando_muda', pct),
@@ -157,16 +160,16 @@ function blocoGeral(av: AvaliacaoGeral, lacuna: number): HTMLElement {
     return r ? el('span', {}, f(r.valor), el('br'), el('span', { class: 'sub' }, `${f(r.ic95_inf)} a ${f(r.ic95_sup)}`)) : '—';
   };
   const tabelaCasos = tabela(['Previsão feita', 'Erro em relação a repetir os casos confirmados', 'Casos dentro da faixa de 80%',
-    'Erro (15 nunca vistos)', 'Dentro da faixa (15 nunca vistos)'], ANTECEDENCIAS.map((a) => [ROTULOS_LINHA[a],
+    'Erro (15 de teste)', 'Dentro da faixa (15 de teste)'], ANTECEDENCIAS.map((a) => [ROTULOS_LINHA[a],
     casos(cv, 'razao_erro', decimal)(a), casos(cv, 'cobertura_80', pct)(a), casos(vf, 'razao_erro', decimal)(a),
     casos(vf, 'cobertura_80', pct)(a)]));
 
   return el('section', { class: 'card largo' }, el('h3', {}, 'Todos os municípios'),
-    el('p', { class: 'nota' }, `Previsões de ${INICIO_AVALIACAO.slice(0, 4)} em diante, feitas como o painel as faz para ` +
-      `este município: com os dados confirmados até ${lacuna} semanas antes (${lacuna === 2 ? 'municípios com estimativa ' +
-      'do InfoDengue para as semanas recentes' : 'municípios sem estimativa do InfoDengue para as semanas recentes'}) e ` +
-      'modelos que não viram o município (validação cruzada por município nos 100 de treino; os 15 de validação nunca ' +
-      'foram usados no desenvolvimento). Abaixo de cada número, o intervalo de confiança de 95%.'),
+    el('p', { class: 'nota' }, `Previsões de ${INICIO_AVALIACAO.slice(0, 4)} em diante, feitas como o painel as faz: ` +
+      `com os dados confirmados até ${lacuna} semanas antes e modelos que não viram o município (validação cruzada por ` +
+      'município nos 100 de treino; os 15 do conjunto de teste nunca foram usados no desenvolvimento). O mesmo modelo dá os ' +
+      'casos aproximados e a chance de cada nível, lida nos limiares a partir da faixa de casos prevista. Abaixo de ' +
+      'cada número, o intervalo de confiança de 95%.'),
     el('h4', {}, 'Alerta de epidemia (mobilização)'), mobilizacao,
     el('p', { class: 'nota' }, 'Uma epidemia é um período de 2 semanas ou mais no nível epidêmico. Um alerta se confirma ' +
       'quando uma epidemia começa durante ele ou até 4 semanas depois. A regra simples alerta quando os casos sobem há 2 ' +
@@ -178,8 +181,7 @@ function blocoGeral(av: AvaliacaoGeral, lacuna: number): HTMLElement {
       'confirmada (abaixo de 1, o modelo erra menos). A faixa de 80% deveria conter o valor real em cerca de 80% das semanas.'),
     el('h4', {}, 'Efeito do atraso das notificações'), atraso,
     el('p', { class: 'nota' }, 'Sem atraso: como se os dados da semana atual já estivessem completos. O painel usa 2 ' +
-      'semanas de atraso nos municípios com estimativa do InfoDengue para as semanas recentes e 3 nos demais; 4 semanas é o ' +
-      'pior caso.'));
+      'semanas de atraso; 4 semanas é o pior caso.'));
 }
 
 export function renderAvaliacao(alvo: HTMLElement, m: Municipio, av: AvaliacaoGeral): void {

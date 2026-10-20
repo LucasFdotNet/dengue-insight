@@ -59,7 +59,10 @@ def run_revisao():
         logging.warning("É preciso ao menos duas fotos em data/snapshots/ para comparar.")
         return
     tabelas = []
-    for antes, depois in zip(fotos, fotos[1:]):
+    pares = list(zip(fotos, fotos[1:]))
+    if len(fotos) > 2:
+        pares.append((fotos[0], fotos[-1]))  # o maior intervalo disponível
+    for antes, depois in pares:
         t = comparar(ler_foto(antes), ler_foto(depois))
         tabelas.append(t.assign(foto_antes=antes, foto_depois=depois))
         logging.info(f"{antes} -> {depois}: última semana {t['casos_est_antes'].iloc[0]:.0f} -> "

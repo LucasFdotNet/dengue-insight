@@ -40,18 +40,32 @@ function eixoY(log: boolean) {
     : { label: 'Casos por semana', grid: true, tickFormat: (v: number) => n(v), zero: true };
 }
 
-/** Indicadores: casos das últimas semanas, semanas incompletas, previsão com faixa de 80% e limiares. */
+const MARGEM_ESQ = 64;
+const MARGEM_DIR = 20;
+
+/** Indicadores: casos das últimas semanas e, embaixo, os níveis confirmados no mesmo eixo de tempo. */
 export function graficoCasos(m: Municipio, semanas: number, log: boolean): Element {
+  const ini = Math.max(0, m.serie.semana.length - semanas);
+  const dominio: [Date, Date] = [data(m.serie.semana[ini]),
+    data(somarSemanas(m.previsoes[m.previsoes.length - 1].semana, 1))];
+  const div = document.createElement('div');
+  div.append(linhaCasos(m, ini, dominio, log), faixaNiveis(m, ini, dominio));
+  return div;
+}
+
+/** Casos das últimas semanas, semanas incompletas, previsão com faixa de 80% e limiares. */
+function linhaCasos(m: Municipio, ini: number, dominio: [Date, Date], log: boolean): Element {
   const c = cores();
   const s = m.serie;
   const total = s.semana.length;
-  const ini = Math.max(0, total - semanas);
   const confirmadas = total - m.lacuna;
   const sem = s.semana.slice(ini);
   const conf = pontos(sem.slice(0, confirmadas - ini), s.casos.slice(ini, confirmadas));
   // As semanas incompletas ligam-se à última confirmada para a linha não ficar solta
   const incompletas = pontos(s.semana.slice(confirmadas - 1), s.casos.slice(confirmadas - 1));
   const prev = m.previsoes.map((p) => ({ semana: data(p.semana), casos: p.casos, inf: p.casos_inf, sup: p.casos_sup }));
+  // A previsão parte da última semana confirmada: o traço fino mostra de onde ela sai
+  const partida = [{ semana: data(s.semana[confirmadas - 1]), casos: s.casos[confirmadas - 1] }, prev[0]];
 
   // Limiares: os da série e, nas semanas previstas, os da temporada de cada semana
   const limiar = (campo: 'limiar_amarelo' | 'limiar_vermelho') => [
@@ -60,14 +74,15 @@ export function graficoCasos(m: Municipio, semanas: number, log: boolean): Eleme
   ];
   const amarelo = limiar('limiar_amarelo');
   const vermelho = limiar('limiar_vermelho');
-  const fim = data(somarSemanas(m.previsoes[m.previsoes.length - 1].semana, 1));
 
   return Plot.plot({
     width: largura(),
-    height: 320,
-    marginLeft: 64,
+    height: 300,
+    marginLeft: MARGEM_ESQ,
+    marginRight: MARGEM_DIR,
+    marginBottom: 8,
     style: { background: 'transparent', color: c.tintaSec, fontSize: '12px' },
-    x: { type: 'time', label: null, domain: [data(sem[0]), fim], tickFormat: mesAno },
+    x: { type: 'time', domain: dominio, axis: null },
     y: eixoY(log),
     marks: [
       Plot.areaY(prev, { x: 'semana', y1: 'inf', y2: 'sup', fill: c.faixa, curve: 'monotone-x' }),
@@ -78,16 +93,80 @@ export function graficoCasos(m: Municipio, semanas: number, log: boolean): Eleme
       Plot.line(conf, { x: 'semana', y: 'valor', stroke: c.tinta, strokeWidth: 2 }),
       Plot.line(incompletas, { x: 'semana', y: 'valor', stroke: c.tinta, strokeWidth: 2, strokeDasharray: '2,3' }),
       Plot.dot(incompletas.slice(1), { x: 'semana', y: 'valor', r: 4, fill: c.fundo, stroke: c.tinta, strokeWidth: 1.5 }),
+      Plot.line(partida, { x: 'semana', y: 'casos', stroke: c.previsto, strokeWidth: 1.5, strokeDasharray: '2,3' }),
       Plot.line(prev, { x: 'semana', y: 'casos', stroke: c.previsto, strokeWidth: 2 }),
       Plot.dot(prev, { x: 'semana', y: 'casos', r: 4, fill: c.previsto, stroke: c.fundo, strokeWidth: 2 }),
       Plot.tip([...conf.map((p) => ({ ...p, tipo: 'confirmado' })),
-        ...incompletas.slice(1).map((p) => ({ ...p, tipo: 'semana incompleta (estimativa)' }))],
+        ...incompletas.slice(1).map((p) => ({ ...p, tipo: 'estimativa nowcast' }))],
       Plot.pointerX({ x: 'semana', y: 'valor', title: (p: Ponto & { tipo: string }) =>
         `Semana de ${diaMesAno(fmtIso(p.semana))}\n${n(p.valor)} casos (${p.tipo})` })),
       Plot.tip(prev, Plot.pointerX({ x: 'semana', y: 'casos', title: (p: (typeof prev)[number]) =>
         `Semana de ${diaMesAno(fmtIso(p.semana))}\nPrevisto: ${n(p.casos)} casos\nFaixa de 80%: ${n(p.inf)} a ${n(p.sup)}` })),
     ],
   });
+}
+
+/** Faixa com o nível de cada semana: cheio nas confirmadas, hachurado nas previstas (nível mais provável).
+ * As semanas incompletas sem previsão ficam em branco. Um triângulo no eixo marca a última semana confirmada,
+ * de onde partem as previsões. */
+function faixaNiveis(m: Municipio, ini: number, dominio: [Date, Date]): Element {
+  const c = cores();
+  const meiaSemana = 3.5 * 86_400_000; // a célula fica centrada no ponto da semana, como na linha
+  const celula = (sem: string, nivel: Nivel, previsto: boolean) => {
+    const t = data(sem).getTime();
+    return { semana: data(sem), x1: new Date(t - meiaSemana), x2: new Date(t + meiaSemana), linha: 'Nível', nivel,
+      previsto };
+  };
+  const confirmadas = m.serie.semana.slice(ini).flatMap((sem, i) => {
+    const nivel = m.serie.nivel[ini + i];
+    return nivel == null ? [] : [celula(sem, nivel, false)];
+  });
+  const previstas = m.previsoes.map((p) => celula(p.semana, p.nivel, true));
+  const id = `hachura-${++faixas}`;
+  const svg = Plot.plot({
+    width: largura(),
+    height: 30 + 34,
+    marginLeft: MARGEM_ESQ,
+    marginRight: MARGEM_DIR,
+    marginTop: 4,
+    marginBottom: 36,
+    style: { background: 'transparent', color: c.tintaSec, fontSize: '12px' },
+    x: { type: 'time', label: null, domain: dominio, tickFormat: mesAno, tickSize: 0, tickPadding: 16 },
+    y: { domain: ['Nível'], label: null, padding: 0.12 },
+    color: { type: 'ordinal', domain: [0, 1, 2], range: c.nivel },
+    marks: [
+      Plot.rect(confirmadas, { x1: 'x1', x2: 'x2', y: 'linha', fill: 'nivel', inset: 0.5, clip: true }),
+      // Previstas: listras na cor do nível (padrão SVG acrescentado abaixo) e contorno na mesma cor
+      ...([0, 1, 2] as Nivel[]).map((nv) => Plot.rect(previstas.filter((x) => x.nivel === nv), {
+        x1: 'x1', x2: 'x2', y: 'linha', fill: `url(#${id}-${nv})`, stroke: c.nivel[nv], strokeWidth: 1, inset: 1,
+        clip: true })),
+      Plot.text([data(m.confirmada.semana)], { x: (d: Date) => d, frameAnchor: 'bottom', dy: 8, text: () => '▲',
+        fill: c.tinta, fontSize: 11, title: () => `Última semana confirmada (${diaMesAno(m.confirmada.semana)})` }),
+      Plot.tip([...confirmadas, ...previstas], Plot.pointerX({ x: 'semana', y: 'linha',
+        title: (x: (typeof confirmadas)[number]) => `Semana de ${diaMesAno(fmtIso(x.semana))}
+` +
+          (x.previsto ? `Nível mais provável (previsto): ${NOMES_NIVEL[x.nivel]}` : `Nível: ${NOMES_NIVEL[x.nivel]}`) })),
+    ],
+  });
+  svg.prepend(hachuras(id, c.nivel));
+  return svg;
+}
+
+let faixas = 0; // ids únicos para os padrões de hachura
+
+function hachuras(id: string, cores: string[]): SVGDefsElement {
+  const ns = 'http://www.w3.org/2000/svg';
+  const defs = document.createElementNS(ns, 'defs');
+  cores.forEach((cor, nv) => {
+    const padrao = document.createElementNS(ns, 'pattern');
+    for (const [k, v] of Object.entries({ id: `${id}-${nv}`, width: '6', height: '6', patternUnits: 'userSpaceOnUse',
+      patternTransform: 'rotate(45)' })) padrao.setAttribute(k, v);
+    const listra = document.createElementNS(ns, 'rect');
+    for (const [k, v] of Object.entries({ width: '3', height: '6', fill: cor })) listra.setAttribute(k, v);
+    padrao.append(listra);
+    defs.append(padrao);
+  });
+  return defs;
 }
 
 function fmtIso(d: Date): string {

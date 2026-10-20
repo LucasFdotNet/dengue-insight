@@ -44,13 +44,17 @@ PASSOS = [
     ('experimento_atraso', []),
     ('experimento_estados', []),             # níveis: dois estados (decisão 16)
     ('experimento_niveis', []),              # níveis: verde, amarelo, vermelho e quadradinhos (decisão 16)
-    ('experimento_niveis_robustez', []),     # desmobilização, atraso dos dados e intervalos de confiança (decisão 16)
+    ('experimento_niveis_robustez', []),     # modelo do painel: desmobilização, atraso dos dados e IC (decisões 16 e 18)
     ('experimento_casos_atraso', []),        # casos aproximados como no painel (2 semanas de atraso)
-    ('exportar_painel', []),                 # modelos de produção e JSON do painel estático (web/public/dados)
+    ('exportar_painel', []),                 # modelo de produção e JSON do painel estático (web/public/dados)
 ]
 # Fora do pipeline: experimento_variaveis.py (base de SP) e experimento_clima_semanal.py (base de 63
 # municípios) são históricos; os resultados citados em docs/historia_decisoes.md são os dos commits
-# originais, e rodá-los com a base atual seria outro experimento.
+# originais, e rodá-los com a base atual seria outro experimento. experimento_niveis_quantis.py (decisão
+# 18) também: compara as variantes que levaram ao modelo do painel (cerca de 2h30 de treino) e seus
+# resultados, com os dados de 10/2026, estão em reports/niveis_quantis.csv; as previsões do modelo do
+# painel são geradas por experimento_niveis_robustez.py (previsoes_producao), sem as variantes.
+# experimento_niveis_ms.py (limiares fixos do Ministério x MEM; seção 26 da história) também fica fora.
 ARQUIVO_ESTADO = 'reports/pipeline_estado.json'
 PASTA_LOGS = 'reports/logs'
 

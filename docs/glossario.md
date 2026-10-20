@@ -34,7 +34,7 @@
 
 **Hiperparâmetros.** Configurações de um modelo escolhidas antes do treino, e não aprendidas dos dados: por exemplo, quantas árvores o LightGBM usa ou o tamanho de uma rede neural. O ajuste testa algumas configurações num período separado (2015 a 2018) e escolhe a melhor, sem usar os anos em que os modelos são comparados.
 
-**Incidência.** Casos por 100 mil habitantes. Permite comparar municípios de tamanhos diferentes. O Ministério da Saúde considera alta uma incidência anual de 300 ou mais.
+**Incidência.** Casos por 100 mil habitantes. Permite comparar municípios de tamanhos diferentes. O Plano de Contingência do Ministério da Saúde (2025) não usa um patamar fixo de incidência: compara os casos com o diagrama de controle do próprio município.
 
 **InfoDengue.** Sistema de alerta de arboviroses da Fiocruz e da FGV, que publica, por município e por semana, os casos de dengue, o *nowcast*, o Rt e níveis de alerta. É a fonte dos dados de casos do projeto.
 

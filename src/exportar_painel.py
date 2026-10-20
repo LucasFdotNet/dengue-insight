@@ -5,22 +5,25 @@ avaliação geral.
 O painel parte do último nível confirmado: as 2 semanas mais recentes ainda estão incompletas
 (reports/revisao_dados.csv), então a semana confirmada é a atual - 2. Todos os municípios têm o
 nowcast do InfoDengue (os que não tinham foram substituídos, decisão 1); se algum o perder numa
-atualização, a exportação avisa no log. A partir da semana confirmada, os modelos de produção
-preveem a semana atual e as 4 seguintes (2 a 6 semanas à frente), como avaliado com dados
-atrasados (decisões 16 e 17; experimento_niveis_robustez.py e experimento_casos_atraso.py):
-  - níveis: NivelLightGBM (verde, amarelo, vermelho pelos limiares do MEM), nível mais provável;
-  - casos aproximados: LightGBMQuantis (mediana e faixa de 80%);
+atualização, a exportação avisa no log. A partir da semana confirmada, o modelo de produção
+prevê a semana atual e as 4 seguintes (2 a 6 semanas à frente), como avaliado com dados
+atrasados (decisões 16 a 18; experimento_niveis_quantis.py, experimento_niveis_robustez.py e
+experimento_casos_atraso.py). Um modelo só, o de quantis com o clima (LightGBMQuantisNiveis), dá:
+  - casos aproximados: mediana e faixa de 80% (quantis de 10% e 90%);
+  - níveis (verde, amarelo, vermelho pelos limiares do MEM): a chance de cada um lida nos
+    limiares, na curva prevista dos casos, e o nível mais provável. Os limiares são os conhecidos
+    na semana confirmada (os da temporada seguinte, só com as temporadas completas até ela), como
+    na avaliação;
   - alerta de mobilização (se o nível confirmado não é vermelho): maior probabilidade de
     vermelho de 2 a 4 semanas à frente da semana atual acima do corte mais recente escolhido
     com 2 semanas de atraso (reports/niveis_robustez_cortes.csv);
   - desmobilização (se o nível confirmado é vermelho): o nível mais provável 2 semanas à frente
     da semana atual deixa de ser vermelho.
-Os modelos de produção são treinados aqui com os municípios de treino e todos os dados até as
+O modelo de produção é treinado aqui com os municípios de treino e todos os dados até as
 semanas instáveis, como em train.py.
 
-A seção Avaliação de cada município usa as previsões fora da amostra dos experimentos, no mesmo
-modo do painel (2 semanas de atraso): níveis (caches de experimento_niveis e
-experimento_niveis_robustez) e casos (cache de experimento_casos_atraso).
+A seção Avaliação de cada município usa as previsões fora da amostra do mesmo modelo, no mesmo
+modo do painel (2 semanas de atraso), do cache de experimento_niveis_quantis.py.
 
 Saídas (web/public/dados/):
   indice.json             municípios, semana atual, cortes do alerta e situação de cada município
@@ -40,15 +43,15 @@ import pandas as pd
 
 from src import experimento_casos_atraso as eca
 from src import experimento_niveis as en
+from src import experimento_niveis_quantis as enq
 from src import experimento_niveis_robustez as enr
 from src.cidades import CIDADES
 from src.estados import MIN_CASOS_ALTO, MIN_CASOS_AMARELO
 from src.experimento_atraso import adicionar_alvos
 from src.mem import SEMANA_INICIO_TEMPORADA, limiares_mem, temporadas_do_municipio
-from src.modelos.lightgbm_quantis import LightGBMQuantis
-from src.modelos.nivel_lightgbm import NivelLightGBM
+from src.modelos.lightgbm_quantis_niveis import LightGBMQuantisNiveis, probabilidades_niveis
 from src.snapshot import id_dados_processados
-from src.train import HORIZONTES, SEMANAS_INSTAVEIS, linhas_validas
+from src.train import SEMANAS_INSTAVEIS
 
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
 
@@ -99,17 +102,18 @@ def tem_nowcast(g):
 
 # --------------------------------------------------------------- modelos de produção
 
+VARIANTE = enq.VARIANTES[enq.VARIANTE_PRODUCAO]
+GRADE = VARIANTE['grade']
+Q10, Q50, Q90 = (int(np.argmin(np.abs(GRADE - q))) for q in (0.1, 0.5, 0.9))  # posições na grade
+
+
 def treinar_producao(treino):
-    niveis, casos = {}, {}
+    modelos = {}
     for h in HORIZONTES_PAINEL:
-        tr = linhas_validas(treino, min(h, max(HORIZONTES)))
-        tn = tr[tr[f'faixa_h{h}'].notna()]
-        niveis[h] = NivelLightGBM().treinar(tn, h)
-        tc = tr[tr[f'target_h{h}'].notna()]
-        casos[h] = LightGBMQuantis().treinar(tc, h)
-        logging.info(f"Produção H+{h}: níveis com {len(tn)} semanas, casos com {len(tc)} "
-                     f"(até {tc['data_iniSE'].max():%d/%m/%Y}).")
-    return niveis, casos
+        tr = enq.linhas(treino, h)
+        modelos[h] = LightGBMQuantisNiveis(grade=GRADE, features=VARIANTE['features']).treinar(tr, h)
+        logging.info(f"Produção H+{h}: {len(tr)} semanas (até {tr['data_iniSE'].max():%d/%m/%Y}).")
+    return modelos
 
 
 def corte_alerta_atual():
@@ -135,25 +139,25 @@ def limiares_temporadas(g, temporadas):
 
 # --------------------------------------------------------------- situação atual
 
-def situacao_atual(g, niveis, casos, corte):
+def situacao_atual(g, modelos, corte):
     """Nível confirmado, semanas incompletas, previsões e alerta de um município (g ordenado por semana)."""
     atual, confirmada = g.iloc[-1], g.iloc[-1 - LACUNA]
     linha_c = g.iloc[[-1 - LACUNA]]
+    # Limiares da temporada de cada semana prevista, com os dados até a semana confirmada (a temporada muda
+    # na semana 41; perto do fim do ano, se_atual + a pode passar de 52, mas continua na mesma temporada)
+    temporada = temporada_de(int(atual['SE']))
+    limiares = limiares_temporadas(g.iloc[:len(g) - LACUNA], [temporada, temporada + 1])
     previsoes = []
     for a, h in zip(ANTECEDENCIAS, HORIZONTES_PAINEL):
-        p = niveis[h].prever(linha_c, h)[0]
-        q = casos[h].prever(linha_c, h).iloc[0]
+        lim = limiares[temporada_de(int(atual['SE']) + a) - temporada]
+        q = modelos[h].prever_quantis(linha_c, h)
+        p = probabilidades_niveis(q, np.array([lim['pre_epidemico']], float), np.array([lim['epidemico']], float),
+                                  GRADE)[0]
         previsoes.append({'semana': limpo(atual['data_iniSE'] + pd.Timedelta(weeks=a)), 'antecedencia': a,
                           'p_verde': limpo(p[0], 3), 'p_amarelo': limpo(p[1], 3), 'p_vermelho': limpo(p[2], 3),
-                          'nivel': int(np.argmax(p)), 'casos': limpo(q['previsto'], 0),
-                          'casos_inf': limpo(q['inferior'], 0), 'casos_sup': limpo(q['superior'], 0)})
-    # Limiares da temporada de cada semana prevista (a temporada muda na semana 41; perto do fim do ano,
-    # se_atual + a pode passar de 52, mas continua na mesma temporada)
-    temporada = temporada_de(int(atual['SE']))
-    limiares = limiares_temporadas(g, [temporada, temporada + 1])
-    for x in previsoes:
-        lim = limiares[temporada_de(int(atual['SE']) + x['antecedencia']) - temporada]
-        x['limiar_amarelo'], x['limiar_vermelho'] = lim['pre_epidemico'], lim['epidemico']
+                          'nivel': int(np.argmax(p)), 'casos': limpo(q[0, Q50], 0),
+                          'casos_inf': limpo(q[0, Q10], 0), 'casos_sup': limpo(q[0, Q90], 0),
+                          'limiar_amarelo': lim['pre_epidemico'], 'limiar_vermelho': lim['epidemico']})
     em_vermelho = confirmada['faixa'] == 2
     p_max = max(x['p_vermelho'] for x in previsoes if x['antecedencia'] in ANTECEDENCIAS_ALERTA)
     if em_vermelho:
@@ -181,7 +185,7 @@ def situacao_atual(g, niveis, casos, corte):
 
 def niveis_fora_da_amostra(id_):
     """Nível previsto para cada semana-alvo, com antecedência a partir da semana de consulta."""
-    p = enr.rodar_previsoes(id_, en.PROCESSOS)
+    p = enq.previsoes_producao(id_)
     p = p[p['h'].isin(HORIZONTES_PAINEL)].copy()
     p['antecedencia'] = p['h'] - LACUNA
     p['data_alvo'] = p['data_iniSE'] + pd.to_timedelta(7 * p['h'], unit='D')
@@ -199,13 +203,10 @@ def avaliacao_geral():
     """Métricas gerais para a seção Avaliação (só leitura dos resultados dos experimentos)."""
     r = pd.read_csv(enr.ARQUIVO_SAIDA)
     c = pd.read_csv(eca.ARQUIVO_SAIDA)
-    alertas_h = pd.read_csv(en.ARQUIVO_ALERTAS_H)
-    alertas_h = alertas_h[alertas_h['variante'] == 'D']
 
     def registros(df):
         return [{k: limpo(v, 3) for k, v in linha.items()} for linha in df.to_dict('records')]
-    return {'niveis_robustez': registros(r), 'casos_atraso': registros(c),
-            'alertas_por_antecedencia': registros(alertas_h.drop(columns='variante'))}
+    return {'niveis_robustez': registros(r), 'casos_atraso': registros(c)}
 
 
 # --------------------------------------------------------------- exportação
@@ -213,7 +214,7 @@ def avaliacao_geral():
 def run_exportacao():
     id_ = id_dados_processados()
     treino, validacao = (adicionar_alvos(d, max(HORIZONTES_PAINEL)) for d in en.dados('D'))
-    niveis, casos = treinar_producao(treino)
+    modelos = treinar_producao(treino)
     corte, trimestre_corte = corte_alerta_atual()
     niveis_oos, casos_oos = niveis_fora_da_amostra(id_), casos_fora_da_amostra(id_)
     base = pd.concat([treino, validacao], ignore_index=True).sort_values(['cidade', 'data_iniSE'])
@@ -227,7 +228,7 @@ def run_exportacao():
     indice = []
     for cidade, g in base.groupby('cidade', sort=True):
         info = CIDADES[cidade]
-        atual = situacao_atual(g, niveis, casos, corte)
+        atual = situacao_atual(g, modelos, corte)
         s = g[g['data_iniSE'] >= INICIO_SERIE]
         semanas = s['data_iniSE']
         no = niveis_oos.loc[cidade].reindex(semanas) if cidade in niveis_oos.index.get_level_values(0) else None

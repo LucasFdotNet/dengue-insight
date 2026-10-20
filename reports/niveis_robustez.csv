@@ -1,157 +1,451 @@
 teste,conjunto,lacuna,metodo,metrica,valor,ic95_inf,ic95_sup,dif_vs_comparacao,dif_ic95_inf,dif_ic95_sup,municipios
-desmobilizacao,validacao_cruzada,0,Modelo: nível previsto em S+2 deixa o vermelho,avisos_prematuros_por_episodio,1.047,0.892,1.212,-2.17,-2.556,-1.817,100
-desmobilizacao,validacao_cruzada,2,Modelo: nível previsto em S+2 deixa o vermelho,avisos_prematuros_por_episodio,1.474,1.244,1.724,-0.99,-1.299,-0.718,100
-desmobilizacao,validacao_cruzada,4,Modelo: nível previsto em S+2 deixa o vermelho,avisos_prematuros_por_episodio,2.064,1.752,2.388,0.193,-0.078,0.468,100
-desmobilizacao,validacao_cruzada,0,Modelo: nível previsto em S+2 deixa o vermelho,fins_indicados,0.777,0.737,0.817,0.247,0.199,0.294,100
-desmobilizacao,validacao_cruzada,2,Modelo: nível previsto em S+2 deixa o vermelho,fins_indicados,0.702,0.65,0.755,0.236,0.187,0.286,100
-desmobilizacao,validacao_cruzada,4,Modelo: nível previsto em S+2 deixa o vermelho,fins_indicados,0.667,0.622,0.715,0.261,0.217,0.304,100
-desmobilizacao,validacao_cruzada,0,Modelo: nível previsto em S+2 deixa o vermelho,fins_indicados_antes_dos_dados,0.777,0.737,0.817,0.247,0.199,0.294,100
-desmobilizacao,validacao_cruzada,2,Modelo: nível previsto em S+2 deixa o vermelho,fins_indicados_antes_dos_dados,0.909,0.88,0.936,0.246,0.198,0.293,100
-desmobilizacao,validacao_cruzada,4,Modelo: nível previsto em S+2 deixa o vermelho,fins_indicados_antes_dos_dados,0.938,0.916,0.959,0.223,0.185,0.265,100
-desmobilizacao,validacao_cruzada,0,Regra simples (caindo há 2 semanas),avisos_prematuros_por_episodio,3.217,2.829,3.663,,,,100
-desmobilizacao,validacao_cruzada,2,Regra simples (caindo há 2 semanas),avisos_prematuros_por_episodio,2.464,2.116,2.874,,,,100
-desmobilizacao,validacao_cruzada,4,Regra simples (caindo há 2 semanas),avisos_prematuros_por_episodio,1.871,1.54,2.255,,,,100
-desmobilizacao,validacao_cruzada,0,Regra simples (caindo há 2 semanas),fins_indicados,0.53,0.483,0.579,,,,100
-desmobilizacao,validacao_cruzada,2,Regra simples (caindo há 2 semanas),fins_indicados,0.466,0.419,0.517,,,,100
+desmobilizacao,validacao_cruzada,0,Classificador de níveis (anterior): nível previsto em S+2 deixa o vermelho,avisos_prematuros_por_episodio,1.047,0.902,1.201,0.294,0.209,0.392,100
+desmobilizacao,validacao_cruzada,1,Classificador de níveis (anterior): nível previsto em S+2 deixa o vermelho,avisos_prematuros_por_episodio,1.279,1.101,1.47,0.3,0.2,0.402,100
+desmobilizacao,validacao_cruzada,2,Classificador de níveis (anterior): nível previsto em S+2 deixa o vermelho,avisos_prematuros_por_episodio,1.474,1.235,1.737,0.244,0.13,0.375,100
+desmobilizacao,validacao_cruzada,3,Classificador de níveis (anterior): nível previsto em S+2 deixa o vermelho,avisos_prematuros_por_episodio,1.698,1.441,1.973,0.242,0.108,0.392,100
+desmobilizacao,validacao_cruzada,4,Classificador de níveis (anterior): nível previsto em S+2 deixa o vermelho,avisos_prematuros_por_episodio,2.064,1.748,2.405,0.259,0.097,0.428,100
+desmobilizacao,validacao_cruzada,0,Classificador de níveis (anterior): nível previsto em S+2 deixa o vermelho,fins_indicados,0.777,0.737,0.817,0.028,-0.002,0.058,100
+desmobilizacao,validacao_cruzada,1,Classificador de níveis (anterior): nível previsto em S+2 deixa o vermelho,fins_indicados,0.765,0.719,0.81,0.059,0.024,0.099,100
+desmobilizacao,validacao_cruzada,2,Classificador de níveis (anterior): nível previsto em S+2 deixa o vermelho,fins_indicados,0.702,0.653,0.752,0.014,-0.016,0.046,100
+desmobilizacao,validacao_cruzada,3,Classificador de níveis (anterior): nível previsto em S+2 deixa o vermelho,fins_indicados,0.692,0.645,0.739,0.024,-0.002,0.049,100
+desmobilizacao,validacao_cruzada,4,Classificador de níveis (anterior): nível previsto em S+2 deixa o vermelho,fins_indicados,0.667,0.622,0.718,0.02,-0.004,0.045,100
+desmobilizacao,validacao_cruzada,0,Classificador de níveis (anterior): nível previsto em S+2 deixa o vermelho,fins_indicados_antes_dos_dados,0.777,0.737,0.817,0.028,-0.002,0.058,100
+desmobilizacao,validacao_cruzada,1,Classificador de níveis (anterior): nível previsto em S+2 deixa o vermelho,fins_indicados_antes_dos_dados,0.879,0.85,0.909,0.042,0.014,0.072,100
+desmobilizacao,validacao_cruzada,2,Classificador de níveis (anterior): nível previsto em S+2 deixa o vermelho,fins_indicados_antes_dos_dados,0.909,0.88,0.937,0.036,0.01,0.063,100
+desmobilizacao,validacao_cruzada,3,Classificador de níveis (anterior): nível previsto em S+2 deixa o vermelho,fins_indicados_antes_dos_dados,0.931,0.906,0.953,0.048,0.02,0.078,100
+desmobilizacao,validacao_cruzada,4,Classificador de níveis (anterior): nível previsto em S+2 deixa o vermelho,fins_indicados_antes_dos_dados,0.938,0.916,0.96,0.018,-0.002,0.038,100
+desmobilizacao,validacao_cruzada,0,Modelo: nível previsto em S+2 deixa o vermelho,avisos_prematuros_por_episodio,0.753,0.638,0.87,-2.464,-2.894,-2.095,100
+desmobilizacao,validacao_cruzada,1,Modelo: nível previsto em S+2 deixa o vermelho,avisos_prematuros_por_episodio,0.978,0.827,1.148,-1.852,-2.249,-1.521,100
+desmobilizacao,validacao_cruzada,2,Modelo: nível previsto em S+2 deixa o vermelho,avisos_prematuros_por_episodio,1.23,1.034,1.439,-1.234,-1.568,-0.932,100
+desmobilizacao,validacao_cruzada,3,Modelo: nível previsto em S+2 deixa o vermelho,avisos_prematuros_por_episodio,1.456,1.219,1.724,-0.671,-1.018,-0.342,100
+desmobilizacao,validacao_cruzada,4,Modelo: nível previsto em S+2 deixa o vermelho,avisos_prematuros_por_episodio,1.805,1.523,2.106,-0.066,-0.397,0.253,100
+desmobilizacao,validacao_cruzada,0,Modelo: nível previsto em S+2 deixa o vermelho,fins_indicados,0.749,0.699,0.796,0.219,0.165,0.273,100
+desmobilizacao,validacao_cruzada,1,Modelo: nível previsto em S+2 deixa o vermelho,fins_indicados,0.706,0.656,0.754,0.206,0.154,0.258,100
+desmobilizacao,validacao_cruzada,2,Modelo: nível previsto em S+2 deixa o vermelho,fins_indicados,0.688,0.637,0.743,0.222,0.169,0.271,100
+desmobilizacao,validacao_cruzada,3,Modelo: nível previsto em S+2 deixa o vermelho,fins_indicados,0.669,0.615,0.719,0.188,0.14,0.242,100
+desmobilizacao,validacao_cruzada,4,Modelo: nível previsto em S+2 deixa o vermelho,fins_indicados,0.647,0.599,0.696,0.241,0.198,0.284,100
+desmobilizacao,validacao_cruzada,0,Modelo: nível previsto em S+2 deixa o vermelho,fins_indicados_antes_dos_dados,0.749,0.699,0.796,0.219,0.165,0.273,100
+desmobilizacao,validacao_cruzada,1,Modelo: nível previsto em S+2 deixa o vermelho,fins_indicados_antes_dos_dados,0.838,0.796,0.877,0.209,0.162,0.254,100
+desmobilizacao,validacao_cruzada,2,Modelo: nível previsto em S+2 deixa o vermelho,fins_indicados_antes_dos_dados,0.873,0.834,0.909,0.21,0.16,0.258,100
+desmobilizacao,validacao_cruzada,3,Modelo: nível previsto em S+2 deixa o vermelho,fins_indicados_antes_dos_dados,0.883,0.843,0.919,0.188,0.145,0.232,100
+desmobilizacao,validacao_cruzada,4,Modelo: nível previsto em S+2 deixa o vermelho,fins_indicados_antes_dos_dados,0.92,0.893,0.945,0.205,0.166,0.247,100
+desmobilizacao,validacao_cruzada,0,Regra simples (caindo há 2 semanas),avisos_prematuros_por_episodio,3.217,2.827,3.659,,,,100
+desmobilizacao,validacao_cruzada,1,Regra simples (caindo há 2 semanas),avisos_prematuros_por_episodio,2.83,2.453,3.24,,,,100
+desmobilizacao,validacao_cruzada,2,Regra simples (caindo há 2 semanas),avisos_prematuros_por_episodio,2.464,2.111,2.878,,,,100
+desmobilizacao,validacao_cruzada,3,Regra simples (caindo há 2 semanas),avisos_prematuros_por_episodio,2.127,1.777,2.515,,,,100
+desmobilizacao,validacao_cruzada,4,Regra simples (caindo há 2 semanas),avisos_prematuros_por_episodio,1.871,1.529,2.261,,,,100
+desmobilizacao,validacao_cruzada,0,Regra simples (caindo há 2 semanas),fins_indicados,0.53,0.48,0.575,,,,100
+desmobilizacao,validacao_cruzada,1,Regra simples (caindo há 2 semanas),fins_indicados,0.5,0.452,0.552,,,,100
+desmobilizacao,validacao_cruzada,2,Regra simples (caindo há 2 semanas),fins_indicados,0.466,0.417,0.516,,,,100
+desmobilizacao,validacao_cruzada,3,Regra simples (caindo há 2 semanas),fins_indicados,0.48,0.431,0.534,,,,100
 desmobilizacao,validacao_cruzada,4,Regra simples (caindo há 2 semanas),fins_indicados,0.406,0.36,0.457,,,,100
-desmobilizacao,validacao_cruzada,0,Regra simples (caindo há 2 semanas),fins_indicados_antes_dos_dados,0.53,0.483,0.579,,,,100
-desmobilizacao,validacao_cruzada,2,Regra simples (caindo há 2 semanas),fins_indicados_antes_dos_dados,0.663,0.611,0.711,,,,100
-desmobilizacao,validacao_cruzada,4,Regra simples (caindo há 2 semanas),fins_indicados_antes_dos_dados,0.715,0.672,0.76,,,,100
-desmobilizacao,validacao_final,0,Modelo: nível previsto em S+2 deixa o vermelho,avisos_prematuros_por_episodio,1.085,0.675,1.465,-2.829,-3.988,-1.938,15
-desmobilizacao,validacao_final,2,Modelo: nível previsto em S+2 deixa o vermelho,avisos_prematuros_por_episodio,1.476,1.053,1.868,-1.622,-2.79,-0.795,15
-desmobilizacao,validacao_final,4,Modelo: nível previsto em S+2 deixa o vermelho,avisos_prematuros_por_episodio,2.049,1.547,2.535,-0.366,-1.659,0.462,15
-desmobilizacao,validacao_final,0,Modelo: nível previsto em S+2 deixa o vermelho,fins_indicados,0.805,0.69,0.901,0.207,0.118,0.3,15
-desmobilizacao,validacao_final,2,Modelo: nível previsto em S+2 deixa o vermelho,fins_indicados,0.732,0.636,0.829,0.22,0.114,0.329,15
-desmobilizacao,validacao_final,4,Modelo: nível previsto em S+2 deixa o vermelho,fins_indicados,0.707,0.551,0.836,0.268,0.143,0.386,15
-desmobilizacao,validacao_final,0,Modelo: nível previsto em S+2 deixa o vermelho,fins_indicados_antes_dos_dados,0.805,0.69,0.901,0.207,0.118,0.3,15
-desmobilizacao,validacao_final,2,Modelo: nível previsto em S+2 deixa o vermelho,fins_indicados_antes_dos_dados,0.902,0.838,0.964,0.207,0.107,0.329,15
-desmobilizacao,validacao_final,4,Modelo: nível previsto em S+2 deixa o vermelho,fins_indicados_antes_dos_dados,0.89,0.818,0.95,0.11,0.036,0.191,15
-desmobilizacao,validacao_final,0,Regra simples (caindo há 2 semanas),avisos_prematuros_por_episodio,3.915,3.123,4.848,,,,15
-desmobilizacao,validacao_final,2,Regra simples (caindo há 2 semanas),avisos_prematuros_por_episodio,3.098,2.368,4.156,,,,15
-desmobilizacao,validacao_final,4,Regra simples (caindo há 2 semanas),avisos_prematuros_por_episodio,2.415,1.662,3.4,,,,15
-desmobilizacao,validacao_final,0,Regra simples (caindo há 2 semanas),fins_indicados,0.598,0.466,0.741,,,,15
-desmobilizacao,validacao_final,2,Regra simples (caindo há 2 semanas),fins_indicados,0.512,0.395,0.618,,,,15
-desmobilizacao,validacao_final,4,Regra simples (caindo há 2 semanas),fins_indicados,0.439,0.315,0.57,,,,15
-desmobilizacao,validacao_final,0,Regra simples (caindo há 2 semanas),fins_indicados_antes_dos_dados,0.598,0.466,0.741,,,,15
-desmobilizacao,validacao_final,2,Regra simples (caindo há 2 semanas),fins_indicados_antes_dos_dados,0.695,0.556,0.817,,,,15
-desmobilizacao,validacao_final,4,Regra simples (caindo há 2 semanas),fins_indicados_antes_dos_dados,0.78,0.659,0.893,,,,15
-mobilizacao,validacao_cruzada,0,Modelo: alerta de vermelho,alarmes_corretos,0.511,0.473,0.549,0.159,0.126,0.193,100
-mobilizacao,validacao_cruzada,2,Modelo: alerta de vermelho,alarmes_corretos,0.536,0.507,0.566,0.132,0.102,0.163,100
-mobilizacao,validacao_cruzada,4,Modelo: alerta de vermelho,alarmes_corretos,0.529,0.497,0.562,0.084,0.05,0.118,100
-mobilizacao,validacao_cruzada,0,Modelo: alerta de vermelho,alarmes_falsos_por_municipio_ano,0.527,0.463,0.594,-0.335,-0.431,-0.246,100
-mobilizacao,validacao_cruzada,2,Modelo: alerta de vermelho,alarmes_falsos_por_municipio_ano,0.594,0.539,0.648,-0.2,-0.285,-0.114,100
-mobilizacao,validacao_cruzada,4,Modelo: alerta de vermelho,alarmes_falsos_por_municipio_ano,0.62,0.558,0.682,-0.117,-0.205,-0.032,100
-mobilizacao,validacao_cruzada,0,Modelo: alerta de vermelho,avisadas_antes_dos_dados,0.723,0.684,0.762,0.063,0.024,0.105,100
-mobilizacao,validacao_cruzada,2,Modelo: alerta de vermelho,avisadas_antes_dos_dados,0.796,0.758,0.834,0.077,0.038,0.115,100
-mobilizacao,validacao_cruzada,4,Modelo: alerta de vermelho,avisadas_antes_dos_dados,0.771,0.731,0.81,0.014,-0.026,0.053,100
-mobilizacao,validacao_cruzada,0,Modelo: alerta de vermelho,epidemias_avisadas,0.723,0.684,0.762,0.063,0.024,0.105,100
-mobilizacao,validacao_cruzada,2,Modelo: alerta de vermelho,epidemias_avisadas,0.563,0.522,0.604,0.198,0.148,0.244,100
-mobilizacao,validacao_cruzada,4,Modelo: alerta de vermelho,epidemias_avisadas,0.421,0.38,0.459,0.188,0.143,0.235,100
+desmobilizacao,validacao_cruzada,0,Regra simples (caindo há 2 semanas),fins_indicados_antes_dos_dados,0.53,0.48,0.575,,,,100
+desmobilizacao,validacao_cruzada,1,Regra simples (caindo há 2 semanas),fins_indicados_antes_dos_dados,0.628,0.579,0.676,,,,100
+desmobilizacao,validacao_cruzada,2,Regra simples (caindo há 2 semanas),fins_indicados_antes_dos_dados,0.663,0.617,0.711,,,,100
+desmobilizacao,validacao_cruzada,3,Regra simples (caindo há 2 semanas),fins_indicados_antes_dos_dados,0.694,0.651,0.739,,,,100
+desmobilizacao,validacao_cruzada,4,Regra simples (caindo há 2 semanas),fins_indicados_antes_dos_dados,0.715,0.671,0.76,,,,100
+desmobilizacao,validacao_final,0,Classificador de níveis (anterior): nível previsto em S+2 deixa o vermelho,avisos_prematuros_por_episodio,1.085,0.671,1.465,0.195,0.0,0.409,15
+desmobilizacao,validacao_final,1,Classificador de níveis (anterior): nível previsto em S+2 deixa o vermelho,avisos_prematuros_por_episodio,1.378,0.919,1.845,0.146,-0.049,0.356,15
+desmobilizacao,validacao_final,2,Classificador de níveis (anterior): nível previsto em S+2 deixa o vermelho,avisos_prematuros_por_episodio,1.476,1.079,1.872,0.0,-0.158,0.149,15
+desmobilizacao,validacao_final,3,Classificador de níveis (anterior): nível previsto em S+2 deixa o vermelho,avisos_prematuros_por_episodio,1.866,1.423,2.244,0.049,-0.127,0.217,15
+desmobilizacao,validacao_final,4,Classificador de níveis (anterior): nível previsto em S+2 deixa o vermelho,avisos_prematuros_por_episodio,2.049,1.525,2.529,-0.146,-0.35,0.037,15
+desmobilizacao,validacao_final,0,Classificador de níveis (anterior): nível previsto em S+2 deixa o vermelho,fins_indicados,0.805,0.699,0.909,0.012,-0.026,0.055,15
+desmobilizacao,validacao_final,1,Classificador de níveis (anterior): nível previsto em S+2 deixa o vermelho,fins_indicados,0.829,0.736,0.918,0.037,-0.024,0.096,15
+desmobilizacao,validacao_final,2,Classificador de níveis (anterior): nível previsto em S+2 deixa o vermelho,fins_indicados,0.732,0.641,0.824,-0.012,-0.069,0.056,15
+desmobilizacao,validacao_final,3,Classificador de níveis (anterior): nível previsto em S+2 deixa o vermelho,fins_indicados,0.72,0.6,0.827,0.012,-0.026,0.054,15
+desmobilizacao,validacao_final,4,Classificador de níveis (anterior): nível previsto em S+2 deixa o vermelho,fins_indicados,0.707,0.553,0.84,-0.024,-0.056,0.0,15
+desmobilizacao,validacao_final,0,Classificador de níveis (anterior): nível previsto em S+2 deixa o vermelho,fins_indicados_antes_dos_dados,0.805,0.699,0.909,0.012,-0.026,0.055,15
+desmobilizacao,validacao_final,1,Classificador de níveis (anterior): nível previsto em S+2 deixa o vermelho,fins_indicados_antes_dos_dados,0.878,0.797,0.951,0.049,-0.012,0.112,15
+desmobilizacao,validacao_final,2,Classificador de níveis (anterior): nível previsto em S+2 deixa o vermelho,fins_indicados_antes_dos_dados,0.902,0.837,0.962,0.024,-0.024,0.073,15
+desmobilizacao,validacao_final,3,Classificador de níveis (anterior): nível previsto em S+2 deixa o vermelho,fins_indicados_antes_dos_dados,0.89,0.819,0.951,0.0,-0.034,0.037,15
+desmobilizacao,validacao_final,4,Classificador de níveis (anterior): nível previsto em S+2 deixa o vermelho,fins_indicados_antes_dos_dados,0.89,0.825,0.952,-0.024,-0.062,0.0,15
+desmobilizacao,validacao_final,0,Modelo: nível previsto em S+2 deixa o vermelho,avisos_prematuros_por_episodio,0.89,0.615,1.156,-3.024,-4.0,-2.202,15
+desmobilizacao,validacao_final,1,Modelo: nível previsto em S+2 deixa o vermelho,avisos_prematuros_por_episodio,1.232,0.841,1.617,-2.305,-3.464,-1.368,15
+desmobilizacao,validacao_final,2,Modelo: nível previsto em S+2 deixa o vermelho,avisos_prematuros_por_episodio,1.476,1.113,1.81,-1.622,-2.8,-0.815,15
+desmobilizacao,validacao_final,3,Modelo: nível previsto em S+2 deixa o vermelho,avisos_prematuros_por_episodio,1.817,1.408,2.2,-0.89,-2.062,-0.114,15
+desmobilizacao,validacao_final,4,Modelo: nível previsto em S+2 deixa o vermelho,avisos_prematuros_por_episodio,2.195,1.726,2.616,-0.22,-1.419,0.545,15
+desmobilizacao,validacao_final,0,Modelo: nível previsto em S+2 deixa o vermelho,fins_indicados,0.793,0.68,0.902,0.195,0.094,0.286,15
+desmobilizacao,validacao_final,1,Modelo: nível previsto em S+2 deixa o vermelho,fins_indicados,0.793,0.674,0.905,0.329,0.184,0.464,15
+desmobilizacao,validacao_final,2,Modelo: nível previsto em S+2 deixa o vermelho,fins_indicados,0.744,0.622,0.854,0.232,0.137,0.333,15
+desmobilizacao,validacao_final,3,Modelo: nível previsto em S+2 deixa o vermelho,fins_indicados,0.707,0.586,0.827,0.171,0.074,0.273,15
+desmobilizacao,validacao_final,4,Modelo: nível previsto em S+2 deixa o vermelho,fins_indicados,0.732,0.595,0.86,0.293,0.202,0.39,15
+desmobilizacao,validacao_final,0,Modelo: nível previsto em S+2 deixa o vermelho,fins_indicados_antes_dos_dados,0.793,0.68,0.902,0.195,0.094,0.286,15
+desmobilizacao,validacao_final,1,Modelo: nível previsto em S+2 deixa o vermelho,fins_indicados_antes_dos_dados,0.829,0.729,0.922,0.171,0.06,0.296,15
+desmobilizacao,validacao_final,2,Modelo: nível previsto em S+2 deixa o vermelho,fins_indicados_antes_dos_dados,0.878,0.792,0.952,0.183,0.104,0.267,15
+desmobilizacao,validacao_final,3,Modelo: nível previsto em S+2 deixa o vermelho,fins_indicados_antes_dos_dados,0.89,0.812,0.962,0.134,0.071,0.198,15
+desmobilizacao,validacao_final,4,Modelo: nível previsto em S+2 deixa o vermelho,fins_indicados_antes_dos_dados,0.915,0.849,0.975,0.134,0.066,0.202,15
+desmobilizacao,validacao_final,0,Regra simples (caindo há 2 semanas),avisos_prematuros_por_episodio,3.915,3.173,4.907,,,,15
+desmobilizacao,validacao_final,1,Regra simples (caindo há 2 semanas),avisos_prematuros_por_episodio,3.537,2.774,4.553,,,,15
+desmobilizacao,validacao_final,2,Regra simples (caindo há 2 semanas),avisos_prematuros_por_episodio,3.098,2.319,4.107,,,,15
+desmobilizacao,validacao_final,3,Regra simples (caindo há 2 semanas),avisos_prematuros_por_episodio,2.707,1.987,3.775,,,,15
+desmobilizacao,validacao_final,4,Regra simples (caindo há 2 semanas),avisos_prematuros_por_episodio,2.415,1.687,3.421,,,,15
+desmobilizacao,validacao_final,0,Regra simples (caindo há 2 semanas),fins_indicados,0.598,0.463,0.732,,,,15
+desmobilizacao,validacao_final,1,Regra simples (caindo há 2 semanas),fins_indicados,0.463,0.314,0.608,,,,15
+desmobilizacao,validacao_final,2,Regra simples (caindo há 2 semanas),fins_indicados,0.512,0.4,0.617,,,,15
+desmobilizacao,validacao_final,3,Regra simples (caindo há 2 semanas),fins_indicados,0.537,0.393,0.667,,,,15
+desmobilizacao,validacao_final,4,Regra simples (caindo há 2 semanas),fins_indicados,0.439,0.318,0.571,,,,15
+desmobilizacao,validacao_final,0,Regra simples (caindo há 2 semanas),fins_indicados_antes_dos_dados,0.598,0.463,0.732,,,,15
+desmobilizacao,validacao_final,1,Regra simples (caindo há 2 semanas),fins_indicados_antes_dos_dados,0.659,0.506,0.798,,,,15
+desmobilizacao,validacao_final,2,Regra simples (caindo há 2 semanas),fins_indicados_antes_dos_dados,0.695,0.564,0.821,,,,15
+desmobilizacao,validacao_final,3,Regra simples (caindo há 2 semanas),fins_indicados_antes_dos_dados,0.756,0.631,0.864,,,,15
+desmobilizacao,validacao_final,4,Regra simples (caindo há 2 semanas),fins_indicados_antes_dos_dados,0.78,0.659,0.892,,,,15
+mobilizacao,validacao_cruzada,0,Classificador de níveis (anterior): alerta de vermelho,alarmes_corretos,0.511,0.474,0.549,-0.003,-0.026,0.019,100
+mobilizacao,validacao_cruzada,1,Classificador de níveis (anterior): alerta de vermelho,alarmes_corretos,0.53,0.498,0.562,-0.003,-0.026,0.019,100
+mobilizacao,validacao_cruzada,2,Classificador de níveis (anterior): alerta de vermelho,alarmes_corretos,0.536,0.507,0.566,0.007,-0.014,0.028,100
+mobilizacao,validacao_cruzada,3,Classificador de níveis (anterior): alerta de vermelho,alarmes_corretos,0.525,0.493,0.56,-0.007,-0.03,0.013,100
+mobilizacao,validacao_cruzada,4,Classificador de níveis (anterior): alerta de vermelho,alarmes_corretos,0.529,0.497,0.563,-0.016,-0.036,0.004,100
+mobilizacao,validacao_cruzada,0,Classificador de níveis (anterior): alerta de vermelho,alarmes_falsos_por_municipio_ano,0.527,0.466,0.595,-0.037,-0.084,0.011,100
+mobilizacao,validacao_cruzada,1,Classificador de níveis (anterior): alerta de vermelho,alarmes_falsos_por_municipio_ano,0.591,0.532,0.651,0.004,-0.051,0.055,100
+mobilizacao,validacao_cruzada,2,Classificador de níveis (anterior): alerta de vermelho,alarmes_falsos_por_municipio_ano,0.594,0.536,0.652,-0.047,-0.104,0.007,100
+mobilizacao,validacao_cruzada,3,Classificador de níveis (anterior): alerta de vermelho,alarmes_falsos_por_municipio_ano,0.608,0.546,0.673,-0.035,-0.085,0.019,100
+mobilizacao,validacao_cruzada,4,Classificador de níveis (anterior): alerta de vermelho,alarmes_falsos_por_municipio_ano,0.62,0.558,0.683,-0.008,-0.057,0.04,100
+mobilizacao,validacao_cruzada,0,Classificador de níveis (anterior): alerta de vermelho,avisadas_antes_dos_dados,0.723,0.683,0.761,-0.055,-0.083,-0.03,100
+mobilizacao,validacao_cruzada,1,Classificador de níveis (anterior): alerta de vermelho,avisadas_antes_dos_dados,0.796,0.76,0.832,-0.026,-0.049,0.0,100
+mobilizacao,validacao_cruzada,2,Classificador de níveis (anterior): alerta de vermelho,avisadas_antes_dos_dados,0.796,0.76,0.836,-0.051,-0.08,-0.024,100
+mobilizacao,validacao_cruzada,3,Classificador de níveis (anterior): alerta de vermelho,avisadas_antes_dos_dados,0.765,0.721,0.809,-0.083,-0.116,-0.052,100
+mobilizacao,validacao_cruzada,4,Classificador de níveis (anterior): alerta de vermelho,avisadas_antes_dos_dados,0.771,0.732,0.812,-0.073,-0.099,-0.049,100
+mobilizacao,validacao_cruzada,0,Classificador de níveis (anterior): alerta de vermelho,epidemias_avisadas,0.723,0.683,0.761,-0.055,-0.083,-0.03,100
+mobilizacao,validacao_cruzada,1,Classificador de níveis (anterior): alerta de vermelho,epidemias_avisadas,0.67,0.628,0.709,-0.014,-0.042,0.013,100
+mobilizacao,validacao_cruzada,2,Classificador de níveis (anterior): alerta de vermelho,epidemias_avisadas,0.563,0.523,0.606,-0.061,-0.091,-0.032,100
+mobilizacao,validacao_cruzada,3,Classificador de níveis (anterior): alerta de vermelho,epidemias_avisadas,0.476,0.434,0.52,-0.085,-0.122,-0.049,100
+mobilizacao,validacao_cruzada,4,Classificador de níveis (anterior): alerta de vermelho,epidemias_avisadas,0.421,0.382,0.46,-0.059,-0.086,-0.035,100
+mobilizacao,validacao_cruzada,0,Modelo: alerta de vermelho,alarmes_corretos,0.514,0.478,0.55,0.162,0.131,0.195,100
+mobilizacao,validacao_cruzada,1,Modelo: alerta de vermelho,alarmes_corretos,0.532,0.498,0.57,0.151,0.117,0.186,100
+mobilizacao,validacao_cruzada,2,Modelo: alerta de vermelho,alarmes_corretos,0.529,0.497,0.564,0.125,0.092,0.159,100
+mobilizacao,validacao_cruzada,3,Modelo: alerta de vermelho,alarmes_corretos,0.533,0.498,0.569,0.11,0.074,0.145,100
+mobilizacao,validacao_cruzada,4,Modelo: alerta de vermelho,alarmes_corretos,0.546,0.515,0.577,0.1,0.069,0.133,100
+mobilizacao,validacao_cruzada,0,Modelo: alerta de vermelho,alarmes_falsos_por_municipio_ano,0.564,0.498,0.635,-0.298,-0.39,-0.212,100
+mobilizacao,validacao_cruzada,1,Modelo: alerta de vermelho,alarmes_falsos_por_municipio_ano,0.587,0.511,0.662,-0.237,-0.329,-0.149,100
+mobilizacao,validacao_cruzada,2,Modelo: alerta de vermelho,alarmes_falsos_por_municipio_ano,0.64,0.568,0.712,-0.153,-0.24,-0.064,100
+mobilizacao,validacao_cruzada,3,Modelo: alerta de vermelho,alarmes_falsos_por_municipio_ano,0.643,0.571,0.721,-0.123,-0.216,-0.032,100
+mobilizacao,validacao_cruzada,4,Modelo: alerta de vermelho,alarmes_falsos_por_municipio_ano,0.628,0.56,0.697,-0.109,-0.191,-0.034,100
+mobilizacao,validacao_cruzada,0,Modelo: alerta de vermelho,avisadas_antes_dos_dados,0.779,0.739,0.82,0.119,0.075,0.163,100
+mobilizacao,validacao_cruzada,1,Modelo: alerta de vermelho,avisadas_antes_dos_dados,0.822,0.788,0.857,0.126,0.087,0.167,100
+mobilizacao,validacao_cruzada,2,Modelo: alerta de vermelho,avisadas_antes_dos_dados,0.848,0.812,0.881,0.128,0.085,0.172,100
+mobilizacao,validacao_cruzada,3,Modelo: alerta de vermelho,avisadas_antes_dos_dados,0.848,0.813,0.882,0.105,0.058,0.151,100
+mobilizacao,validacao_cruzada,4,Modelo: alerta de vermelho,avisadas_antes_dos_dados,0.844,0.81,0.878,0.087,0.038,0.133,100
+mobilizacao,validacao_cruzada,0,Modelo: alerta de vermelho,epidemias_avisadas,0.779,0.739,0.82,0.119,0.075,0.163,100
+mobilizacao,validacao_cruzada,1,Modelo: alerta de vermelho,epidemias_avisadas,0.684,0.638,0.729,0.178,0.127,0.227,100
+mobilizacao,validacao_cruzada,2,Modelo: alerta de vermelho,epidemias_avisadas,0.625,0.585,0.664,0.259,0.21,0.306,100
+mobilizacao,validacao_cruzada,3,Modelo: alerta de vermelho,epidemias_avisadas,0.561,0.52,0.603,0.273,0.231,0.315,100
+mobilizacao,validacao_cruzada,4,Modelo: alerta de vermelho,epidemias_avisadas,0.48,0.442,0.518,0.247,0.204,0.291,100
 mobilizacao,validacao_cruzada,0,Regra simples (subindo há 2 semanas),alarmes_corretos,0.352,0.321,0.386,,,,100
-mobilizacao,validacao_cruzada,2,Regra simples (subindo há 2 semanas),alarmes_corretos,0.403,0.371,0.439,,,,100
-mobilizacao,validacao_cruzada,4,Regra simples (subindo há 2 semanas),alarmes_corretos,0.445,0.415,0.477,,,,100
+mobilizacao,validacao_cruzada,1,Regra simples (subindo há 2 semanas),alarmes_corretos,0.381,0.349,0.416,,,,100
+mobilizacao,validacao_cruzada,2,Regra simples (subindo há 2 semanas),alarmes_corretos,0.403,0.371,0.438,,,,100
+mobilizacao,validacao_cruzada,3,Regra simples (subindo há 2 semanas),alarmes_corretos,0.423,0.391,0.458,,,,100
+mobilizacao,validacao_cruzada,4,Regra simples (subindo há 2 semanas),alarmes_corretos,0.445,0.412,0.479,,,,100
 mobilizacao,validacao_cruzada,0,Regra simples (subindo há 2 semanas),alarmes_falsos_por_municipio_ano,0.863,0.767,0.961,,,,100
-mobilizacao,validacao_cruzada,2,Regra simples (subindo há 2 semanas),alarmes_falsos_por_municipio_ano,0.793,0.699,0.896,,,,100
-mobilizacao,validacao_cruzada,4,Regra simples (subindo há 2 semanas),alarmes_falsos_por_municipio_ano,0.736,0.649,0.826,,,,100
+mobilizacao,validacao_cruzada,1,Regra simples (subindo há 2 semanas),alarmes_falsos_por_municipio_ano,0.824,0.728,0.925,,,,100
+mobilizacao,validacao_cruzada,2,Regra simples (subindo há 2 semanas),alarmes_falsos_por_municipio_ano,0.793,0.702,0.893,,,,100
+mobilizacao,validacao_cruzada,3,Regra simples (subindo há 2 semanas),alarmes_falsos_por_municipio_ano,0.766,0.672,0.862,,,,100
+mobilizacao,validacao_cruzada,4,Regra simples (subindo há 2 semanas),alarmes_falsos_por_municipio_ano,0.736,0.646,0.833,,,,100
 mobilizacao,validacao_cruzada,0,Regra simples (subindo há 2 semanas),avisadas_antes_dos_dados,0.66,0.611,0.707,,,,100
-mobilizacao,validacao_cruzada,2,Regra simples (subindo há 2 semanas),avisadas_antes_dos_dados,0.719,0.676,0.763,,,,100
-mobilizacao,validacao_cruzada,4,Regra simples (subindo há 2 semanas),avisadas_antes_dos_dados,0.757,0.717,0.797,,,,100
+mobilizacao,validacao_cruzada,1,Regra simples (subindo há 2 semanas),avisadas_antes_dos_dados,0.696,0.651,0.741,,,,100
+mobilizacao,validacao_cruzada,2,Regra simples (subindo há 2 semanas),avisadas_antes_dos_dados,0.719,0.677,0.763,,,,100
+mobilizacao,validacao_cruzada,3,Regra simples (subindo há 2 semanas),avisadas_antes_dos_dados,0.743,0.701,0.785,,,,100
+mobilizacao,validacao_cruzada,4,Regra simples (subindo há 2 semanas),avisadas_antes_dos_dados,0.757,0.716,0.796,,,,100
 mobilizacao,validacao_cruzada,0,Regra simples (subindo há 2 semanas),epidemias_avisadas,0.66,0.611,0.707,,,,100
-mobilizacao,validacao_cruzada,2,Regra simples (subindo há 2 semanas),epidemias_avisadas,0.366,0.323,0.405,,,,100
-mobilizacao,validacao_cruzada,4,Regra simples (subindo há 2 semanas),epidemias_avisadas,0.233,0.197,0.273,,,,100
-mobilizacao,validacao_final,0,Modelo: alerta de vermelho,alarmes_corretos,0.568,0.446,0.695,0.195,0.094,0.304,15
-mobilizacao,validacao_final,2,Modelo: alerta de vermelho,alarmes_corretos,0.562,0.484,0.652,0.121,0.025,0.236,15
-mobilizacao,validacao_final,4,Modelo: alerta de vermelho,alarmes_corretos,0.572,0.506,0.646,0.107,0.001,0.207,15
-mobilizacao,validacao_final,0,Modelo: alerta de vermelho,alarmes_falsos_por_municipio_ano,0.426,0.266,0.612,-0.47,-0.754,-0.248,15
-mobilizacao,validacao_final,2,Modelo: alerta de vermelho,alarmes_falsos_por_municipio_ano,0.532,0.364,0.71,-0.266,-0.559,-0.062,15
-mobilizacao,validacao_final,4,Modelo: alerta de vermelho,alarmes_falsos_por_municipio_ano,0.547,0.415,0.689,-0.212,-0.468,0.0,15
-mobilizacao,validacao_final,0,Modelo: alerta de vermelho,avisadas_antes_dos_dados,0.709,0.588,0.836,0.0,-0.09,0.08,15
-mobilizacao,validacao_final,2,Modelo: alerta de vermelho,avisadas_antes_dos_dados,0.785,0.679,0.89,0.038,-0.026,0.101,15
-mobilizacao,validacao_final,4,Modelo: alerta de vermelho,avisadas_antes_dos_dados,0.797,0.699,0.89,0.025,-0.041,0.092,15
-mobilizacao,validacao_final,0,Modelo: alerta de vermelho,epidemias_avisadas,0.709,0.588,0.836,0.0,-0.09,0.08,15
-mobilizacao,validacao_final,2,Modelo: alerta de vermelho,epidemias_avisadas,0.646,0.536,0.756,0.152,0.065,0.243,15
-mobilizacao,validacao_final,4,Modelo: alerta de vermelho,epidemias_avisadas,0.532,0.408,0.638,0.278,0.16,0.403,15
-mobilizacao,validacao_final,0,Regra simples (subindo há 2 semanas),alarmes_corretos,0.373,0.277,0.48,,,,15
-mobilizacao,validacao_final,2,Regra simples (subindo há 2 semanas),alarmes_corretos,0.441,0.331,0.562,,,,15
-mobilizacao,validacao_final,4,Regra simples (subindo há 2 semanas),alarmes_corretos,0.466,0.371,0.568,,,,15
-mobilizacao,validacao_final,0,Regra simples (subindo há 2 semanas),alarmes_falsos_por_municipio_ano,0.896,0.648,1.18,,,,15
-mobilizacao,validacao_final,2,Regra simples (subindo há 2 semanas),alarmes_falsos_por_municipio_ano,0.799,0.55,1.083,,,,15
-mobilizacao,validacao_final,4,Regra simples (subindo há 2 semanas),alarmes_falsos_por_municipio_ano,0.759,0.547,0.998,,,,15
-mobilizacao,validacao_final,0,Regra simples (subindo há 2 semanas),avisadas_antes_dos_dados,0.709,0.558,0.873,,,,15
-mobilizacao,validacao_final,2,Regra simples (subindo há 2 semanas),avisadas_antes_dos_dados,0.747,0.608,0.885,,,,15
-mobilizacao,validacao_final,4,Regra simples (subindo há 2 semanas),avisadas_antes_dos_dados,0.772,0.635,0.903,,,,15
-mobilizacao,validacao_final,0,Regra simples (subindo há 2 semanas),epidemias_avisadas,0.709,0.558,0.873,,,,15
-mobilizacao,validacao_final,2,Regra simples (subindo há 2 semanas),epidemias_avisadas,0.494,0.389,0.61,,,,15
-mobilizacao,validacao_final,4,Regra simples (subindo há 2 semanas),epidemias_avisadas,0.253,0.169,0.337,,,,15
-nivel_2_semanas,validacao_cruzada,0,Modelo e persistência,acerto,0.837,0.828,0.847,,,,100
-nivel_2_semanas,validacao_cruzada,2,Modelo e persistência,acerto,0.789,0.779,0.799,,,,100
-nivel_2_semanas,validacao_cruzada,4,Modelo e persistência,acerto,0.743,0.732,0.754,,,,100
+mobilizacao,validacao_cruzada,1,Regra simples (subindo há 2 semanas),epidemias_avisadas,0.506,0.463,0.55,,,,100
+mobilizacao,validacao_cruzada,2,Regra simples (subindo há 2 semanas),epidemias_avisadas,0.366,0.326,0.409,,,,100
+mobilizacao,validacao_cruzada,3,Regra simples (subindo há 2 semanas),epidemias_avisadas,0.289,0.249,0.328,,,,100
+mobilizacao,validacao_cruzada,4,Regra simples (subindo há 2 semanas),epidemias_avisadas,0.233,0.194,0.273,,,,100
+mobilizacao,validacao_final,0,Classificador de níveis (anterior): alerta de vermelho,alarmes_corretos,0.568,0.453,0.694,0.028,-0.031,0.077,15
+mobilizacao,validacao_final,1,Classificador de níveis (anterior): alerta de vermelho,alarmes_corretos,0.522,0.438,0.622,-0.042,-0.09,0.008,15
+mobilizacao,validacao_final,2,Classificador de níveis (anterior): alerta de vermelho,alarmes_corretos,0.562,0.486,0.654,0.016,-0.031,0.063,15
+mobilizacao,validacao_final,3,Classificador de níveis (anterior): alerta de vermelho,alarmes_corretos,0.579,0.503,0.672,0.006,-0.037,0.057,15
+mobilizacao,validacao_final,4,Classificador de níveis (anterior): alerta de vermelho,alarmes_corretos,0.572,0.503,0.653,-0.015,-0.053,0.028,15
+mobilizacao,validacao_final,0,Classificador de níveis (anterior): alerta de vermelho,alarmes_falsos_por_municipio_ano,0.426,0.266,0.612,-0.089,-0.186,0.009,15
+mobilizacao,validacao_final,1,Classificador de níveis (anterior): alerta de vermelho,alarmes_falsos_por_municipio_ano,0.568,0.382,0.772,0.062,-0.027,0.151,15
+mobilizacao,validacao_final,2,Classificador de níveis (anterior): alerta de vermelho,alarmes_falsos_por_municipio_ano,0.532,0.364,0.701,-0.08,-0.169,0.0,15
+mobilizacao,validacao_final,3,Classificador de níveis (anterior): alerta de vermelho,alarmes_falsos_por_municipio_ano,0.522,0.363,0.69,-0.08,-0.177,0.018,15
+mobilizacao,validacao_final,4,Classificador de níveis (anterior): alerta de vermelho,alarmes_falsos_por_municipio_ano,0.547,0.406,0.697,-0.018,-0.106,0.071,15
+mobilizacao,validacao_final,0,Classificador de níveis (anterior): alerta de vermelho,avisadas_antes_dos_dados,0.709,0.59,0.846,-0.051,-0.107,0.0,15
+mobilizacao,validacao_final,1,Classificador de níveis (anterior): alerta de vermelho,avisadas_antes_dos_dados,0.772,0.667,0.888,-0.025,-0.071,0.025,15
+mobilizacao,validacao_final,2,Classificador de níveis (anterior): alerta de vermelho,avisadas_antes_dos_dados,0.785,0.684,0.895,-0.038,-0.08,0.0,15
+mobilizacao,validacao_final,3,Classificador de níveis (anterior): alerta de vermelho,avisadas_antes_dos_dados,0.797,0.696,0.897,-0.063,-0.108,-0.024,15
+mobilizacao,validacao_final,4,Classificador de níveis (anterior): alerta de vermelho,avisadas_antes_dos_dados,0.797,0.702,0.891,-0.051,-0.106,0.0,15
+mobilizacao,validacao_final,0,Classificador de níveis (anterior): alerta de vermelho,epidemias_avisadas,0.709,0.59,0.846,-0.051,-0.107,0.0,15
+mobilizacao,validacao_final,1,Classificador de níveis (anterior): alerta de vermelho,epidemias_avisadas,0.646,0.517,0.778,-0.025,-0.11,0.05,15
+mobilizacao,validacao_final,2,Classificador de níveis (anterior): alerta de vermelho,epidemias_avisadas,0.646,0.539,0.754,-0.013,-0.067,0.048,15
+mobilizacao,validacao_final,3,Classificador de níveis (anterior): alerta de vermelho,epidemias_avisadas,0.582,0.462,0.69,-0.076,-0.13,-0.013,15
+mobilizacao,validacao_final,4,Classificador de níveis (anterior): alerta de vermelho,epidemias_avisadas,0.532,0.4,0.639,-0.089,-0.165,-0.013,15
+mobilizacao,validacao_final,0,Modelo: alerta de vermelho,alarmes_corretos,0.54,0.424,0.679,0.167,0.076,0.252,15
+mobilizacao,validacao_final,1,Modelo: alerta de vermelho,alarmes_corretos,0.565,0.459,0.673,0.165,0.064,0.273,15
+mobilizacao,validacao_final,2,Modelo: alerta de vermelho,alarmes_corretos,0.546,0.467,0.632,0.105,0.002,0.218,15
+mobilizacao,validacao_final,3,Modelo: alerta de vermelho,alarmes_corretos,0.572,0.492,0.655,0.125,0.008,0.263,15
+mobilizacao,validacao_final,4,Modelo: alerta de vermelho,alarmes_corretos,0.587,0.525,0.653,0.121,0.025,0.234,15
+mobilizacao,validacao_final,0,Modelo: alerta de vermelho,alarmes_falsos_por_municipio_ano,0.515,0.302,0.755,-0.382,-0.612,-0.142,15
+mobilizacao,validacao_final,1,Modelo: alerta de vermelho,alarmes_falsos_por_municipio_ano,0.506,0.328,0.728,-0.346,-0.612,-0.124,15
+mobilizacao,validacao_final,2,Modelo: alerta de vermelho,alarmes_falsos_por_municipio_ano,0.612,0.435,0.799,-0.186,-0.47,0.044,15
+mobilizacao,validacao_final,3,Modelo: alerta de vermelho,alarmes_falsos_por_municipio_ano,0.602,0.443,0.77,-0.186,-0.496,0.053,15
+mobilizacao,validacao_final,4,Modelo: alerta de vermelho,alarmes_falsos_por_municipio_ano,0.565,0.45,0.671,-0.194,-0.468,0.0,15
+mobilizacao,validacao_final,0,Modelo: alerta de vermelho,avisadas_antes_dos_dados,0.759,0.646,0.873,0.051,-0.054,0.154,15
+mobilizacao,validacao_final,1,Modelo: alerta de vermelho,avisadas_antes_dos_dados,0.797,0.674,0.917,0.076,0.0,0.159,15
+mobilizacao,validacao_final,2,Modelo: alerta de vermelho,avisadas_antes_dos_dados,0.823,0.724,0.921,0.076,0.011,0.147,15
+mobilizacao,validacao_final,3,Modelo: alerta de vermelho,avisadas_antes_dos_dados,0.861,0.753,0.958,0.101,0.026,0.19,15
+mobilizacao,validacao_final,4,Modelo: alerta de vermelho,avisadas_antes_dos_dados,0.848,0.742,0.938,0.076,0.013,0.145,15
+mobilizacao,validacao_final,0,Modelo: alerta de vermelho,epidemias_avisadas,0.759,0.646,0.873,0.051,-0.054,0.154,15
+mobilizacao,validacao_final,1,Modelo: alerta de vermelho,epidemias_avisadas,0.671,0.551,0.8,0.101,0.026,0.184,15
+mobilizacao,validacao_final,2,Modelo: alerta de vermelho,epidemias_avisadas,0.658,0.553,0.769,0.165,0.09,0.247,15
+mobilizacao,validacao_final,3,Modelo: alerta de vermelho,epidemias_avisadas,0.658,0.553,0.757,0.304,0.194,0.432,15
+mobilizacao,validacao_final,4,Modelo: alerta de vermelho,epidemias_avisadas,0.62,0.53,0.704,0.367,0.272,0.472,15
+mobilizacao,validacao_final,0,Regra simples (subindo há 2 semanas),alarmes_corretos,0.373,0.27,0.483,,,,15
+mobilizacao,validacao_final,1,Regra simples (subindo há 2 semanas),alarmes_corretos,0.4,0.297,0.506,,,,15
+mobilizacao,validacao_final,2,Regra simples (subindo há 2 semanas),alarmes_corretos,0.441,0.33,0.556,,,,15
+mobilizacao,validacao_final,3,Regra simples (subindo há 2 semanas),alarmes_corretos,0.447,0.335,0.564,,,,15
+mobilizacao,validacao_final,4,Regra simples (subindo há 2 semanas),alarmes_corretos,0.466,0.373,0.571,,,,15
+mobilizacao,validacao_final,0,Regra simples (subindo há 2 semanas),alarmes_falsos_por_municipio_ano,0.896,0.648,1.216,,,,15
+mobilizacao,validacao_final,1,Regra simples (subindo há 2 semanas),alarmes_falsos_por_municipio_ano,0.852,0.612,1.154,,,,15
+mobilizacao,validacao_final,2,Regra simples (subindo há 2 semanas),alarmes_falsos_por_municipio_ano,0.799,0.577,1.083,,,,15
+mobilizacao,validacao_final,3,Regra simples (subindo há 2 semanas),alarmes_falsos_por_municipio_ano,0.788,0.558,1.08,,,,15
+mobilizacao,validacao_final,4,Regra simples (subindo há 2 semanas),alarmes_falsos_por_municipio_ano,0.759,0.547,1.015,,,,15
+mobilizacao,validacao_final,0,Regra simples (subindo há 2 semanas),avisadas_antes_dos_dados,0.709,0.558,0.868,,,,15
+mobilizacao,validacao_final,1,Regra simples (subindo há 2 semanas),avisadas_antes_dos_dados,0.722,0.577,0.877,,,,15
+mobilizacao,validacao_final,2,Regra simples (subindo há 2 semanas),avisadas_antes_dos_dados,0.747,0.61,0.889,,,,15
+mobilizacao,validacao_final,3,Regra simples (subindo há 2 semanas),avisadas_antes_dos_dados,0.759,0.625,0.896,,,,15
+mobilizacao,validacao_final,4,Regra simples (subindo há 2 semanas),avisadas_antes_dos_dados,0.772,0.644,0.903,,,,15
+mobilizacao,validacao_final,0,Regra simples (subindo há 2 semanas),epidemias_avisadas,0.709,0.558,0.868,,,,15
+mobilizacao,validacao_final,1,Regra simples (subindo há 2 semanas),epidemias_avisadas,0.57,0.452,0.699,,,,15
+mobilizacao,validacao_final,2,Regra simples (subindo há 2 semanas),epidemias_avisadas,0.494,0.388,0.608,,,,15
+mobilizacao,validacao_final,3,Regra simples (subindo há 2 semanas),epidemias_avisadas,0.354,0.247,0.457,,,,15
+mobilizacao,validacao_final,4,Regra simples (subindo há 2 semanas),epidemias_avisadas,0.253,0.171,0.342,,,,15
+nivel_2_semanas,validacao_cruzada,0,Classificador de níveis (anterior) e persistência,acerto,0.837,0.827,0.846,-0.006,-0.008,-0.003,100
+nivel_2_semanas,validacao_cruzada,1,Classificador de níveis (anterior) e persistência,acerto,0.814,0.804,0.824,-0.006,-0.009,-0.004,100
+nivel_2_semanas,validacao_cruzada,2,Classificador de níveis (anterior) e persistência,acerto,0.789,0.779,0.799,-0.005,-0.008,-0.002,100
+nivel_2_semanas,validacao_cruzada,3,Classificador de níveis (anterior) e persistência,acerto,0.766,0.755,0.778,-0.007,-0.011,-0.004,100
+nivel_2_semanas,validacao_cruzada,4,Classificador de níveis (anterior) e persistência,acerto,0.743,0.732,0.754,-0.008,-0.011,-0.004,100
+nivel_2_semanas,validacao_cruzada,0,Classificador de níveis (anterior) e persistência,acerto_persistencia,0.825,0.815,0.835,0.0,0.0,0.0,100
+nivel_2_semanas,validacao_cruzada,1,Classificador de níveis (anterior) e persistência,acerto_persistencia,0.791,0.781,0.801,0.0,0.0,0.0,100
+nivel_2_semanas,validacao_cruzada,2,Classificador de níveis (anterior) e persistência,acerto_persistencia,0.758,0.748,0.767,0.0,0.0,0.0,100
+nivel_2_semanas,validacao_cruzada,3,Classificador de níveis (anterior) e persistência,acerto_persistencia,0.729,0.719,0.74,0.0,0.0,0.0,100
+nivel_2_semanas,validacao_cruzada,4,Classificador de níveis (anterior) e persistência,acerto_persistencia,0.702,0.692,0.714,0.0,0.0,0.0,100
+nivel_2_semanas,validacao_cruzada,0,Classificador de níveis (anterior) e persistência,acerto_quando_muda,0.334,0.318,0.35,0.021,0.012,0.031,100
+nivel_2_semanas,validacao_cruzada,1,Classificador de níveis (anterior) e persistência,acerto_quando_muda,0.382,0.365,0.399,0.021,0.014,0.028,100
+nivel_2_semanas,validacao_cruzada,2,Classificador de níveis (anterior) e persistência,acerto_quando_muda,0.406,0.388,0.425,0.012,0.004,0.019,100
+nivel_2_semanas,validacao_cruzada,3,Classificador de níveis (anterior) e persistência,acerto_quando_muda,0.437,0.42,0.455,0.012,0.004,0.02,100
+nivel_2_semanas,validacao_cruzada,4,Classificador de níveis (anterior) e persistência,acerto_quando_muda,0.46,0.442,0.48,0.013,0.005,0.022,100
+nivel_2_semanas,validacao_cruzada,0,Classificador de níveis (anterior) e persistência,ganho_sobre_persistencia,0.011,0.008,0.015,-0.006,-0.008,-0.003,100
+nivel_2_semanas,validacao_cruzada,1,Classificador de níveis (anterior) e persistência,ganho_sobre_persistencia,0.023,0.018,0.027,-0.006,-0.009,-0.004,100
+nivel_2_semanas,validacao_cruzada,2,Classificador de níveis (anterior) e persistência,ganho_sobre_persistencia,0.032,0.025,0.038,-0.005,-0.008,-0.002,100
+nivel_2_semanas,validacao_cruzada,3,Classificador de níveis (anterior) e persistência,ganho_sobre_persistencia,0.037,0.029,0.045,-0.007,-0.011,-0.004,100
+nivel_2_semanas,validacao_cruzada,4,Classificador de níveis (anterior) e persistência,ganho_sobre_persistencia,0.041,0.032,0.049,-0.008,-0.011,-0.004,100
+nivel_2_semanas,validacao_cruzada,0,Modelo e persistência,acerto,0.842,0.833,0.852,,,,100
+nivel_2_semanas,validacao_cruzada,1,Modelo e persistência,acerto,0.82,0.811,0.83,,,,100
+nivel_2_semanas,validacao_cruzada,2,Modelo e persistência,acerto,0.794,0.784,0.805,,,,100
+nivel_2_semanas,validacao_cruzada,3,Modelo e persistência,acerto,0.774,0.762,0.784,,,,100
+nivel_2_semanas,validacao_cruzada,4,Modelo e persistência,acerto,0.751,0.739,0.762,,,,100
 nivel_2_semanas,validacao_cruzada,0,Modelo e persistência,acerto_persistencia,0.825,0.816,0.835,,,,100
+nivel_2_semanas,validacao_cruzada,1,Modelo e persistência,acerto_persistencia,0.791,0.782,0.8,,,,100
 nivel_2_semanas,validacao_cruzada,2,Modelo e persistência,acerto_persistencia,0.758,0.748,0.768,,,,100
-nivel_2_semanas,validacao_cruzada,4,Modelo e persistência,acerto_persistencia,0.702,0.691,0.713,,,,100
-nivel_2_semanas,validacao_cruzada,0,Modelo e persistência,acerto_quando_muda,0.334,0.319,0.35,,,,100
-nivel_2_semanas,validacao_cruzada,2,Modelo e persistência,acerto_quando_muda,0.406,0.387,0.423,,,,100
-nivel_2_semanas,validacao_cruzada,4,Modelo e persistência,acerto_quando_muda,0.46,0.442,0.478,,,,100
-nivel_2_semanas,validacao_cruzada,0,Modelo e persistência,ganho_sobre_persistencia,0.011,0.008,0.015,,,,100
-nivel_2_semanas,validacao_cruzada,2,Modelo e persistência,ganho_sobre_persistencia,0.032,0.025,0.038,,,,100
-nivel_2_semanas,validacao_cruzada,4,Modelo e persistência,ganho_sobre_persistencia,0.041,0.032,0.05,,,,100
-nivel_2_semanas,validacao_final,0,Modelo e persistência,acerto,0.854,0.828,0.876,,,,15
-nivel_2_semanas,validacao_final,2,Modelo e persistência,acerto,0.807,0.776,0.834,,,,15
-nivel_2_semanas,validacao_final,4,Modelo e persistência,acerto,0.759,0.726,0.788,,,,15
-nivel_2_semanas,validacao_final,0,Modelo e persistência,acerto_persistencia,0.839,0.818,0.857,,,,15
-nivel_2_semanas,validacao_final,2,Modelo e persistência,acerto_persistencia,0.772,0.752,0.791,,,,15
-nivel_2_semanas,validacao_final,4,Modelo e persistência,acerto_persistencia,0.715,0.69,0.739,,,,15
-nivel_2_semanas,validacao_final,0,Modelo e persistência,acerto_quando_muda,0.378,0.328,0.443,,,,15
-nivel_2_semanas,validacao_final,2,Modelo e persistência,acerto_quando_muda,0.461,0.393,0.532,,,,15
-nivel_2_semanas,validacao_final,4,Modelo e persistência,acerto_quando_muda,0.519,0.449,0.59,,,,15
-nivel_2_semanas,validacao_final,0,Modelo e persistência,ganho_sobre_persistencia,0.015,0.008,0.021,,,,15
-nivel_2_semanas,validacao_final,2,Modelo e persistência,ganho_sobre_persistencia,0.035,0.018,0.051,,,,15
-nivel_2_semanas,validacao_final,4,Modelo e persistência,ganho_sobre_persistencia,0.044,0.019,0.069,,,,15
-nivel_3_semanas,validacao_cruzada,0,Modelo e persistência,acerto,0.814,0.804,0.824,,,,100
-nivel_3_semanas,validacao_cruzada,2,Modelo e persistência,acerto,0.766,0.755,0.777,,,,100
-nivel_3_semanas,validacao_cruzada,4,Modelo e persistência,acerto,0.724,0.712,0.736,,,,100
-nivel_3_semanas,validacao_cruzada,0,Modelo e persistência,acerto_persistencia,0.791,0.782,0.801,,,,100
-nivel_3_semanas,validacao_cruzada,2,Modelo e persistência,acerto_persistencia,0.729,0.72,0.739,,,,100
+nivel_2_semanas,validacao_cruzada,3,Modelo e persistência,acerto_persistencia,0.729,0.719,0.74,,,,100
+nivel_2_semanas,validacao_cruzada,4,Modelo e persistência,acerto_persistencia,0.702,0.691,0.714,,,,100
+nivel_2_semanas,validacao_cruzada,0,Modelo e persistência,acerto_quando_muda,0.313,0.297,0.329,,,,100
+nivel_2_semanas,validacao_cruzada,1,Modelo e persistência,acerto_quando_muda,0.362,0.346,0.378,,,,100
+nivel_2_semanas,validacao_cruzada,2,Modelo e persistência,acerto_quando_muda,0.394,0.376,0.412,,,,100
+nivel_2_semanas,validacao_cruzada,3,Modelo e persistência,acerto_quando_muda,0.425,0.406,0.444,,,,100
+nivel_2_semanas,validacao_cruzada,4,Modelo e persistência,acerto_quando_muda,0.447,0.429,0.466,,,,100
+nivel_2_semanas,validacao_cruzada,0,Modelo e persistência,ganho_sobre_persistencia,0.017,0.014,0.02,,,,100
+nivel_2_semanas,validacao_cruzada,1,Modelo e persistência,ganho_sobre_persistencia,0.029,0.025,0.034,,,,100
+nivel_2_semanas,validacao_cruzada,2,Modelo e persistência,ganho_sobre_persistencia,0.037,0.03,0.043,,,,100
+nivel_2_semanas,validacao_cruzada,3,Modelo e persistência,ganho_sobre_persistencia,0.044,0.037,0.052,,,,100
+nivel_2_semanas,validacao_cruzada,4,Modelo e persistência,ganho_sobre_persistencia,0.049,0.04,0.057,,,,100
+nivel_2_semanas,validacao_final,0,Classificador de níveis (anterior) e persistência,acerto,0.854,0.83,0.876,-0.007,-0.012,-0.002,15
+nivel_2_semanas,validacao_final,1,Classificador de níveis (anterior) e persistência,acerto,0.83,0.801,0.856,-0.002,-0.008,0.004,15
+nivel_2_semanas,validacao_final,2,Classificador de níveis (anterior) e persistência,acerto,0.807,0.776,0.835,-0.01,-0.016,-0.005,15
+nivel_2_semanas,validacao_final,3,Classificador de níveis (anterior) e persistência,acerto,0.785,0.755,0.809,-0.006,-0.012,-0.0,15
+nivel_2_semanas,validacao_final,4,Classificador de níveis (anterior) e persistência,acerto,0.759,0.725,0.787,-0.004,-0.012,0.004,15
+nivel_2_semanas,validacao_final,0,Classificador de níveis (anterior) e persistência,acerto_persistencia,0.839,0.819,0.858,0.0,0.0,0.0,15
+nivel_2_semanas,validacao_final,1,Classificador de níveis (anterior) e persistência,acerto_persistencia,0.802,0.779,0.823,0.0,0.0,0.0,15
+nivel_2_semanas,validacao_final,2,Classificador de níveis (anterior) e persistência,acerto_persistencia,0.772,0.753,0.791,0.0,0.0,0.0,15
+nivel_2_semanas,validacao_final,3,Classificador de níveis (anterior) e persistência,acerto_persistencia,0.744,0.72,0.767,0.0,0.0,0.0,15
+nivel_2_semanas,validacao_final,4,Classificador de níveis (anterior) e persistência,acerto_persistencia,0.715,0.692,0.737,0.0,0.0,0.0,15
+nivel_2_semanas,validacao_final,0,Classificador de níveis (anterior) e persistência,acerto_quando_muda,0.378,0.326,0.443,0.016,-0.002,0.033,15
+nivel_2_semanas,validacao_final,1,Classificador de níveis (anterior) e persistência,acerto_quando_muda,0.435,0.382,0.5,0.025,0.003,0.047,15
+nivel_2_semanas,validacao_final,2,Classificador de níveis (anterior) e persistência,acerto_quando_muda,0.461,0.397,0.533,-0.001,-0.02,0.017,15
+nivel_2_semanas,validacao_final,3,Classificador de níveis (anterior) e persistência,acerto_quando_muda,0.496,0.432,0.561,0.009,-0.006,0.023,15
+nivel_2_semanas,validacao_final,4,Classificador de níveis (anterior) e persistência,acerto_quando_muda,0.519,0.45,0.59,0.02,0.003,0.036,15
+nivel_2_semanas,validacao_final,0,Classificador de níveis (anterior) e persistência,ganho_sobre_persistencia,0.015,0.008,0.021,-0.007,-0.012,-0.002,15
+nivel_2_semanas,validacao_final,1,Classificador de níveis (anterior) e persistência,ganho_sobre_persistencia,0.028,0.017,0.04,-0.002,-0.008,0.004,15
+nivel_2_semanas,validacao_final,2,Classificador de níveis (anterior) e persistência,ganho_sobre_persistencia,0.035,0.018,0.051,-0.01,-0.016,-0.005,15
+nivel_2_semanas,validacao_final,3,Classificador de níveis (anterior) e persistência,ganho_sobre_persistencia,0.041,0.021,0.06,-0.006,-0.012,-0.0,15
+nivel_2_semanas,validacao_final,4,Classificador de níveis (anterior) e persistência,ganho_sobre_persistencia,0.044,0.02,0.071,-0.004,-0.012,0.004,15
+nivel_2_semanas,validacao_final,0,Modelo e persistência,acerto,0.861,0.834,0.885,,,,15
+nivel_2_semanas,validacao_final,1,Modelo e persistência,acerto,0.832,0.8,0.861,,,,15
+nivel_2_semanas,validacao_final,2,Modelo e persistência,acerto,0.817,0.787,0.844,,,,15
+nivel_2_semanas,validacao_final,3,Modelo e persistência,acerto,0.791,0.759,0.816,,,,15
+nivel_2_semanas,validacao_final,4,Modelo e persistência,acerto,0.762,0.727,0.79,,,,15
+nivel_2_semanas,validacao_final,0,Modelo e persistência,acerto_persistencia,0.839,0.818,0.858,,,,15
+nivel_2_semanas,validacao_final,1,Modelo e persistência,acerto_persistencia,0.802,0.779,0.823,,,,15
+nivel_2_semanas,validacao_final,2,Modelo e persistência,acerto_persistencia,0.772,0.753,0.791,,,,15
+nivel_2_semanas,validacao_final,3,Modelo e persistência,acerto_persistencia,0.744,0.719,0.767,,,,15
+nivel_2_semanas,validacao_final,4,Modelo e persistência,acerto_persistencia,0.715,0.69,0.738,,,,15
+nivel_2_semanas,validacao_final,0,Modelo e persistência,acerto_quando_muda,0.362,0.302,0.435,,,,15
+nivel_2_semanas,validacao_final,1,Modelo e persistência,acerto_quando_muda,0.41,0.343,0.485,,,,15
+nivel_2_semanas,validacao_final,2,Modelo e persistência,acerto_quando_muda,0.462,0.401,0.529,,,,15
+nivel_2_semanas,validacao_final,3,Modelo e persistência,acerto_quando_muda,0.487,0.428,0.547,,,,15
+nivel_2_semanas,validacao_final,4,Modelo e persistência,acerto_quando_muda,0.499,0.43,0.563,,,,15
+nivel_2_semanas,validacao_final,0,Modelo e persistência,ganho_sobre_persistencia,0.022,0.013,0.03,,,,15
+nivel_2_semanas,validacao_final,1,Modelo e persistência,ganho_sobre_persistencia,0.03,0.015,0.043,,,,15
+nivel_2_semanas,validacao_final,2,Modelo e persistência,ganho_sobre_persistencia,0.045,0.029,0.061,,,,15
+nivel_2_semanas,validacao_final,3,Modelo e persistência,ganho_sobre_persistencia,0.047,0.026,0.069,,,,15
+nivel_2_semanas,validacao_final,4,Modelo e persistência,ganho_sobre_persistencia,0.048,0.024,0.072,,,,15
+nivel_3_semanas,validacao_cruzada,0,Classificador de níveis (anterior) e persistência,acerto,0.814,0.804,0.824,-0.006,-0.008,-0.004,100
+nivel_3_semanas,validacao_cruzada,1,Classificador de níveis (anterior) e persistência,acerto,0.789,0.779,0.8,-0.005,-0.008,-0.002,100
+nivel_3_semanas,validacao_cruzada,2,Classificador de níveis (anterior) e persistência,acerto,0.766,0.755,0.777,-0.007,-0.011,-0.004,100
+nivel_3_semanas,validacao_cruzada,3,Classificador de níveis (anterior) e persistência,acerto,0.743,0.732,0.755,-0.008,-0.011,-0.004,100
+nivel_3_semanas,validacao_cruzada,4,Classificador de níveis (anterior) e persistência,acerto,0.724,0.712,0.735,-0.009,-0.012,-0.005,100
+nivel_3_semanas,validacao_cruzada,0,Classificador de níveis (anterior) e persistência,acerto_persistencia,0.791,0.782,0.801,0.0,0.0,0.0,100
+nivel_3_semanas,validacao_cruzada,1,Classificador de níveis (anterior) e persistência,acerto_persistencia,0.758,0.748,0.768,0.0,0.0,0.0,100
+nivel_3_semanas,validacao_cruzada,2,Classificador de níveis (anterior) e persistência,acerto_persistencia,0.729,0.719,0.739,0.0,0.0,0.0,100
+nivel_3_semanas,validacao_cruzada,3,Classificador de níveis (anterior) e persistência,acerto_persistencia,0.702,0.692,0.713,0.0,0.0,0.0,100
+nivel_3_semanas,validacao_cruzada,4,Classificador de níveis (anterior) e persistência,acerto_persistencia,0.675,0.663,0.686,0.0,0.0,0.0,100
+nivel_3_semanas,validacao_cruzada,0,Classificador de níveis (anterior) e persistência,acerto_quando_muda,0.383,0.367,0.4,0.021,0.014,0.028,100
+nivel_3_semanas,validacao_cruzada,1,Classificador de níveis (anterior) e persistência,acerto_quando_muda,0.406,0.389,0.423,0.012,0.004,0.019,100
+nivel_3_semanas,validacao_cruzada,2,Classificador de níveis (anterior) e persistência,acerto_quando_muda,0.437,0.42,0.455,0.012,0.003,0.02,100
+nivel_3_semanas,validacao_cruzada,3,Classificador de níveis (anterior) e persistência,acerto_quando_muda,0.461,0.441,0.479,0.013,0.005,0.022,100
+nivel_3_semanas,validacao_cruzada,4,Classificador de níveis (anterior) e persistência,acerto_quando_muda,0.486,0.468,0.504,0.016,0.009,0.023,100
+nivel_3_semanas,validacao_cruzada,0,Classificador de níveis (anterior) e persistência,ganho_sobre_persistencia,0.023,0.018,0.027,-0.006,-0.008,-0.004,100
+nivel_3_semanas,validacao_cruzada,1,Classificador de níveis (anterior) e persistência,ganho_sobre_persistencia,0.032,0.025,0.038,-0.005,-0.008,-0.002,100
+nivel_3_semanas,validacao_cruzada,2,Classificador de níveis (anterior) e persistência,ganho_sobre_persistencia,0.037,0.029,0.044,-0.007,-0.011,-0.004,100
+nivel_3_semanas,validacao_cruzada,3,Classificador de níveis (anterior) e persistência,ganho_sobre_persistencia,0.041,0.032,0.05,-0.008,-0.011,-0.004,100
+nivel_3_semanas,validacao_cruzada,4,Classificador de níveis (anterior) e persistência,ganho_sobre_persistencia,0.05,0.04,0.059,-0.009,-0.012,-0.005,100
+nivel_3_semanas,validacao_cruzada,0,Modelo e persistência,acerto,0.82,0.81,0.83,,,,100
+nivel_3_semanas,validacao_cruzada,1,Modelo e persistência,acerto,0.794,0.783,0.805,,,,100
+nivel_3_semanas,validacao_cruzada,2,Modelo e persistência,acerto,0.774,0.762,0.784,,,,100
+nivel_3_semanas,validacao_cruzada,3,Modelo e persistência,acerto,0.751,0.739,0.763,,,,100
+nivel_3_semanas,validacao_cruzada,4,Modelo e persistência,acerto,0.733,0.721,0.744,,,,100
+nivel_3_semanas,validacao_cruzada,0,Modelo e persistência,acerto_persistencia,0.791,0.781,0.8,,,,100
+nivel_3_semanas,validacao_cruzada,1,Modelo e persistência,acerto_persistencia,0.758,0.748,0.768,,,,100
+nivel_3_semanas,validacao_cruzada,2,Modelo e persistência,acerto_persistencia,0.729,0.719,0.74,,,,100
+nivel_3_semanas,validacao_cruzada,3,Modelo e persistência,acerto_persistencia,0.702,0.691,0.715,,,,100
 nivel_3_semanas,validacao_cruzada,4,Modelo e persistência,acerto_persistencia,0.675,0.664,0.686,,,,100
-nivel_3_semanas,validacao_cruzada,0,Modelo e persistência,acerto_quando_muda,0.383,0.366,0.4,,,,100
-nivel_3_semanas,validacao_cruzada,2,Modelo e persistência,acerto_quando_muda,0.437,0.419,0.456,,,,100
-nivel_3_semanas,validacao_cruzada,4,Modelo e persistência,acerto_quando_muda,0.486,0.468,0.504,,,,100
-nivel_3_semanas,validacao_cruzada,0,Modelo e persistência,ganho_sobre_persistencia,0.023,0.018,0.027,,,,100
-nivel_3_semanas,validacao_cruzada,2,Modelo e persistência,ganho_sobre_persistencia,0.037,0.03,0.044,,,,100
-nivel_3_semanas,validacao_cruzada,4,Modelo e persistência,ganho_sobre_persistencia,0.05,0.04,0.06,,,,100
-nivel_3_semanas,validacao_final,0,Modelo e persistência,acerto,0.83,0.802,0.857,,,,15
-nivel_3_semanas,validacao_final,2,Modelo e persistência,acerto,0.785,0.753,0.811,,,,15
-nivel_3_semanas,validacao_final,4,Modelo e persistência,acerto,0.742,0.709,0.769,,,,15
-nivel_3_semanas,validacao_final,0,Modelo e persistência,acerto_persistencia,0.802,0.78,0.824,,,,15
-nivel_3_semanas,validacao_final,2,Modelo e persistência,acerto_persistencia,0.744,0.72,0.767,,,,15
+nivel_3_semanas,validacao_cruzada,0,Modelo e persistência,acerto_quando_muda,0.362,0.345,0.379,,,,100
+nivel_3_semanas,validacao_cruzada,1,Modelo e persistência,acerto_quando_muda,0.394,0.377,0.414,,,,100
+nivel_3_semanas,validacao_cruzada,2,Modelo e persistência,acerto_quando_muda,0.425,0.406,0.444,,,,100
+nivel_3_semanas,validacao_cruzada,3,Modelo e persistência,acerto_quando_muda,0.447,0.429,0.466,,,,100
+nivel_3_semanas,validacao_cruzada,4,Modelo e persistência,acerto_quando_muda,0.47,0.451,0.487,,,,100
+nivel_3_semanas,validacao_cruzada,0,Modelo e persistência,ganho_sobre_persistencia,0.029,0.025,0.034,,,,100
+nivel_3_semanas,validacao_cruzada,1,Modelo e persistência,ganho_sobre_persistencia,0.036,0.03,0.043,,,,100
+nivel_3_semanas,validacao_cruzada,2,Modelo e persistência,ganho_sobre_persistencia,0.044,0.037,0.052,,,,100
+nivel_3_semanas,validacao_cruzada,3,Modelo e persistência,ganho_sobre_persistencia,0.048,0.04,0.057,,,,100
+nivel_3_semanas,validacao_cruzada,4,Modelo e persistência,ganho_sobre_persistencia,0.058,0.048,0.067,,,,100
+nivel_3_semanas,validacao_final,0,Classificador de níveis (anterior) e persistência,acerto,0.83,0.801,0.857,-0.002,-0.008,0.004,15
+nivel_3_semanas,validacao_final,1,Classificador de níveis (anterior) e persistência,acerto,0.807,0.775,0.833,-0.01,-0.016,-0.005,15
+nivel_3_semanas,validacao_final,2,Classificador de níveis (anterior) e persistência,acerto,0.785,0.755,0.81,-0.006,-0.012,-0.001,15
+nivel_3_semanas,validacao_final,3,Classificador de níveis (anterior) e persistência,acerto,0.759,0.724,0.788,-0.004,-0.012,0.004,15
+nivel_3_semanas,validacao_final,4,Classificador de níveis (anterior) e persistência,acerto,0.742,0.711,0.769,-0.001,-0.006,0.004,15
+nivel_3_semanas,validacao_final,0,Classificador de níveis (anterior) e persistência,acerto_persistencia,0.802,0.78,0.823,0.0,0.0,0.0,15
+nivel_3_semanas,validacao_final,1,Classificador de níveis (anterior) e persistência,acerto_persistencia,0.773,0.753,0.79,0.0,0.0,0.0,15
+nivel_3_semanas,validacao_final,2,Classificador de níveis (anterior) e persistência,acerto_persistencia,0.744,0.721,0.767,0.0,0.0,0.0,15
+nivel_3_semanas,validacao_final,3,Classificador de níveis (anterior) e persistência,acerto_persistencia,0.715,0.689,0.739,0.0,0.0,0.0,15
+nivel_3_semanas,validacao_final,4,Classificador de níveis (anterior) e persistência,acerto_persistencia,0.688,0.664,0.713,0.0,0.0,0.0,15
+nivel_3_semanas,validacao_final,0,Classificador de níveis (anterior) e persistência,acerto_quando_muda,0.436,0.38,0.501,0.025,0.003,0.049,15
+nivel_3_semanas,validacao_final,1,Classificador de níveis (anterior) e persistência,acerto_quando_muda,0.461,0.395,0.529,-0.002,-0.02,0.018,15
+nivel_3_semanas,validacao_final,2,Classificador de níveis (anterior) e persistência,acerto_quando_muda,0.496,0.43,0.565,0.007,-0.008,0.022,15
+nivel_3_semanas,validacao_final,3,Classificador de níveis (anterior) e persistência,acerto_quando_muda,0.52,0.451,0.591,0.02,0.002,0.036,15
+nivel_3_semanas,validacao_final,4,Classificador de níveis (anterior) e persistência,acerto_quando_muda,0.544,0.473,0.609,0.027,0.011,0.041,15
+nivel_3_semanas,validacao_final,0,Classificador de níveis (anterior) e persistência,ganho_sobre_persistencia,0.028,0.016,0.041,-0.002,-0.008,0.004,15
+nivel_3_semanas,validacao_final,1,Classificador de níveis (anterior) e persistência,ganho_sobre_persistencia,0.034,0.017,0.051,-0.01,-0.016,-0.005,15
+nivel_3_semanas,validacao_final,2,Classificador de níveis (anterior) e persistência,ganho_sobre_persistencia,0.04,0.022,0.062,-0.006,-0.012,-0.001,15
+nivel_3_semanas,validacao_final,3,Classificador de níveis (anterior) e persistência,ganho_sobre_persistencia,0.044,0.02,0.07,-0.004,-0.012,0.004,15
+nivel_3_semanas,validacao_final,4,Classificador de níveis (anterior) e persistência,ganho_sobre_persistencia,0.054,0.025,0.086,-0.001,-0.006,0.004,15
+nivel_3_semanas,validacao_final,0,Modelo e persistência,acerto,0.832,0.8,0.862,,,,15
+nivel_3_semanas,validacao_final,1,Modelo e persistência,acerto,0.817,0.784,0.843,,,,15
+nivel_3_semanas,validacao_final,2,Modelo e persistência,acerto,0.791,0.76,0.818,,,,15
+nivel_3_semanas,validacao_final,3,Modelo e persistência,acerto,0.762,0.729,0.791,,,,15
+nivel_3_semanas,validacao_final,4,Modelo e persistência,acerto,0.743,0.711,0.771,,,,15
+nivel_3_semanas,validacao_final,0,Modelo e persistência,acerto_persistencia,0.802,0.78,0.823,,,,15
+nivel_3_semanas,validacao_final,1,Modelo e persistência,acerto_persistencia,0.773,0.753,0.79,,,,15
+nivel_3_semanas,validacao_final,2,Modelo e persistência,acerto_persistencia,0.744,0.72,0.766,,,,15
+nivel_3_semanas,validacao_final,3,Modelo e persistência,acerto_persistencia,0.715,0.69,0.739,,,,15
 nivel_3_semanas,validacao_final,4,Modelo e persistência,acerto_persistencia,0.688,0.664,0.714,,,,15
-nivel_3_semanas,validacao_final,0,Modelo e persistência,acerto_quando_muda,0.436,0.385,0.505,,,,15
-nivel_3_semanas,validacao_final,2,Modelo e persistência,acerto_quando_muda,0.496,0.43,0.563,,,,15
-nivel_3_semanas,validacao_final,4,Modelo e persistência,acerto_quando_muda,0.544,0.472,0.611,,,,15
-nivel_3_semanas,validacao_final,0,Modelo e persistência,ganho_sobre_persistencia,0.028,0.016,0.04,,,,15
-nivel_3_semanas,validacao_final,2,Modelo e persistência,ganho_sobre_persistencia,0.04,0.021,0.061,,,,15
-nivel_3_semanas,validacao_final,4,Modelo e persistência,ganho_sobre_persistencia,0.054,0.024,0.085,,,,15
-nivel_4_semanas,validacao_cruzada,0,Modelo e persistência,acerto,0.79,0.779,0.799,,,,100
-nivel_4_semanas,validacao_cruzada,2,Modelo e persistência,acerto,0.743,0.732,0.754,,,,100
-nivel_4_semanas,validacao_cruzada,4,Modelo e persistência,acerto,0.704,0.692,0.716,,,,100
+nivel_3_semanas,validacao_final,0,Modelo e persistência,acerto_quando_muda,0.411,0.347,0.484,,,,15
+nivel_3_semanas,validacao_final,1,Modelo e persistência,acerto_quando_muda,0.463,0.397,0.529,,,,15
+nivel_3_semanas,validacao_final,2,Modelo e persistência,acerto_quando_muda,0.488,0.427,0.55,,,,15
+nivel_3_semanas,validacao_final,3,Modelo e persistência,acerto_quando_muda,0.5,0.433,0.564,,,,15
+nivel_3_semanas,validacao_final,4,Modelo e persistência,acerto_quando_muda,0.517,0.456,0.579,,,,15
+nivel_3_semanas,validacao_final,0,Modelo e persistência,ganho_sobre_persistencia,0.03,0.016,0.044,,,,15
+nivel_3_semanas,validacao_final,1,Modelo e persistência,ganho_sobre_persistencia,0.045,0.028,0.061,,,,15
+nivel_3_semanas,validacao_final,2,Modelo e persistência,ganho_sobre_persistencia,0.047,0.024,0.068,,,,15
+nivel_3_semanas,validacao_final,3,Modelo e persistência,ganho_sobre_persistencia,0.048,0.025,0.071,,,,15
+nivel_3_semanas,validacao_final,4,Modelo e persistência,ganho_sobre_persistencia,0.055,0.026,0.087,,,,15
+nivel_4_semanas,validacao_cruzada,0,Classificador de níveis (anterior) e persistência,acerto,0.79,0.779,0.8,-0.005,-0.008,-0.002,100
+nivel_4_semanas,validacao_cruzada,1,Classificador de níveis (anterior) e persistência,acerto,0.766,0.755,0.777,-0.007,-0.01,-0.004,100
+nivel_4_semanas,validacao_cruzada,2,Classificador de níveis (anterior) e persistência,acerto,0.743,0.733,0.754,-0.007,-0.011,-0.004,100
+nivel_4_semanas,validacao_cruzada,3,Classificador de níveis (anterior) e persistência,acerto,0.724,0.712,0.736,-0.009,-0.013,-0.005,100
+nivel_4_semanas,validacao_cruzada,4,Classificador de níveis (anterior) e persistência,acerto,0.704,0.693,0.716,-0.01,-0.015,-0.005,100
+nivel_4_semanas,validacao_cruzada,0,Classificador de níveis (anterior) e persistência,acerto_persistencia,0.758,0.748,0.769,0.0,0.0,0.0,100
+nivel_4_semanas,validacao_cruzada,1,Classificador de níveis (anterior) e persistência,acerto_persistencia,0.73,0.719,0.74,0.0,0.0,0.0,100
+nivel_4_semanas,validacao_cruzada,2,Classificador de níveis (anterior) e persistência,acerto_persistencia,0.702,0.691,0.713,0.0,0.0,0.0,100
+nivel_4_semanas,validacao_cruzada,3,Classificador de níveis (anterior) e persistência,acerto_persistencia,0.675,0.664,0.686,0.0,0.0,0.0,100
+nivel_4_semanas,validacao_cruzada,4,Classificador de níveis (anterior) e persistência,acerto_persistencia,0.653,0.641,0.664,0.0,0.0,0.0,100
+nivel_4_semanas,validacao_cruzada,0,Classificador de níveis (anterior) e persistência,acerto_quando_muda,0.406,0.389,0.425,0.012,0.004,0.019,100
+nivel_4_semanas,validacao_cruzada,1,Classificador de níveis (anterior) e persistência,acerto_quando_muda,0.437,0.419,0.456,0.012,0.004,0.02,100
+nivel_4_semanas,validacao_cruzada,2,Classificador de níveis (anterior) e persistência,acerto_quando_muda,0.46,0.442,0.479,0.013,0.005,0.022,100
+nivel_4_semanas,validacao_cruzada,3,Classificador de níveis (anterior) e persistência,acerto_quando_muda,0.486,0.467,0.504,0.016,0.009,0.022,100
+nivel_4_semanas,validacao_cruzada,4,Classificador de níveis (anterior) e persistência,acerto_quando_muda,0.504,0.487,0.523,0.02,0.012,0.027,100
+nivel_4_semanas,validacao_cruzada,0,Classificador de níveis (anterior) e persistência,ganho_sobre_persistencia,0.032,0.025,0.038,-0.005,-0.008,-0.002,100
+nivel_4_semanas,validacao_cruzada,1,Classificador de níveis (anterior) e persistência,ganho_sobre_persistencia,0.037,0.029,0.044,-0.007,-0.01,-0.004,100
+nivel_4_semanas,validacao_cruzada,2,Classificador de níveis (anterior) e persistência,ganho_sobre_persistencia,0.041,0.033,0.049,-0.007,-0.011,-0.004,100
+nivel_4_semanas,validacao_cruzada,3,Classificador de níveis (anterior) e persistência,ganho_sobre_persistencia,0.05,0.04,0.059,-0.009,-0.013,-0.005,100
+nivel_4_semanas,validacao_cruzada,4,Classificador de níveis (anterior) e persistência,ganho_sobre_persistencia,0.052,0.04,0.063,-0.01,-0.015,-0.005,100
+nivel_4_semanas,validacao_cruzada,0,Modelo e persistência,acerto,0.794,0.784,0.805,,,,100
+nivel_4_semanas,validacao_cruzada,1,Modelo e persistência,acerto,0.774,0.763,0.784,,,,100
+nivel_4_semanas,validacao_cruzada,2,Modelo e persistência,acerto,0.751,0.739,0.762,,,,100
+nivel_4_semanas,validacao_cruzada,3,Modelo e persistência,acerto,0.733,0.722,0.745,,,,100
+nivel_4_semanas,validacao_cruzada,4,Modelo e persistência,acerto,0.714,0.703,0.725,,,,100
 nivel_4_semanas,validacao_cruzada,0,Modelo e persistência,acerto_persistencia,0.758,0.748,0.768,,,,100
-nivel_4_semanas,validacao_cruzada,2,Modelo e persistência,acerto_persistencia,0.702,0.692,0.714,,,,100
+nivel_4_semanas,validacao_cruzada,1,Modelo e persistência,acerto_persistencia,0.73,0.719,0.74,,,,100
+nivel_4_semanas,validacao_cruzada,2,Modelo e persistência,acerto_persistencia,0.702,0.692,0.713,,,,100
+nivel_4_semanas,validacao_cruzada,3,Modelo e persistência,acerto_persistencia,0.675,0.663,0.686,,,,100
 nivel_4_semanas,validacao_cruzada,4,Modelo e persistência,acerto_persistencia,0.653,0.641,0.664,,,,100
-nivel_4_semanas,validacao_cruzada,0,Modelo e persistência,acerto_quando_muda,0.406,0.388,0.424,,,,100
-nivel_4_semanas,validacao_cruzada,2,Modelo e persistência,acerto_quando_muda,0.46,0.442,0.479,,,,100
-nivel_4_semanas,validacao_cruzada,4,Modelo e persistência,acerto_quando_muda,0.504,0.486,0.523,,,,100
-nivel_4_semanas,validacao_cruzada,0,Modelo e persistência,ganho_sobre_persistencia,0.032,0.025,0.038,,,,100
-nivel_4_semanas,validacao_cruzada,2,Modelo e persistência,ganho_sobre_persistencia,0.041,0.032,0.049,,,,100
-nivel_4_semanas,validacao_cruzada,4,Modelo e persistência,ganho_sobre_persistencia,0.052,0.04,0.063,,,,100
-nivel_4_semanas,validacao_final,0,Modelo e persistência,acerto,0.807,0.776,0.835,,,,15
-nivel_4_semanas,validacao_final,2,Modelo e persistência,acerto,0.759,0.725,0.788,,,,15
-nivel_4_semanas,validacao_final,4,Modelo e persistência,acerto,0.718,0.688,0.746,,,,15
+nivel_4_semanas,validacao_cruzada,0,Modelo e persistência,acerto_quando_muda,0.394,0.376,0.413,,,,100
+nivel_4_semanas,validacao_cruzada,1,Modelo e persistência,acerto_quando_muda,0.425,0.407,0.443,,,,100
+nivel_4_semanas,validacao_cruzada,2,Modelo e persistência,acerto_quando_muda,0.447,0.429,0.467,,,,100
+nivel_4_semanas,validacao_cruzada,3,Modelo e persistência,acerto_quando_muda,0.47,0.451,0.488,,,,100
+nivel_4_semanas,validacao_cruzada,4,Modelo e persistência,acerto_quando_muda,0.485,0.467,0.503,,,,100
+nivel_4_semanas,validacao_cruzada,0,Modelo e persistência,ganho_sobre_persistencia,0.036,0.03,0.043,,,,100
+nivel_4_semanas,validacao_cruzada,1,Modelo e persistência,ganho_sobre_persistencia,0.044,0.037,0.051,,,,100
+nivel_4_semanas,validacao_cruzada,2,Modelo e persistência,ganho_sobre_persistencia,0.048,0.041,0.056,,,,100
+nivel_4_semanas,validacao_cruzada,3,Modelo e persistência,ganho_sobre_persistencia,0.058,0.048,0.068,,,,100
+nivel_4_semanas,validacao_cruzada,4,Modelo e persistência,ganho_sobre_persistencia,0.061,0.05,0.072,,,,100
+nivel_4_semanas,validacao_final,0,Classificador de níveis (anterior) e persistência,acerto,0.807,0.776,0.834,-0.01,-0.016,-0.005,15
+nivel_4_semanas,validacao_final,1,Classificador de níveis (anterior) e persistência,acerto,0.785,0.753,0.811,-0.006,-0.012,-0.001,15
+nivel_4_semanas,validacao_final,2,Classificador de níveis (anterior) e persistência,acerto,0.759,0.727,0.788,-0.004,-0.012,0.004,15
+nivel_4_semanas,validacao_final,3,Classificador de níveis (anterior) e persistência,acerto,0.742,0.708,0.769,-0.001,-0.006,0.004,15
+nivel_4_semanas,validacao_final,4,Classificador de níveis (anterior) e persistência,acerto,0.718,0.686,0.745,-0.004,-0.011,0.003,15
+nivel_4_semanas,validacao_final,0,Classificador de níveis (anterior) e persistência,acerto_persistencia,0.773,0.755,0.791,0.0,0.0,0.0,15
+nivel_4_semanas,validacao_final,1,Classificador de níveis (anterior) e persistência,acerto_persistencia,0.745,0.719,0.768,0.0,0.0,0.0,15
+nivel_4_semanas,validacao_final,2,Classificador de níveis (anterior) e persistência,acerto_persistencia,0.715,0.691,0.739,0.0,0.0,0.0,15
+nivel_4_semanas,validacao_final,3,Classificador de níveis (anterior) e persistência,acerto_persistencia,0.688,0.664,0.714,0.0,0.0,0.0,15
+nivel_4_semanas,validacao_final,4,Classificador de níveis (anterior) e persistência,acerto_persistencia,0.66,0.635,0.685,0.0,0.0,0.0,15
+nivel_4_semanas,validacao_final,0,Classificador de níveis (anterior) e persistência,acerto_quando_muda,0.461,0.397,0.532,-0.003,-0.02,0.016,15
+nivel_4_semanas,validacao_final,1,Classificador de níveis (anterior) e persistência,acerto_quando_muda,0.496,0.433,0.566,0.007,-0.008,0.021,15
+nivel_4_semanas,validacao_final,2,Classificador de níveis (anterior) e persistência,acerto_quando_muda,0.52,0.448,0.594,0.019,0.003,0.035,15
+nivel_4_semanas,validacao_final,3,Classificador de níveis (anterior) e persistência,acerto_quando_muda,0.544,0.475,0.608,0.027,0.012,0.041,15
+nivel_4_semanas,validacao_final,4,Classificador de níveis (anterior) e persistência,acerto_quando_muda,0.564,0.495,0.629,0.025,0.009,0.042,15
+nivel_4_semanas,validacao_final,0,Classificador de níveis (anterior) e persistência,ganho_sobre_persistencia,0.034,0.017,0.05,-0.01,-0.016,-0.005,15
+nivel_4_semanas,validacao_final,1,Classificador de níveis (anterior) e persistência,ganho_sobre_persistencia,0.04,0.022,0.059,-0.006,-0.012,-0.001,15
+nivel_4_semanas,validacao_final,2,Classificador de níveis (anterior) e persistência,ganho_sobre_persistencia,0.044,0.021,0.069,-0.004,-0.012,0.004,15
+nivel_4_semanas,validacao_final,3,Classificador de níveis (anterior) e persistência,ganho_sobre_persistencia,0.054,0.025,0.084,-0.001,-0.006,0.004,15
+nivel_4_semanas,validacao_final,4,Classificador de níveis (anterior) e persistência,ganho_sobre_persistencia,0.058,0.029,0.09,-0.004,-0.011,0.003,15
+nivel_4_semanas,validacao_final,0,Modelo e persistência,acerto,0.817,0.786,0.846,,,,15
+nivel_4_semanas,validacao_final,1,Modelo e persistência,acerto,0.791,0.76,0.82,,,,15
+nivel_4_semanas,validacao_final,2,Modelo e persistência,acerto,0.763,0.727,0.792,,,,15
+nivel_4_semanas,validacao_final,3,Modelo e persistência,acerto,0.742,0.712,0.771,,,,15
+nivel_4_semanas,validacao_final,4,Modelo e persistência,acerto,0.722,0.689,0.748,,,,15
 nivel_4_semanas,validacao_final,0,Modelo e persistência,acerto_persistencia,0.773,0.753,0.792,,,,15
-nivel_4_semanas,validacao_final,2,Modelo e persistência,acerto_persistencia,0.715,0.692,0.737,,,,15
+nivel_4_semanas,validacao_final,1,Modelo e persistência,acerto_persistencia,0.745,0.721,0.768,,,,15
+nivel_4_semanas,validacao_final,2,Modelo e persistência,acerto_persistencia,0.715,0.69,0.739,,,,15
+nivel_4_semanas,validacao_final,3,Modelo e persistência,acerto_persistencia,0.688,0.665,0.714,,,,15
 nivel_4_semanas,validacao_final,4,Modelo e persistência,acerto_persistencia,0.66,0.635,0.685,,,,15
-nivel_4_semanas,validacao_final,0,Modelo e persistência,acerto_quando_muda,0.461,0.395,0.532,,,,15
-nivel_4_semanas,validacao_final,2,Modelo e persistência,acerto_quando_muda,0.52,0.451,0.595,,,,15
-nivel_4_semanas,validacao_final,4,Modelo e persistência,acerto_quando_muda,0.564,0.495,0.63,,,,15
-nivel_4_semanas,validacao_final,0,Modelo e persistência,ganho_sobre_persistencia,0.034,0.018,0.051,,,,15
-nivel_4_semanas,validacao_final,2,Modelo e persistência,ganho_sobre_persistencia,0.044,0.02,0.07,,,,15
-nivel_4_semanas,validacao_final,4,Modelo e persistência,ganho_sobre_persistencia,0.058,0.028,0.092,,,,15
+nivel_4_semanas,validacao_final,0,Modelo e persistência,acerto_quando_muda,0.464,0.401,0.536,,,,15
+nivel_4_semanas,validacao_final,1,Modelo e persistência,acerto_quando_muda,0.489,0.426,0.554,,,,15
+nivel_4_semanas,validacao_final,2,Modelo e persistência,acerto_quando_muda,0.501,0.431,0.573,,,,15
+nivel_4_semanas,validacao_final,3,Modelo e persistência,acerto_quando_muda,0.518,0.453,0.578,,,,15
+nivel_4_semanas,validacao_final,4,Modelo e persistência,acerto_quando_muda,0.539,0.473,0.599,,,,15
+nivel_4_semanas,validacao_final,0,Modelo e persistência,ganho_sobre_persistencia,0.044,0.028,0.061,,,,15
+nivel_4_semanas,validacao_final,1,Modelo e persistência,ganho_sobre_persistencia,0.047,0.025,0.07,,,,15
+nivel_4_semanas,validacao_final,2,Modelo e persistência,ganho_sobre_persistencia,0.048,0.023,0.073,,,,15
+nivel_4_semanas,validacao_final,3,Modelo e persistência,ganho_sobre_persistencia,0.055,0.025,0.085,,,,15
+nivel_4_semanas,validacao_final,4,Modelo e persistência,ganho_sobre_persistencia,0.062,0.031,0.095,,,,15

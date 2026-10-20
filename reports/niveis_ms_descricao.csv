@@ -1,0 +1,6 @@
+definicao,semanas,baixa_verde,media_amarelo,alta_vermelho,municipios_nunca_alto,municipios_alto_mais_de_metade,fins_do_alto_por_municipio_ano
+"MEM, semana (D)",70495,0.4027,0.4286,0.1687,0,0,0.9349
+"Ministério, semana (E)",70495,0.9124,0.0602,0.0274,38,0,0.1843
+"Ministério, acumulada em 4 semanas (F)",70495,0.7233,0.1616,0.1151,13,0,0.4071
+"Ministério, acumulada na temporada",70495,0.3593,0.1968,0.4439,0,53,0.6543
+"Ministério, acumulada em 52 semanas",70495,0.1957,0.1547,0.6496,0,79,0.1303

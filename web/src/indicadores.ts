@@ -1,7 +1,6 @@
-import type { AvaliacaoGeral, Indice, Municipio, Previsao } from './dados';
+import type { Indice, Municipio, Previsao } from './dados';
 import { graficoCasos } from './graficos';
-import { metrica } from './avaliacao';
-import { diaMes, el, n, pct, periodoSemana, se, seloNivel } from './formato';
+import { data, diaMes, el, n, pct, periodoSemana, seloNivel } from './formato';
 
 const PERIODOS: [string, number][] = [['6 meses', 26], ['1 ano', 52], ['2 anos', 104]];
 let periodo = 52;
@@ -13,86 +12,54 @@ function card(titulo: string, classe: string, ...conteudo: (Node | string | null
 
 function cardConfirmado(m: Municipio): HTMLElement {
   const c = m.confirmada;
+  const dias = Math.round((Date.now() - data(c.semana).getTime()) / 86_400_000);
   return card('Último nível confirmado', 'confirmado',
     el('div', { class: 'destaque' }, seloNivel(c.nivel)),
     el('p', { class: 'valor' }, `${n(c.casos)} casos`),
-    el('p', {}, `Semana de ${periodoSemana(c.semana)} (${se(c.se)}).`),
-    el('p', { class: 'nota' }, `As ${m.lacuna} semanas seguintes ainda estão recebendo notificações; o nível só é ` +
-      'confirmado depois disso.'));
+    el('p', {}, `Semana ${diaMes(c.semana)}; há ${dias}d`));
 }
 
-function cardAlerta(m: Municipio, av: AvaliacaoGeral): HTMLElement {
+function cardAlerta(m: Municipio): HTMLElement {
   const a = m.alerta;
-  const ate = m.previsoes[m.previsoes.length - 1].semana;
-  const corretos = metrica(av, 'mobilizacao', 'validacao_cruzada', m.lacuna, 'Modelo: alerta de vermelho', 'alarmes_corretos');
-  const antes = metrica(av, 'mobilizacao', 'validacao_cruzada', m.lacuna, 'Modelo: alerta de vermelho', 'avisadas_antes_dos_dados');
-  const fins = metrica(av, 'desmobilizacao', 'validacao_cruzada', m.lacuna, 'Modelo: nível previsto em S+2 deixa o vermelho',
-    'fins_indicados_antes_dos_dados');
-  const prematuros = metrica(av, 'desmobilizacao', 'validacao_cruzada', m.lacuna,
-    'Modelo: nível previsto em S+2 deixa o vermelho', 'avisos_prematuros_por_episodio');
-  const confianca = (texto: string) => el('p', { class: 'nota' }, texto);
+  const ate = (h: number) => diaMes(m.previsoes.find((p) => p.antecedencia === h)!.semana);
   switch (a.estado) {
     case 'alerta':
-      return card('Alerta de epidemia', 'alerta ativo',
+      return card('Alertas', 'alerta ativo',
         el('div', { class: 'destaque' }, seloNivel(2, 'Alerta')),
-        el('p', { class: 'valor' }, `${pct(a.p_vermelho_max)} de chance`),
-        el('p', {}, `de o município entrar no nível epidêmico nas próximas 2 a 4 semanas (até ${diaMes(ate)}). ` +
-          'É o momento de considerar a mobilização.'),
-        confianca(`Nos testes com dados do passado, ${pct(corretos?.valor)} dos alertas se confirmaram, e ` +
-          `${pct(antes?.valor)} das epidemias foram avisadas antes de os dados mostrarem o início.`));
+        el('p', { class: 'valor' }, `Chance de ${pct(a.p_vermelho_max)}`),
+        el('p', {}, `de nível epidêmico até ${ate(4)} · alerta a partir de ${pct(a.corte)}`));
     case 'sem_alerta':
-      return card('Sem alerta de epidemia', 'alerta',
+      return card('Alertas', 'alerta',
         el('div', { class: 'destaque' }, el('span', { class: 'selo neutro' }, 'Sem alerta')),
-        el('p', { class: 'valor' }, `${pct(a.p_vermelho_max)} de chance`),
-        el('p', {}, `de nível epidêmico nas próximas 2 a 4 semanas (até ${diaMes(ate)}). ` +
-          `O alerta acende a partir de ${pct(a.corte)}.`),
-        confianca(`Quando acende, o alerta se confirma em cerca de ${pct(corretos?.valor)} das vezes.`));
+        el('p', { class: 'valor' }, `Chance de ${pct(a.p_vermelho_max)}`),
+        el('p', {}, `de nível epidêmico até ${ate(4)} · alerta a partir de ${pct(a.corte)}`));
     case 'epidemia_continua':
-      return card('Em epidemia', 'alerta ativo',
+      return card('Alertas', 'alerta ativo',
         el('div', { class: 'destaque' }, seloNivel(2, 'Epidemia em curso')),
-        el('p', {}, 'O nível epidêmico deve continuar nas próximas 2 semanas. Mantenha as ações em curso.'),
-        confianca(`Quando o fim se aproxima, o painel indica: ${pct(fins?.valor)} dos fins de epidemia foram ` +
-          'indicados antes de os dados os mostrarem.'));
+        el('p', {}, `Nível epidêmico deve continuar até ${ate(2)}`));
     case 'fim_indicado':
-      return card('Em epidemia, com sinal de fim', 'alerta',
+      return card('Alertas', 'alerta',
         el('div', { class: 'destaque' }, seloNivel(1, 'Sinal de fim')),
-        el('p', {}, 'O município deve sair do nível epidêmico em até 2 semanas. É o momento de planejar a desmobilização.'),
-        confianca(`Nos testes, ${pct(fins?.valor)} dos fins de epidemia foram indicados antes de os dados os ` +
-          `mostrarem, com cerca de ${n(prematuros?.valor)} sinal antecipado por epidemia.`));
+        el('p', {}, `Deve sair do nível epidêmico até ${ate(2)}`));
   }
 }
 
-function cardNotificados(m: Municipio): HTMLElement {
-  const atual = m.recentes[m.recentes.length - 1];
-  const anteriores = m.recentes.slice(0, -1).reverse();
-  const estimativa = (r: (typeof m.recentes)[number]) => (m.tem_nowcast ? `; estimativa de ${n(r.estimados)}` : '');
-  return card('Casos notificados até o momento', 'notificados',
-    el('p', { class: 'valor' }, n(atual.notificados)),
-    el('p', {}, `Semana de ${periodoSemana(atual.semana)} (${se(atual.se)}), ainda incompleta.`),
-    m.tem_nowcast
-      ? el('p', {}, `Estimativa do InfoDengue, que corrige o atraso das notificações: ${n(atual.estimados)} ` +
-        `(entre ${n(atual.estimados_min)} e ${n(atual.estimados_max)}).`)
-      : el('p', {}, 'O InfoDengue não publica estimativa que corrija o atraso das notificações (nowcast) para este ' +
-        `município; por isso, o nível confirmado é o de ${m.lacuna} semanas atrás.`),
-    ...anteriores.map((r) => el('p', {}, `Semana de ${diaMes(r.semana)}: ${n(r.notificados)} notificados${estimativa(r)}.`)),
-    el('p', { class: 'nota cuidado' }, 'Provavelmente subnotificado: as notificações de uma semana continuam chegando ' +
-      'por várias semanas. Para a semana mais recente, o número de notificados pode mais que dobrar.'));
+function cardLimiares(m: Municipio): HTMLElement {
+  const [atual] = m.limiares;
+  return card('Limiares epidêmicos', 'limiares',
+    el('dl', {},
+      el('dt', {}, seloNivel(1, 'Pré-epidêmico')), el('dd', {}, `${n(atual.pre_epidemico)} casos / semana`),
+      el('dt', {}, seloNivel(2, 'Epidêmico')), el('dd', {}, `${n(atual.epidemico)} casos / semana`)));
 }
 
-function cardLimiares(m: Municipio): HTMLElement {
-  const [atual, proxima] = m.limiares;
-  const muda = m.previsoes.some((p) => p.limiar_vermelho !== m.previsoes[0].limiar_vermelho);
-  return card(`Limiares da temporada ${atual.temporada}`, 'limiares',
-    el('dl', {},
-      el('dt', {}, seloNivel(1, 'Pré-epidêmico')), el('dd', {}, `${n(atual.pre_epidemico)} casos por semana`),
-      el('dt', {}, seloNivel(2, 'Epidêmico')), el('dd', {}, `${n(atual.epidemico)} casos por semana`)),
-    muda && el('p', {}, `A partir da ${se(proxima.inicio_se)}, temporada ${proxima.temporada}: ` +
-      `${n(proxima.pre_epidemico)} e ${n(proxima.epidemico)} casos por semana.`),
-    el('p', { class: 'nota' }, 'Calculados pelo Método da Epidemia Móvel (MEM), como no InfoDengue, com as ' +
-      'temporadas anteriores do município. Mudam a cada temporada, na semana epidemiológica 41.'));
-}
+// "<1%" em vez de "menos de 1%": cabe na coluna da tabela
+const pctCurto = (x: number) => (x > 0 && x < 0.005 ? '<1%' : pct(x));
+const casosFaixa = (p: Previsao, sep = ' a ') => el('span', {}, n(p.casos), el('br'),
+  el('span', { class: 'sub' }, `${n(p.casos_inf)}${sep}${n(p.casos_sup)}`));
 
 function tabelaPrevisoes(m: Municipio): HTMLElement {
+  // Tela estreita: uma linha por semana, para não precisar rolar para o lado
+  if (window.matchMedia('(max-width: 640px)').matches) return tabelaPrevisoesVertical(m);
   const titulo = (p: Previsao) => (p.antecedencia === 0 ? 'Esta semana' : `Em ${p.antecedencia} semana${p.antecedencia > 1 ? 's' : ''}`);
   const linha = (rotulo: string, f: (p: Previsao) => Node | string) =>
     el('tr', {}, el('th', { scope: 'row' }, rotulo), ...m.previsoes.map((p) => el('td', {}, f(p))));
@@ -101,9 +68,17 @@ function tabelaPrevisoes(m: Municipio): HTMLElement {
       el('th', { scope: 'col' }, titulo(p), el('br'), el('span', { class: 'sub' }, periodoSemana(p.semana)))))),
     el('tbody', {},
       linha('Nível mais provável', (p) => seloNivel(p.nivel)),
-      linha('Chance de nível epidêmico', (p) => pct(p.p_vermelho)),
-      linha('Casos aproximados', (p) => el('span', {}, n(p.casos), el('br'),
-        el('span', { class: 'sub' }, `${n(p.casos_inf)} a ${n(p.casos_sup)}`))))));
+      linha('Chance de nível epidêmico', (p) => pctCurto(p.p_vermelho)),
+      linha('Casos aproximados', (p) => casosFaixa(p)))));
+}
+
+function tabelaPrevisoesVertical(m: Municipio): HTMLElement {
+  return el('div', { class: 'tabela-rolagem' }, el('table', { class: 'previsoes vertical' },
+    el('thead', {}, el('tr', {}, ...['Semana', 'Nível', 'Chance de epidemia', 'Casos'].map((t) => el('th', { scope: 'col' }, t)))),
+    el('tbody', {}, ...m.previsoes.map((p) => el('tr', {},
+      el('th', { scope: 'row' }, diaMes(p.semana), p.antecedencia === 0 && el('br'),
+        p.antecedencia === 0 && el('span', { class: 'sub' }, 'atual')),
+      el('td', {}, seloNivel(p.nivel)), el('td', {}, pctCurto(p.p_vermelho)), el('td', {}, casosFaixa(p, '–')))))));
 }
 
 function controles(aoMudar: () => void): HTMLElement {
@@ -122,12 +97,16 @@ function controles(aoMudar: () => void): HTMLElement {
 function legendaCasos(): HTMLElement {
   const item = (classe: string, texto: string) => el('span', { class: 'item' }, el('span', { class: `chave ${classe}` }), texto);
   return el('div', { class: 'legenda' },
-    item('linha-tinta', 'casos (semanas confirmadas)'), item('linha-pontilhada', 'semanas incompletas (estimativa)'),
+    item('linha-tinta', 'casos (semanas confirmadas)'), item('linha-pontilhada', 'estimativa nowcast'),
     item('linha-azul', 'casos previstos'), item('faixa-azul', 'faixa provável (80%)'),
-    item('tracejado-amarelo', 'limiar pré-epidêmico'), item('tracejado-vermelho', 'limiar epidêmico'));
+    item('tracejado-amarelo', 'limiar pré-epidêmico'), item('tracejado-vermelho', 'limiar epidêmico'),
+    item('quadrados', 'nível confirmado (verde, amarelo, vermelho)'),
+    item('quadrados hachurado', 'nível mais provável (previsto)'),
+    el('span', { class: 'item' }, el('span', { class: 'chave-texto', 'aria-hidden': 'true' }, '▲'),
+      'última semana confirmada'));
 }
 
-export function renderIndicadores(alvo: HTMLElement, m: Municipio, indice: Indice, av: AvaliacaoGeral): void {
+export function renderIndicadores(alvo: HTMLElement, m: Municipio, indice: Indice): void {
   const grafico = el('div', { class: 'grafico' });
   const desenhar = () => {
     grafico.replaceChildren(graficoCasos(m, periodo, escalaLog));
@@ -139,7 +118,7 @@ export function renderIndicadores(alvo: HTMLElement, m: Municipio, indice: Indic
   alvo.replaceChildren(
     el('p', { class: 'contexto' }, `Dados até a semana de ${periodoSemana(m.semana_atual)}. ` +
       `Atualizado em ${indice.gerado_em.split(' ')[0].split('-').reverse().join('/')}.`),
-    el('div', { class: 'cards' }, cardConfirmado(m), cardAlerta(m, av), cardNotificados(m), cardLimiares(m)),
+    el('div', { class: 'cards' }, cardConfirmado(m), cardAlerta(m), cardLimiares(m)),
     el('section', { class: 'card largo' }, el('h3', {}, 'Próximas semanas'),
       el('p', { class: 'nota' }, `Previsões feitas a partir da última semana confirmada (${diaMes(m.confirmada.semana)}).`),
       tabelaPrevisoes(m)),

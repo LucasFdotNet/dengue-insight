@@ -41,17 +41,21 @@
       "concluido": "2026-10-11T09:26:02",
       "minutos": 27.0
     },
+    "experimento_niveis_quantis": {
+      "concluido": "2026-10-12T11:33:18",
+      "minutos": 1.5
+    },
     "experimento_niveis_robustez": {
-      "concluido": "2026-10-11T09:35:40",
-      "minutos": 9.6
+      "concluido": "2026-10-12T11:42:31",
+      "minutos": 9.2
     },
     "experimento_casos_atraso": {
-      "concluido": "2026-10-11T09:51:16",
-      "minutos": 15.6
+      "concluido": "2026-10-12T11:43:21",
+      "minutos": 0.8
     },
     "exportar_painel": {
-      "concluido": "2026-10-11T09:52:09",
-      "minutos": 0.9
+      "concluido": "2026-10-12T11:45:08",
+      "minutos": 1.8
     }
   }
 }

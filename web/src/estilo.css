@@ -78,7 +78,8 @@ nav a {
 }
 nav a:hover { background: var(--borda); }
 nav a[aria-current='page'] { background: var(--tinta); color: var(--fundo); }
-.seletor { display: flex; align-items: center; gap: 8px; color: var(--tinta-sec); }
+.seletor { display: flex; flex-wrap: wrap; align-items: center; gap: 4px 16px; margin-bottom: 12px; color: var(--tinta-sec); }
+.seletor label { display: flex; align-items: center; gap: 8px; }
 
 select, input, button { font: inherit; color: inherit; }
 select, input {
@@ -116,7 +117,7 @@ select, input {
 .selo.neutro { color: var(--tinta-sec); }
 
 dl { display: grid; grid-template-columns: auto 1fr; gap: 8px 12px; align-items: center; margin: 8px 0; }
-dd { margin: 0; font-variant-numeric: tabular-nums; }
+dd { margin: 0; font-variant-numeric: tabular-nums; white-space: nowrap; }
 
 .tabela-rolagem { overflow-x: auto; }
 table { border-collapse: collapse; width: 100%; font-variant-numeric: tabular-nums; }
@@ -125,6 +126,12 @@ thead th { color: var(--tinta-sec); font-weight: 600; font-size: 0.85rem; }
 td.num, th.num { text-align: right; }
 .sub { color: var(--tinta-sec); font-size: 0.8rem; }
 table.previsoes td, table.previsoes thead th { text-align: center; }
+table.previsoes.vertical th, table.previsoes.vertical td { padding: 8px 3px; vertical-align: middle; }
+table.previsoes.vertical thead th:first-child, table.previsoes.vertical tbody th { text-align: left; }
+table.previsoes.vertical tbody th, table.previsoes.vertical td { white-space: nowrap; }
+table.previsoes.vertical tbody th { font-weight: 600; }
+table.previsoes.vertical thead th { font-size: 0.8rem; }
+table.previsoes.vertical .selo { font-size: 0.8rem; padding: 2px 8px; gap: 4px; }
 
 .controles { display: flex; flex-wrap: wrap; gap: 8px 16px; align-items: center; margin: 4px 0 8px; color: var(--tinta-sec); }
 .segmentado { display: inline-flex; border: 1px solid var(--eixo); border-radius: 6px; overflow: hidden; }
@@ -143,6 +150,12 @@ table.previsoes td, table.previsoes thead th { text-align: center; }
 .chave.linha-pontilhada { border-top: 2px dotted var(--tinta); }
 .chave.tracejado-amarelo { border-top: 2px dashed var(--amarelo); }
 .chave.tracejado-vermelho { border-top: 2px dashed var(--vermelho); }
+.chave-texto { display: inline-block; width: 22px; text-align: center; color: var(--tinta); font-size: 0.75rem; }
+.chave.quadrados { width: 30px; height: 10px; border: 0;
+  background: linear-gradient(90deg, var(--verde) 0 32%, transparent 32% 34%, var(--amarelo) 34% 66%,
+    transparent 66% 68%, var(--vermelho) 68%); }
+.chave.quadrados.hachurado { background: repeating-linear-gradient(45deg, var(--verde) 0 2px, transparent 2px 4px);
+  outline: 1px solid var(--verde); outline-offset: -1px; width: 12px; }
 .chave.faixa-azul { height: 12px; border: 0; background: var(--azul-faixa); border-radius: 2px; }
 
 .texto ul { padding-left: 20px; }
@@ -159,7 +172,7 @@ footer { color: var(--mudo); font-size: 0.8rem; padding-top: 16px; border-top: 1
 
 @media (max-width: 640px) {
   header { gap: 8px; }
-  .seletor { width: 100%; }
+  .seletor label { width: 100%; }
   .seletor select { flex: 1; }
   .card .valor { font-size: 1.35rem; }
 }

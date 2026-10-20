@@ -1,0 +1,7 @@
+definicao,conjunto,epidemias_mem,alerta_ate_o_inicio,alerta_2_semanas_antes,sem_alerta_ate_4_semanas_depois,semana_do_1o_alerta_mediana
+MEM (atual),validacao_cruzada,501,0.7745,0.5868,0.1437,-3.0
+"Ministério da Saúde, acumulada em 4 semanas",validacao_cruzada,501,0.4172,0.3074,0.3493,-1.0
+"Ministério da Saúde, incidência da semana",validacao_cruzada,501,0.0858,0.0519,0.7425,2.0
+MEM (atual),validacao_final,78,0.7692,0.641,0.141,-3.0
+"Ministério da Saúde, acumulada em 4 semanas",validacao_final,78,0.5641,0.4359,0.2692,-3.0
+"Ministério da Saúde, incidência da semana",validacao_final,78,0.1667,0.1282,0.5897,1.5

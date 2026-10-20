@@ -48,6 +48,15 @@ Este arquivo lista as fontes que o projeto usa e diz, para cada uma, **o que o p
 * **O que o plano não define:** se os anos epidêmicos entram ou saem dos cinco anos; como calcular o quartil; se o canal usa contagem ou taxa (o texto fala em casos prováveis e a figura em coeficiente de incidência); e o que fazer em municípios com muitas semanas zeradas. O projeto faz essas escolhas e as registra em `src/estados.py`.
 * O canal endêmico foi testado como definição dos níveis verde, amarelo e vermelho (definição C em `src/estados.py` e `src/experimento_niveis.py`) e descartado como alvo de previsão: com o aumento da dengue de 2022 a 2025, municípios ficaram acima do Q3 por anos seguidos, e o modelo não conseguia antecipar a entrada no vermelho (decisão 16 do README, seção 22 da história). O plano segue como referência dos estágios de mobilização, alerta e desmobilização, que orientam o objetivo do painel.
 
+**ESPÍRITO SANTO. Secretaria de Estado da Saúde.** 17º Boletim Epidemiológico da Dengue: semana epidemiológica 17 de 2025. Vitória: SESA, 2025. Disponível em: <https://mosquito.saude.es.gov.br/Media/dengue/Boletim%20Epidemiologico/2025/SE%2017%202025%20-%2017º%20Boletim%20Epidemiológico%20da%20Dengue.pdf>. Acesso em: 12 out. 2026.
+
+* Atribui ao Ministério da Saúde três níveis de **incidência acumulada nas 4 últimas semanas**: baixa (menos de 100 casos por 100 mil habitantes), média (de 100 a 300) e alta (mais de 300), e lista toda semana os municípios em cada nível.
+* Base da definição F dos níveis (`src/estados.py`), testada contra o MEM em `src/experimento_niveis_ms.py` (seção 26 da história): o MEM continuou.
+
+**BRASIL. Ministério da Saúde. Secretaria de Vigilância em Saúde.** Boletim Epidemiológico, v. 51, n. 11. Brasília, DF: Ministério da Saúde, mar. 2020. Disponível em: <https://www.gov.br/saude/pt-br/centrais-de-conteudo/publicacoes/boletins/epidemiologicos/edicoes/2020/boletim-epidemiologico-vol-51-no-11.pdf>. Acesso em: 12 out. 2026.
+
+* Usa o diagrama de controle para acompanhar a dengue no país e o patamar de 300 casos por 100 mil para descrever o ano acumulado ("69 regiões de saúde com incidência maior ou igual a 300 casos/100 mil hab.", da semana 1 à 10 de 2020), sem defini-lo como nível de alerta.
+
 **ALERTADENGUE.** AlertTools: funções do InfoDengue em R. Arquivos `R/infodengue_apply_mem.R` e `R/alert_functions.R`. GitHub. Disponível em: <https://github.com/AlertaDengue/AlertTools>. Acesso em: 10 out. 2026.
 
 **ALERTADENGUE.** AlertaDengueAnalise: parametrização e análises do InfoDengue. Arquivo `parameters/update_parameters.R`. GitHub. Disponível em: <https://github.com/AlertaDengue/AlertaDengueAnalise>. Acesso em: 10 out. 2026.
@@ -177,4 +186,4 @@ Este arquivo lista as fontes que o projeto usa e diz, para cada uma, **o que o p
 
 ## Pendências
 
-* **Limiar de 300 casos por 100 mil habitantes.** O README (decisão 1) e o relatório final citam esse valor como "incidência alta" pela classificação do Ministério da Saúde, mas o projeto ainda não registrou o documento de origem. Falta localizar a publicação (a confirmar) antes de citá-la.
+* **Limiar de 300 casos por 100 mil habitantes (resolvida em 12/10/2026).** Não há documento primário do Ministério da Saúde com esse patamar. O Plano de Contingência de 2025 define os níveis de resposta pelo diagrama de controle e indica os limiares do InfoDengue para os municípios; as Diretrizes Nacionais de 2009 não citam o valor. O 300 aparece em boletins estaduais (por exemplo, SESA-ES), que atribuem ao Ministério três faixas para a incidência acumulada das últimas 4 semanas (baixa, abaixo de 100; média, de 100 a 300; alta, acima de 300), e nos boletins nacionais do próprio Ministério só para descrever o ano acumulado (por exemplo, o vol. 51, n. 11, de 2020), sem defini-lo como nível de alerta. Essa definição foi testada contra o MEM (seção 26 da história) e não foi adotada. A atribuição ao Ministério foi retirada do README, do glossário, da história das decisões e do relatório final.

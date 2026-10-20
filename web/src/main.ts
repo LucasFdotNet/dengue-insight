@@ -31,19 +31,19 @@ function seletor(indice: Indice, atual: string, secao: Secao): HTMLElement {
   }
   const select = el('select', { id: 'municipio' },
     ...[...porUf.keys()].sort().map((uf) => el('optgroup', { label: uf },
-      ...porUf.get(uf)!.map((m) => el('option', { value: m.id }, m.nome)))));
+      ...porUf.get(uf)!.map((m) => el('option', { value: m.id }, m.papel === 'validacao' ? `${m.nome} *` : m.nome)))));
   select.value = atual;
   select.addEventListener('change', () => irPara(secao, select.value));
-  return el('label', { class: 'seletor' }, 'Município ', select);
+  return el('div', { class: 'seletor' }, el('label', {}, 'Município ', select),
+    el('span', { class: 'nota' }, '* município do conjunto de teste: não usado no treino do modelo'));
 }
 
-function cabecalho(indice: Indice, secao: Secao, municipio: string): HTMLElement {
+function cabecalho(secao: Secao, municipio: string): HTMLElement {
   return el('header', {},
     el('div', { class: 'marca' }, el('strong', {}, 'Dengue Insight'),
       el('span', {}, 'Níveis e alertas de dengue para 115 municípios')),
     el('nav', { 'aria-label': 'Seções' }, ...SECOES.map(([k, rotulo]) =>
-      el('a', { href: `#/${k}/${municipio}`, ...(k === secao ? { 'aria-current': 'page' } : {}) }, rotulo))),
-    secao === 'ajuda' ? el('span', {}) : seletor(indice, municipio, secao));
+      el('a', { href: `#/${k}/${municipio}`, ...(k === secao ? { 'aria-current': 'page' } : {}) }, rotulo))));
 }
 
 async function mostrar(): Promise<void> {
@@ -52,13 +52,14 @@ async function mostrar(): Promise<void> {
     const indice = await carregarIndice();
     const { secao, municipio } = rota(indice);
     const conteudo = el('main', { 'aria-busy': 'true' }, el('p', { class: 'contexto' }, 'Carregando…'));
-    app.replaceChildren(cabecalho(indice, secao, municipio), conteudo,
+    // Seletor abaixo do cabeçalho: entra e sai com a seção sem deslocar o menu
+    app.replaceChildren(cabecalho(secao, municipio), secao === 'ajuda' ? '' : seletor(indice, municipio, secao), conteudo,
       el('footer', {}, 'Trabalho acadêmico (PI-IV, UNIVESP). Previsões experimentais: não usar para decisões oficiais. ' +
         'Dados: InfoDengue e Open-Meteo.'));
     if (secao === 'ajuda') renderAjuda(conteudo);
     else {
       const [m, av] = await Promise.all([carregarMunicipio(municipio), carregarAvaliacao()]);
-      if (secao === 'indicadores') renderIndicadores(conteudo, m, indice, av);
+      if (secao === 'indicadores') renderIndicadores(conteudo, m, indice);
       else renderAvaliacao(conteudo, m, av);
     }
     conteudo.setAttribute('aria-busy', 'false');
