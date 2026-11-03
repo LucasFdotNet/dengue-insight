@@ -1,0 +1,5 @@
+# Cloudflare Pages: os dados mudam a cada atualização do pipeline; o resto do site tem nome com hash
+/dados/*
+  Cache-Control: public, max-age=300, must-revalidate
+/assets/*
+  Cache-Control: public, max-age=31536000, immutable

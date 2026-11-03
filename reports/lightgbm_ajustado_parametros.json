@@ -1,6 +1,6 @@
 {
   "parametros": {
-    "num_leaves": 63,
+    "num_leaves": 15,
     "min_child_samples": 100,
     "n_estimators": 400,
     "learning_rate": 0.05

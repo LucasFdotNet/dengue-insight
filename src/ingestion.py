@@ -6,6 +6,7 @@ from datetime import date
 from io import StringIO
 from src.cidades import CIDADES
 from src.http_utils import get_com_retentativas
+from src.snapshot import salvar_foto
 
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
 
@@ -51,6 +52,7 @@ def run_ingestion():
         logging.error(f"Falha em {len(falhas)} município(s): {', '.join(falhas)}. Rode a ingestão novamente.")
         sys.exit(1)
     logging.info(f"Ingestão concluída: {len(CIDADES)} municípios.")
+    salvar_foto('infodengue')
 
 
 if __name__ == "__main__":

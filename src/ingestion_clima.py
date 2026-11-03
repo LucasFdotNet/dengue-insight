@@ -26,6 +26,7 @@ import pandas as pd
 
 from src.cidades import CIDADES
 from src.http_utils import LimiteDiarioAtingido, get_com_retentativas
+from src.snapshot import salvar_foto
 
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
 
@@ -114,6 +115,7 @@ def run_ingestion_clima(completo=False):
         logging.info(f"Salvo: {filepath} ({len(df)} semanas, até {df['data_iniSE'].max():%d/%m/%Y})")
 
     logging.info(f"Ingestão de clima concluída: {len(CIDADES)} municípios.")
+    salvar_foto('clima')
 
 
 if __name__ == "__main__":

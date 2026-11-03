@@ -38,6 +38,13 @@ Este documento reconstrói, em ordem cronológica, as decisões técnicas tomada
 | 17 | Modelo contra o Rt | 27/09/2026 | O classificador supera a regra do Rt, a do `p_rt1` e um classificador treinado só com o Rt; o Rt segue fora dos modelos | [17](#s17) |
 | 18 | Clima no classificador | 27/09/2026 | Com o classificador, o clima de S-1 a S-4 melhora todos os horizontes (+0,006 a +0,010); entra no modelo de 4 semanas | [18](#s18) |
 | 19 | Modelos em produção e painel | 27/09/2026 | Classificador com clima para a tendência e quantis para os casos; painel com aviso, Indicadores e Detalhes do Modelo | [19](#s19) |
+| 20 | Dados atualizados, fotos e pipeline completo | 09–10/10/2026 (`4ba56f0` a `d906288`) | Guardar uma foto dos dados a cada coleta; medir quanto o InfoDengue revisa as semanas recentes; refazer todos os números com um comando retomável | [20](#s20) |
+| 21 | Outros modelos e regra de decisão | 09–10/10/2026 | XGBoost, Random Forest, MLP e LSTM, com o mesmo ajuste, não superam o LightGBM; o peso por classe é só outra regra de decisão; a pergunta do projeto é revista | [21](#s21) |
+| 22 | Da tendência aos níveis de incidência | 10/10/2026 | Prever o nível (verde, amarelo, vermelho) com 2 a 4 semanas pelos limiares do MEM e alertar a entrada no vermelho; canal endêmico, percentis e previsão de 1 semana descartados | [22](#s22) |
+| 23 | Painel estático | 11/10/2026 | Site estático com um JSON por município; o painel parte do último nível confirmado (atual - 2) e prevê a semana atual e as 4 seguintes | [23](#s23) |
+| 24 | Substituição dos municípios sem nowcast | 11/10/2026 | Os 12 municípios sem nowcast do InfoDengue foram trocados por municípios sorteados entre os elegíveis com nowcast, para que todos tenham o mesmo tratamento no painel | [24](#s24) |
+| 25 | Um modelo só para os casos e os níveis | 12/10/2026 | A chance de cada nível passa a sair da faixa de casos prevista (quantis com clima), lida nos limiares; o classificador de níveis sai do painel; casos, níveis e alerta deixam de se contradizer | [25](#s25) |
+| 26 | Limiares fixos do Ministério da Saúde x MEM | 12/10/2026 | Os limiares de 100 e 300 casos por 100 mil (acumulados em 4 semanas) foram testados com o modelo final; avisam menos epidemias e mais tarde que o MEM, que continua | [26](#s26) |
 
 Observação sobre as datas: o código herdado é de 21/09/2026 e quase todo o trabalho de revisão foi registrado em commits de 26/09/2026 (o último, que fixa versões do `scipy` e do `statsmodels`, é de 27/09/2026). A coluna de commits permite reconstruir a ordem exata com `git log --reverse`.
 
@@ -479,7 +486,7 @@ Em seguida, o clima foi testado de novo com a base nacional (temperatura média,
 * **Quais municípios:** em cada UF, entre os municípios com mais de 100 mil habitantes, os de **maior incidência média anual de dengue entre 2010 e 2025** (casos por 100 mil habitantes), a mais de 50 km de qualquer município já incluído.
 * **Por que municípios com surtos:** o modelo precisa aprender como as epidemias começam, atingem o pico e terminam, e esses eventos são raros na série de cada município.
 
-**Critério revisto antes da aplicação.** Uma proposta anterior (`temp/cidades_proposta.md`, marcada como substituída) usava o número de anos com incidência alta (300 ou mais casos por 100 mil habitantes, classificação do Ministério da Saúde), com desempate pelo pico e distância mínima de 25 km. Esse critério não diferenciava os candidatos, porque vários passam do limite todos os anos, e foi trocado pela incidência média anual, com distância mínima de 50 km.
+**Critério revisto antes da aplicação.** Uma proposta anterior (`temp/cidades_proposta.md`, marcada como substituída) usava o número de anos com 300 ou mais casos por 100 mil habitantes, com desempate pelo pico e distância mínima de 25 km. Esse critério não diferenciava os candidatos, porque vários passam do limite todos os anos, e foi trocado pela incidência média anual, com distância mínima de 50 km.
 
 **Viés de seleção.** **Viés de seleção** é a distorção que surge quando a forma de escolher a amostra a torna diferente da população que se quer representar. Escolher municípios pelo histórico de surtos faz o treino ter mais epidemias do que um município típico teria, e o modelo pode ficar mais propenso a prever subidas. Por isso:
 
@@ -854,3 +861,505 @@ Nos municípios com nowcast, a queda é real (baixa temporada). Nos sem nowcast,
 * **Resultado:** em Campinas, as previsões passaram de "subida" com cerca de 70 casos para "estável" com cerca de 150 casos, a partir de 23/08/2026.
 * **Limitação:** nesses municípios, algumas semanas previstas já passaram quando a previsão é exibida. A avaliação *walk-forward* não captura esse problema, porque usa os dados já revisados (avaliação pseudoprospectiva, seção 5).
 
+<a id="s20"></a>
+## 20. Dados atualizados, fotos dos dados e pipeline completo
+
+### Contexto
+
+Antes do relatório final, o grupo decidiu que todos os números citados devem ser calculados com os dados mais recentes. Os dados do InfoDengue, porém, mudam de uma coleta para outra: as semanas recentes são revisadas à medida que chegam notificações atrasadas (seção 2). Sem guardar o que foi baixado, não há como saber exatamente com quais dados um resultado foi calculado, nem medir essas revisões.
+
+### O que foi feito
+
+* **Fotos dos dados** (`src/snapshot.py`, commit `4ba56f0`): ao fim de cada ingestão, os arquivos baixados de casos e de clima são compactados em `data/snapshots/AAAA-MM-DD/`, com um manifesto que registra, por município, o número de semanas, a primeira e a última semana e o SHA-256 do arquivo. Antes da nova coleta, os dados em uso (baixados em 27/09/2026) foram guardados como a primeira foto; a nova coleta, de 09/10/2026, tem dados até a semana de 27/09/2026 (6,8 MB por foto).
+* **Revisão dos dados** (`src/revisao_dados.py`, `reports/revisao_dados.csv`): compara cada foto com a seguinte, somando os casos dos 115 municípios por semana.
+* **Pipeline completo** (`src/pipeline_completo.py`): refaz, na ordem, o pré-processamento, os modelos de produção, a análise exploratória, os experimentos, a revisão dos dados e os números do relatório. Registra cada passo concluído em `reports/pipeline_estado.json`, junto com a identificação dos dados processados (um SHA-256 dos arquivos de `data/processed/`), e retoma de onde parou. `scripts/rodar_pipeline.ps1` o roda em segundo plano no Windows, impedindo que o computador suspenda. A execução completa levou cerca de 6h30, das quais 3h40 no experimento de classificadores (seção 21).
+* **Números do relatório em script** (`src/numeros_relatorio.py`, `reports/relatorio/`): os cálculos avulsos que só imprimiam na tela (base de dados, casos por ano nos municípios em foco, correlação defasada com o clima, métricas do painel e tabela de comparação de modelos) passaram a gravar arquivos e a fazer parte do pipeline.
+
+### Resultados
+
+**Quanto os dados mudaram em 12 dias** (foto de 27/09/2026 contra a de 09/10/2026; soma dos 115 municípios; semanas contadas a partir da mais recente da primeira foto, 13/09/2026):
+
+| Semana | Casos estimados (com nowcast) | Casos notificados |
+|---|---|---|
+| Mais recente | +45% | +189% |
+| 1 antes | +18% | +37% |
+| 2 antes | +8% | +14% |
+| 3 antes | +5% | +8% |
+| 5 antes | +2% | +3% |
+| 8 ou mais antes | menos de 1% | cerca de 1% ou menos |
+| Mais de 1 ano antes | nenhuma semana mudou | nenhuma semana mudou |
+
+* As revisões se concentram nas semanas mais recentes e ficam abaixo de 1% a partir de 8 semanas: o corte de 10 semanas (seção 2) cobre o período em que os números ainda mudam. Isso responde, com dados, à limitação registrada na seção 2 ("o critério não mede o quanto os números mudam depois").
+* O nowcast corrige boa parte do atraso (os notificados subiram 189% na última semana; os estimados, 45%), mas ainda subestima a semana mais recente.
+
+**Efeito dos dados novos nos resultados.** Os dados novos acrescentam cerca de 2 semanas por município, e as 10 mais recentes ficam fora da avaliação; por isso, os números mudaram pouco. O acerto balanceado, as subidas detectadas e os alarmes corretos variaram no máximo 0,002 em todos os experimentos refeitos; o ajuste do LightGBM escolheu os mesmos hiperparâmetros. Duas afirmações do README foram ajustadas: no teste do clima no classificador (seção 18), o ganho nos 15 municípios de validação passou a ser significativo só em 2 semanas (em 1 semana, o limite inferior do intervalo ficou em −0,0002; antes, +0,0013); e, na comparação com o Rt (seção 17), a regra do `p_rt1` empata com o nosso modelo em 1 semana nos municípios de validação (o que já acontecia antes).
+
+### Correção: experimentos históricos fora do pipeline
+
+A primeira versão do pipeline incluía `experimento_variaveis.py` e `experimento_clima_semanal.py`. Esses experimentos foram feitos com bases anteriores (os 13 municípios de SP e a base de 63 municípios, seções 9, 10 e 12) e, rodados com a base atual, viram outro experimento e sobrescrevem os resultados citados nesta história. Os dois foram retirados do pipeline e seus arquivos em `reports/` foram mantidos como estavam.
+
+### Limitações
+
+* A revisão dos dados vem de uma única comparação, de 12 dias. Cada nova coleta acrescenta uma comparação a `reports/revisao_dados.csv`.
+* As fotos guardam os dados como foram baixados a partir de 27/09/2026; não há como recuperar versões anteriores (o InfoDengue não guarda o histórico de revisões), então a avaliação continua pseudoprospectiva (seção 5).
+
+<a id="s21"></a>
+## 21. Outros modelos e regra de decisão
+
+> **Números desta seção:** calculados com a lista de municípios anterior à troca da seção 24 (12 dos 115 municípios mudaram). As conclusões se mantiveram; os números atuais estão na decisão 15 do README.
+
+### Contexto e pergunta
+
+Com os modelos em produção definidos (seção 19), o grupo quis testar se modelos de outros tipos dariam resultados melhores: Random Forest, XGBoost e, se fizesse sentido, redes neurais. A comparação também serve para mostrar no relatório que outras hipóteses foram testadas.
+
+### O que foi testado
+
+(`src/experimento_classificadores.py`; um arquivo por modelo em `src/modelos/`.) Todos os modelos recebem as mesmas informações do classificador em produção (casos recentes e clima de S-1 a S-4) e são avaliados como na seção 16: validação cruzada por município, validação final nos 15 municípios, walk-forward de 2019 em diante com retreino trimestral, intervalos de confiança por bootstrap sobre municípios.
+
+| Modelo | Por que entrou |
+|---|---|
+| XGBoost | Outro boosting de árvores: o resultado depende da biblioteca? |
+| Random Forest | Árvores independentes combinadas por votação (*bagging*), que costumam sobreajustar menos |
+| MLP | Rede neural com as mesmas variáveis, padronizadas |
+| LSTM | Rede neural que lê a sequência das últimas 12 semanas de casos e clima e aprende sozinha quais defasagens importam; uma rede prevê os 4 horizontes |
+| LightGBM com janela de 12 semanas | A mesma informação que a LSTM recebe, para separar o efeito do modelo do efeito de olhar mais longe |
+| LightGBM com peso igual para as três tendências | Como a métrica principal é o acerto balanceado, testa se dar o mesmo peso às subidas e quedas, mais raras, ajuda |
+
+* **Ajuste de hiperparâmetros com o mesmo orçamento para todos:** a configuração padrão de cada modelo e mais 8 alternativas (por exemplo, tamanho e número de árvores; tamanho da rede, regularização e taxa de aprendizado), escolhidas pelo acerto balanceado médio na validação cruzada de 2015 a 2018, com retreino anual. A comparação usa a configuração escolhida de cada modelo; o classificador em produção entra também com a configuração padrão, como está no painel.
+* **Redes neurais com 3 sementes**, porque o resultado delas varia de um treino para outro; a variação entre sementes ficou entre 0,001 e 0,007 no acerto balanceado.
+* **Métricas novas:** log loss e Brier, que avaliam as probabilidades e não dependem da regra de decisão; e o recorte de 2022 em diante (pós-pandemia), como análise de sensibilidade.
+* **Execução:** cerca de 3h40 com 8 treinos em paralelo, retomável (cada treino grava suas previsões em `reports/cache/`).
+
+### Resultados
+
+Validação cruzada, 2019 em diante, acerto balanceado (* = diferença significativa em relação ao modelo em produção):
+
+| Modelo | 1 sem. | 2 sem. | 3 sem. | 4 sem. | Log loss, 4 sem. |
+|---|---|---|---|---|---|
+| **Em produção (padrão)** | **0,430** | **0,560** | **0,611** | **0,633** | **0,780** |
+| LightGBM ajustado | 0,429 | 0,561 | 0,611 | 0,635 | 0,777 |
+| LightGBM, janela de 12 semanas | 0,433 | 0,565* | 0,615* | 0,635 | 0,773 |
+| XGBoost | 0,427 | 0,562 | 0,612 | 0,634 | 0,779 |
+| Random Forest | 0,418* | 0,554* | 0,607* | 0,631 | 0,781 |
+| MLP | 0,419* | 0,554* | 0,611 | 0,632 | 0,790 |
+| LSTM | 0,419* | 0,557 | 0,609 | 0,630 | 0,790 |
+| LightGBM, peso igual por tendência | 0,581* | 0,610* | 0,628* | 0,638 | 0,829 |
+
+* **O modelo não é o limite.** Os sete modelos ficam a menos de 1,2 ponto uns dos outros na regra normal; nos 15 municípios de validação e de 2022 em diante, o quadro se repete. As redes neurais, inclusive a LSTM, que vê a sequência inteira, não superam o LightGBM, o que é comum em dados tabulares com poucas variáveis.
+* **O ajuste não ajudou:** no período de ajuste, o LightGBM foi de 0,554 (padrão) para 0,557 (ajustado); na comparação, empatou. Só o Random Forest ganhou com o ajuste (de 0,524 para 0,545), porque a configuração padrão era ruim.
+
+### O peso por classe é uma regra de decisão
+
+O peso igual por tendência parecia o único ganho relevante (de 0,430 para 0,581 em 1 semana). A hipótese era que ele não melhora o modelo, só desloca o ponto de corte: em vez de escolher a tendência mais provável, passa a favorecer as raras. Para testar, as probabilidades salvas do modelo em produção foram transformadas com a **decisão balanceada**: cada probabilidade dividida pela frequência daquela tendência no treino, antes de escolher a maior. Não é preciso treinar de novo.
+
+| Validação cruzada, 2019+ | Acerto balanceado | Acerto | Subidas detectadas | Alarmes de subida corretos | Sentido oposto | Log loss |
+|---|---|---|---|---|---|---|
+| 1 sem., em produção | 0,430 | 66% | 18% | 50% | 2% | 0,738 |
+| 1 sem., + decisão balanceada | 0,580 | 49% | 63% | 35% | 8% | 0,738 |
+| 1 sem., peso por tendência | 0,581 | 48% | 64% | 35% | 9% | 0,957 |
+| 4 sem., em produção | 0,633 | 64% | 57% | 58% | 8% | 0,780 |
+| 4 sem., + decisão balanceada | 0,640 | 61% | 69% | 52% | 11% | 0,780 |
+| 4 sem., peso por tendência | 0,638 | 61% | 69% | 52% | 11% | 0,829 |
+
+A decisão balanceada reproduz o peso por tendência, com probabilidades melhores. Com ela, os sete modelos também ficam empatados (de 0,570 a 0,585 em 1 semana). Nos 15 municípios de validação, ela piora 3 e 4 semanas (0,590 contra 0,616 em 4 semanas, significativo).
+
+### A sensibilidade do alarme
+
+A decisão balanceada levou a uma discussão sobre quanto o painel deve exigir para avisar "subida". Com as probabilidades de 2015 a 2018 do modelo em produção:
+
+* **A troca é contínua.** Avisando quando a chance de subida passa de 25%, o painel detectaria 50% das subidas de 1 semana, com 33% de alarmes corretos e alarme em 24 de cada 100 semanas; em 4 semanas, 71% das subidas com 44% de alarmes corretos.
+* **"Primeiro detectar o máximo de subidas" precisa de uma meta,** senão o ótimo é avisar sempre. O grupo propôs o critério de credibilidade "alarmes corretos pelo menos o dobro dos falsos". **Ele é praticamente inatingível:** em 1 semana, nenhum corte chega a 2 para 1; em 2 a 4 semanas, só com cortes perto de 75%, que avisam de 2% a 8% das subidas. Com 1 alarme correto para cada falso, o resultado fica perto da regra atual (de 9% das subidas em 1 semana a 53% em 4 semanas).
+* **Níveis de aviso graduam bem o risco.** Com "alerta" (corte com 1 correto para cada falso) e "atenção" (chance de subida acima do normal), os casos subiram depois de 50% dos alertas, 27% a 31% das atenções e só 7% a 11% das semanas sem sinalização; juntos, alerta e atenção capturaram cerca de 72% das subidas em todos os horizontes. Depois de um alerta, os casos caíram em 12% a 16% das vezes.
+
+### Ruído numérico
+
+Na primeira execução, o modelo em produção teve 0,426 de acerto balanceado em 1 semana, contra 0,430 no experimento da seção 18, com os mesmos dados. A causa: a janela de 12 semanas recalculava as variações de casos (`var_log_1` a `var_log_4`), e o recálculo diferia do valor do pré-processamento só no último dígito (cerca de 10⁻¹⁵); isso basta para o LightGBM escolher alguns cortes diferentes. O número de threads e a ordem das linhas não mudam o resultado. A janela passou a reaproveitar os valores do pré-processamento (commit `1ea513f`), o experimento foi refeito, e os dois experimentos passaram a dar previsões idênticas. **Lição:** diferenças de até cerca de 0,004 no acerto balanceado de 1 semana podem vir só de instabilidade numérica e não devem ser interpretadas.
+
+### Decisão e consequência
+
+* Manter o LightGBM classificador com clima, com a configuração padrão.
+* A discussão sobre os alarmes mostrou um problema de fundo na pergunta. A tendência relativa (subida de mais de 20% e 5 casos) trata igual ir de 5 para 8 casos e de 500 para 800; não indica que uma epidemia em platô exige manter equipes mobilizadas; e não distingue a queda depois do pico (desmobilizar) da queda em período normal (nada a fazer). O gestor decide pelo **nível** em que os casos vão estar. Isso levou à reformulação da seção 22.
+
+### Limitações
+
+* As redes neurais tiveram o mesmo orçamento de ajuste dos outros modelos (9 configurações); um ajuste mais extenso poderia melhorá-las um pouco, mas dificilmente o bastante para superar o empate, dado o tamanho das diferenças.
+* Os hiperparâmetros com a decisão balanceada são os escolhidos com a regra normal.
+* A análise da sensibilidade do alarme usou o período de ajuste (2015–2018).
+
+<a id="s22"></a>
+## 22. Da tendência aos níveis de incidência
+
+> **Números desta seção:** calculados com a lista de municípios anterior à troca da seção 24 (12 dos 115 municípios mudaram). As conclusões se mantiveram; os números atuais estão na decisão 16 do README.
+
+### Contexto
+
+A discussão sobre a sensibilidade do alarme (seção 21) levou o grupo a reformular o objetivo do painel: permitir que gestores de saúde se antecipem, **mobilizando** recursos (ações contra criadouros, equipes de atendimento) quando houver expectativa de epidemia, **mantendo-os** enquanto ela durar e **desmobilizando-os** quando ela terminar. Detectar a subida importa para agir a tempo; evitar alarmes falsos importa porque a mobilização tem custo e, com alarmes demais, os gestores deixam de prestar atenção. A queda só importa quando há mobilização em curso. Com isso, a pergunta deixou de ser "os casos vão subir 20%?" e passou a ser "em que **nível** o município estará nas próximas semanas?".
+
+### Etapa 1: dois estados (normal e alto)
+
+(`src/estados.py`, `src/modelos/estado_lightgbm.py`, `src/experimento_estados.py`; resultados em `reports/estados_*.csv`.)
+
+* **Estado alto:** casos da semana acima do percentil 90 das semanas dos anos anteriores do próprio município, com mínimo de 10 casos; o limiar é recalculado a cada ano só com o passado. Como validação externa, 88% das semanas altas estão no nível epidêmico do InfoDengue (`nivel_inc = 2`), que não entra nos modelos. Os estados são persistentes: 74% das semanas altas continuam altas 4 semanas depois.
+* **Modelo:** o LightGBM do classificador de tendência, com a distância da semana atual ao limiar, prevê a probabilidade de estado alto em S+1 a S+4. Entre as semanas normais, a AUC para a entrada no estado alto foi de 0,92 a 0,96.
+* **Avaliação por episódio** (Buehler et al., 2004), e não por semana, porque a persistência acerta quase tudo semana a semana e nunca antecipa nada: epidemias avisadas nas 4 semanas antes do início, antecedência, alarmes corretos e alarmes falsos por município por ano.
+* **Alerta e atenção:** o alerta acende quando a maior probabilidade de estado alto em S+1 a S+4 passa de um corte com pelo menos 1 alarme correto para cada falso no passado; a atenção, quando a probabilidade passa da frequência normal de entrada. Os cortes são escolhidos a cada trimestre só com as previsões anteriores. **Correção:** na primeira versão, o corte do alerta era escolhido por semana, e a avaliação era por alarme (uma sequência de semanas com aviso); os alarmes corretos ficaram em 39%, e não nos 50% pretendidos. O corte passou a ser escolhido pelo mesmo critério da avaliação. Os cortes ficaram estáveis desde 2019 (alerta perto de 50% de probabilidade, atenção de 5% a 7%).
+
+| Validação cruzada, 2019+ (502 epidemias) | Avisadas | Antecedência (mediana) | Alarmes corretos | Falsos por município por ano |
+|---|---|---|---|---|
+| Persistência | 0% | — | — | 0 |
+| Regra simples (casos subindo há 2 semanas e acima de metade do limiar) | 65% | 2 semanas | 36% | 0,80 |
+| Alerta do InfoDengue, laranja ou vermelho (só comparação) | 50% | 3 semanas | 27% | 0,96 |
+| **Modelo: alerta** | **67%** | **2 semanas** | **52%** | **0,47** |
+| Modelo: atenção ou alerta | 99% | 4 semanas | 27% | 1,9 |
+
+Nos 15 municípios de validação, o alerta avisou 70% das epidemias, com 60% de alarmes corretos e 0,38 alarme falso por ano. Desmobilização: em 77% dos fins de epidemia (80% na validação), a probabilidade de estado alto 2 semanas à frente caiu abaixo de 50% nas 2 semanas anteriores ao retorno ao normal. Com o percentil 80, o alerta avisou só 54% das epidemias.
+
+### Etapa 2: três níveis e o gráfico de quadradinhos
+
+O grupo propôs três níveis, para separar "alta que merece atenção" de epidemia, e um gráfico de quadradinhos para ver, semana a semana, o que aconteceu, o que foi previsto com 1 a 4 semanas de antecedência e se o alerta acertou (`src/experimento_niveis.py`, figuras em `reports/figures/niveis/`, fora do git). Nos quadradinhos, cada coluna é uma semana; na linha "Previsto x semanas antes", o quadrado mostra o que foi previsto x semanas antes para aquela semana; o alerta aparece na semana em que foi emitido.
+
+* **Magnitude e confiança separadas:** a cor de cada quadrado é sempre o nível (magnitude); a confiança aparece no alerta. Usar as mesmas cores para "atenção" (confiança) e "amarelo" (magnitude) confundia as duas coisas.
+* **Nível previsto = o mais provável.** A primeira versão escolhia o vermelho sempre que a probabilidade passava de um corte com metade das previsões confirmadas; semana a semana, isso previa vermelho demais e perdia para a persistência (76% contra 88% de acerto em 1 semana). Com o nível mais provável, o modelo empata ou supera a persistência e acerta de 28% a 48% das mudanças de nível; a antecipação das epidemias fica com o alerta.
+* **Previsão de 1 semana:** é quase uma cópia do nível atual deslocada uma semana (ganho de 0,3 a 0,7 ponto sobre a persistência, contra cerca de 3 pontos com 4 semanas).
+* **Duas definições por percentis:** A (amarelo a partir do percentil 75, vermelho a partir do 90) e B (amarelo do 80 ao 97, vermelho a partir do 97). Para seguir uma referência da literatura, o grupo pediu que os limiares viessem de um método publicado.
+
+### Etapa 3: canal endêmico do Ministério da Saúde (definição C)
+
+O Plano de Contingência Nacional para Dengue, Chikungunya e Zika (Ministério da Saúde, 2025, seção 5) define o diagrama de controle: para cada semana epidemiológica, a mediana e os quartis dos casos da mesma semana nos últimos 5 anos; os estágios de mobilização (acima da mediana e abaixo do Q3 por 4 semanas), alerta (acima do Q3 por 4 semanas) e desmobilização. Como o plano não define exclusão de anos epidêmicos, método de quartil, contagem ou taxa e tratamento de semanas zeradas, essas escolhas foram registradas em `src/estados.py` (sem exclusão de anos, quartil linear, contagem, mínimos de 5 e 10 casos).
+
+* **Resultado:** com o aumento da dengue de 2022 a 2025, a maior parte das semanas ficou acima do Q3 (60% em 2023, 69% em 2024, 46% em 2025, nos 115 municípios); Campinas e Blumenau ficaram vermelhos por quase 2 anos seguidos, inclusive no inverno (em Campinas, em julho de 2025, cerca de 400 casos por semana contra um Q3 de 300). O modelo superou a persistência por só 1 ponto, acertou 22% das mudanças de nível, e o alerta avisou 3% das epidemias.
+* **Leitura:** o canal mede "acima do esperado para esta época, em relação aos últimos anos", o que serve para acompanhar a temporada, mas é sensível a mudanças de patamar; a regra das 4 semanas não resolveria, porque os vermelhos duraram anos. Não serve para decidir quando mobilizar.
+
+### Etapa 4: MEM (definição D)
+
+O InfoDengue calcula os seus limiares pelo MEM (*Moving Epidemic Method*; Vega et al., 2013 e 2015), e o próprio Plano de Contingência os cita como apoio (pp. 23 e 90). O código do InfoDengue (AlertTools) e o do pacote R `mem` são públicos, e a reimplementação em Python ficou pequena (`src/mem.py`, cerca de 150 linhas):
+
+1. temporadas da semana 41 à 40 do ano seguinte, até as 10 mais recentes;
+2. em cada temporada, a curva MAP (a maior porcentagem dos casos concentrada em r semanas seguidas, para cada r), suavizada por regressão local linear; o período epidêmico tem a última duração antes de a inclinação da curva cair abaixo de 2,8 pontos;
+3. limiar pré-epidêmico: limite superior do intervalo de confiança unilateral de 95% da média geométrica das semanas anteriores aos períodos epidêmicos; limiar epidêmico: o mesmo, para as semanas dos períodos epidêmicos;
+4. segundo passe, como o InfoDengue: sem as temporadas cujo pico não passou do limiar pré-epidêmico; mínimos de 5 e 10 casos.
+
+* **Validação:** com os dados de 2010 a 2022, os limiares do projeto têm correlação de 0,996 (pré-epidêmico) e 0,992 (epidêmico) com os publicados pelo InfoDengue para os 115 municípios (`parameters/mem/mem_mun_2010_2022_BR.csv`), e ficam em média 5% abaixo, provavelmente pela revisão dos dados desde então.
+* **Uso:** limiares recalculados a cada temporada só com as anteriores, sobre a incidência por 100 mil habitantes (Censo 2022). De 2015 em diante, 42% das semanas ficam verdes, 42% amarelas e 16% vermelhas, com cerca de 0,6 epidemia por município por ano. Em Campinas, o amarelo começa perto de 130 casos por semana e o vermelho perto de 1.000.
+
+### Etapa 5: sem a previsão de 1 semana e triângulos por antecedência
+
+* **Sem a previsão de 1 semana.** Ela é quase uma cópia do nível atual (etapa 2) e dá pouco tempo para mobilizar; o nível atual já informa o gestor sobre a semana corrente. Os níveis passaram a ser previstos com 2, 3 e 4 semanas, e o alerta passou a usar a maior probabilidade de vermelho em S+2 a S+4. Na definição D (validação cruzada), o alerta ficou praticamente igual: 74% das epidemias avisadas, 52% de alarmes corretos e 0,49 alarme falso por município por ano, contra 74%, 52% e 0,50 com a de 1 semana; a antecedência mediana passou de 2 para 3 semanas. O modelo de tendência e o painel atual continuam com 1 a 4 semanas.
+* **Triângulos por antecedência.** Na primeira versão dos quadradinhos, o alerta tinha uma linha própria, na semana em que foi emitido, e não dava para saber qual antecedência o tinha acendido. Agora o triângulo fica na linha "Previsto x sem. antes", na coluna da semana prevista, quando a probabilidade de vermelho daquela previsão passou do corte do alerta (a partir de uma semana que não era vermelha): cheio se a semana foi vermelha, vazado se não foi. Um triângulo vazado logo antes de uma epidemia é um alerta adiantado: na avaliação por episódio, ele conta como correto se o vermelho começa até 4 semanas depois do alarme. **Depois retirados:** com um divisor igual entre as semanas e as linhas alinhadas pela semana prevista, o acerto e o erro se veem pela cor, comparando cada quadrado com o da linha "Aconteceu"; os triângulos e as marcas de erro (• e ×) saíram do gráfico. O desempenho do alerta por antecedência continua na tabela abaixo.
+* **Alertas por antecedência** (`reports/niveis_alertas_antecedencia.csv`; definição D, validação cruzada, 2019 em diante):
+
+  | Antecedência | Semanas com alerta | Veio vermelho | Veio amarelo | Veio verde |
+  |---|---|---|---|---|
+  | 2 semanas | 731 | 54% | 44% | 1% |
+  | 3 semanas | 1.071 | 53% | 46% | 1% |
+  | 4 semanas | 1.355 | 55% | 43% | 2% |
+
+  A precisão é a mesma nas três antecedências; a de 4 semanas acende mais vezes. Quando o alerta erra, a semana prevista quase sempre está no amarelo, e não no normal. Nos 15 municípios de validação, de 58% a 59% das semanas previstas foram vermelhas.
+
+### Etapa 6: desmobilização, dados atrasados e intervalos de confiança
+
+(`src/experimento_niveis_robustez.py`; resultados em `reports/niveis_robustez.csv`; definição D.)
+
+Três pontos ficaram em aberto antes do relatório: a desmobilização só tinha sido avaliada com dois estados; o alerta tinha sido medido com dados já revisados; e as métricas dos níveis não tinham intervalo de confiança, ao contrário das demais.
+
+* **Desmobilização.** O fim é indicado quando o nível mais provável em S+2 deixa de ser vermelho, numa semana em que o município está no vermelho; conta se a indicação vier nas 2 últimas semanas da epidemia. Comparação: regra de queda (casos caindo há 2 semanas).
+* **Atraso dos dados.** Pela revisão dos dados entre as duas fotos (seção 20), a última semana ainda sobe 45% em 12 dias, a de 2 semanas antes, 8%, e a de 4 semanas antes, 3%. Como na seção sobre atraso (decisão 12), a simulação descarta as últimas semanas: na semana X, o último dado usado é o de X-2 (cenário realista) ou X-4 (pior caso), inclusive para saber o nível atual; a previsão para X+H vem do modelo de H+2 ou H+4 semanas, treinado para isso (antecedências de 5 a 8 semanas, só na definição D). **Correção:** na primeira rodada, o alerta com atraso nunca acendia. Um alarme emitido logo depois de o vermelho começar contava como falso ("o episódio começou antes do alarme"), embora o gestor ainda não pudesse vê-lo nos dados; nenhum corte chegava a 1 alarme correto para cada falso. O critério passou a aceitar o episódio que começou nas semanas que os dados ainda não mostravam, e a avaliação mede a antecipação de duas formas: antes do início e antes de os dados mostrarem o início (ou o fim).
+* **Intervalos de confiança.** Bootstrap sobre municípios (2.000 reamostragens), como nas outras seções, com a diferença pareada para a regra simples.
+
+| Validação cruzada (100 municípios) | Sem atraso | Atraso de 2 semanas | Atraso de 4 semanas |
+|---|---|---|---|
+| Alerta: epidemias avisadas antes de começar | 74% (69% a 79%) | 57% (52% a 62%) | 40% (36% a 45%) |
+| Regra simples: epidemias avisadas antes de começar | 68% | 36% | 22% |
+| Alerta: avisadas antes de os dados mostrarem o início | 74% | 80% (76% a 84%) | 76% (72% a 81%) |
+| Alerta: alarmes corretos | 52% (49% a 56%) | 52% (49% a 56%) | 54% (51% a 57%) |
+| Alerta: alarmes falsos por município por ano | 0,49 (0,44 a 0,55) | 0,60 (0,54 a 0,66) | 0,59 (0,53 a 0,65) |
+| Desmobilização: fins indicados nas 2 semanas antes | 79% (75% a 83%) | 72% (67% a 76%) | 69% (64% a 74%) |
+| Regra de queda: fins indicados nas 2 semanas antes | 54% | 47% | 41% |
+| Desmobilização: indicados antes de os dados mostrarem o fim | 79% | 90% (87% a 93%) | 94% (92% a 96%) |
+| Desmobilização: avisos prematuros por epidemia (regra de queda) | 1,0 (3,1) | 1,4 (2,4) | 1,8 (1,8) |
+| Nível com 4 semanas: modelo / persistência | 79% / 76% | 75% / 70% | 71% / 65% |
+| Nível com 4 semanas: ganho sobre a persistência | +3,4 (2,6 a 4,1) | +4,6 (3,8 a 5,4) | +5,7 (4,6 a 6,8) |
+
+Nos 15 municípios de validação: sem atraso, 71% das epidemias avisadas (58% a 84%), 54% de alarmes corretos e 81% dos fins indicados; com atraso de 2 e 4 semanas, 62% e 57% das epidemias avisadas antes de começar (regra simples: 49% e 25%), com 56% e 61% de alarmes corretos.
+
+* **Leitura.** O atraso tira antecedência de todos os métodos, mas o modelo perde menos: a sua vantagem sobre a regra simples e sobre a persistência cresce com o atraso, porque ele antecipa o que os dados ainda não mostram. A credibilidade do alerta se mantém (cerca de 1 alarme correto para cada falso), com um pouco mais de alarmes falsos. Na desmobilização, o modelo indica 79% dos fins, contra 54% da regra de queda, com um terço dos avisos prematuros; com atraso de 4 semanas, a regra passa a ter tantos avisos prematuros quanto o modelo, mas indica bem menos fins.
+* **Consequência para o painel.** O nível "atual" que o painel mostra, calculado com as semanas mais recentes, é incerto; com 2 semanas de atraso, o nível conhecido acerta o nível de 4 semanas depois em 70% das vezes, contra 75% do modelo. A decisão sobre usar ou não as semanas mais recentes no painel fica para a reformulação do painel.
+
+### Comparação das definições
+
+Validação cruzada, 2019 em diante; alerta de entrada no vermelho:
+
+| | A (percentis 75/90) | B (percentis 80/97) | C (canal endêmico) | **D (MEM)** |
+|---|---|---|---|---|
+| Semanas vermelhas (2015+) | 16% | 7% | 36% | 16% |
+| Ganho sobre a persistência, 4 semanas | +3,1 pontos | +2,9 | +1,0 | +3,3 |
+| Mudanças de nível acertadas, 4 semanas | 44% | 48% | 22% | 41% |
+| Alerta: epidemias avisadas | 66% | 84% | 4% | **74%** |
+| Alerta: antecedência (mediana) | 2 semanas | 3 semanas | 2 semanas | 3 semanas |
+| Alerta: alarmes corretos | 52% | 51% | 48% | 52% |
+| Alerta: falsos por município por ano | 0,46 | 0,32 | 0,06 | 0,49 |
+
+Números de 10/10/2026, antes da substituição dos 12 municípios sem nowcast (seção 24). Com a base atual, o canal endêmico fica com 37% de semanas vermelhas (2015 em diante); as demais linhas não foram recalculadas.
+
+Os números do alerta já são os da versão sem a previsão de 1 semana (etapa 5). Na definição D, nos 15 municípios de validação, o alerta avisou 71% das epidemias, com 3 semanas de antecedência, 54% de alarmes corretos e 0,46 alarme falso por ano; a regra simples avisou 71%, com 37% de alarmes corretos e 0,90 falso por ano. Nos quadradinhos, as epidemias de 2024 e de 2025 em Campinas e em Sorocaba (validação) foram avisadas de 2 a 3 semanas antes.
+
+### Decisão
+
+* Níveis pelo **MEM** (definição D): método publicado, usado pelo InfoDengue e citado pelo Ministério da Saúde, reimplementado e validado pelo projeto, com desempenho próximo ao das melhores alternativas e vermelho equivalente ao nível epidêmico usado na vigilância.
+* Percentis (A e B) e canal endêmico (C) ficam registrados como alternativas descartadas, com os motivos na decisão 16 do README.
+
+### Limitações
+
+* Avaliação pseudoprospectiva, como as anteriores (seção 5).
+* O atraso dos dados é simulado descartando as semanas recentes (etapa 6); não há fotos dos dados de cada semana do passado para reproduzir o que se via em tempo real.
+* O ganho semana a semana sobre a persistência é pequeno (cerca de 3 pontos com 4 semanas); o valor do modelo está nas mudanças de nível e no alerta.
+* **Municípios onde a dengue chegou ou mudou de patamar.** Nos quadradinhos, Blumenau aparece vermelha quase todo o período de 07/2023 a 07/2025. A cidade quase não tinha dengue até 2020 (picos de até 22 casos por semana) e teve 75 mil casos na temporada de 2023, com 360 mil habitantes; o limiar epidêmico, calculado com até 10 temporadas quase sem casos, ficou entre 10 e 69 casos por semana até 2024 e só subiu para 209 em 2025, quando a cidade passou ao amarelo. Nos 115 municípios, de 2015 em diante, 8 ficaram um ano ou mais seguidos no vermelho:
+
+  | Grupo | Municípios | Mais longo no vermelho |
+  |---|---|---|
+  | Chegada da dengue em Santa Catarina | Blumenau, Florianópolis, Joinville | 2,7 a 3,5 anos |
+  | De 5 a 10 vezes mais casos que o histórico | Macapá, Altamira, Cosmópolis, Rio das Ostras | 1,3 a 1,8 ano |
+  | Temporada de fato longa (limiar estável) | Sinop | 1,2 ano |
+
+  Outros 46 municípios tiveram episódios de 26 a 51 semanas, o que corresponde a uma temporada epidêmica normal. No Rio Grande do Sul, onde a dengue também chegou (Porto Alegre, Santa Maria, Santa Cruz do Sul, Erechim), o inverno interrompe a transmissão, e os episódios duram no máximo 40 semanas. O comportamento é o esperado de qualquer limiar baseado no histórico do município e se corrige em 1 a 4 temporadas. Alternativas consideradas: usar menos temporadas no MEM (ajuste mais rápido, mas foge da configuração do InfoDengue e deixa os limiares menos estáveis) e uma mensagem de "transmissão sustentada" no painel quando o vermelho dura mais de uma temporada. **Decisão:** registrar como limitação, sem mudar o método, e levar a mensagem de transmissão sustentada para a discussão do painel.
+
+### Como reproduzir
+
+```bash
+python -m src.experimento_estados   # dois estados; reports/estados_*.csv
+python -m src.experimento_niveis    # três níveis, definições A a D; reports/niveis_*.csv e quadradinhos
+python -m src.experimento_niveis_robustez   # desmobilização, atraso dos dados e IC; reports/niveis_robustez.csv
+python -m src.mem <arquivo mem_mun_2010_2022_BR.csv do InfoDengue>   # validação do MEM
+```
+
+<a id="s23"></a>
+## 23. Painel estático
+
+> **Números desta seção:** calculados com a lista de municípios anterior à troca da seção 24 (12 dos 115 municípios mudaram). As conclusões se mantiveram; os números atuais estão na decisão 17 do README.
+
+### Contexto
+
+Com os níveis e o alerta definidos (seção 22), o grupo decidiu refazer o painel: sem depender do Streamlit, como um site 100% estático publicado no Cloudflare Pages, com um arquivo de dados por município carregado só quando ele é escolhido, e com três seções: **Indicadores** (para o gestor), **Avaliação** (para avaliar o modelo, o que pouco importa ao gestor) e **Ajuda** (documentação, a completar depois das definições restantes).
+
+### Decisões
+
+* **Último nível confirmado.** A etapa 6 da seção 22 mostrou que o nível "atual", calculado com as semanas mais recentes, é a informação menos confiável. O painel parte da semana atual menos 2 (cenário de 2 semanas de atraso, já avaliado) e mostra as duas semanas incompletas à parte, num card "Casos notificados até o momento", com a estimativa do InfoDengue (*nowcast*) e o aviso de que o número provavelmente está subnotificado (pela revisão dos dados, os notificados da última semana chegaram a quase triplicar em 12 dias).
+* **Próximas semanas:** nível mais provável, chance de nível epidêmico e casos aproximados da semana atual e das 4 seguintes (2 a 6 semanas à frente da semana confirmada); alerta de entrada no vermelho e sinal de fim, com o corte calibrado com 2 semanas de atraso; limiares do MEM em número de casos por semana.
+* **Casos aproximados avaliados no mesmo modo** (`src/experimento_casos_atraso.py`): o teste de atraso da decisão 12 usou o modelo de regressão, sem a faixa de 80%; o novo teste usa o modelo de quantis, com walk-forward trimestral e validação cruzada por município, como os níveis. O modelo erra de 25% a 31% menos que repetir os casos confirmados, e a faixa de 80% contém o real em 78% a 82% das semanas (tabela na decisão 17 do README).
+* **Confiança junto do alerta.** Mesmo com a avaliação numa seção separada, o card do alerta diz quanto confiar nele, com os números da avaliação lidos do arquivo exportado.
+* **Tecnologia:** TypeScript, Vite e Observable Plot; os gráficos seguem a paleta de status (verde, amarelo, vermelho, sempre com ícone e texto) e têm modo escuro.
+
+### Como reproduzir
+
+```bash
+python -m src.experimento_casos_atraso
+python -m src.exportar_painel
+cd web && npm install && npm run dev
+```
+
+<a id="s24"></a>
+## 24. Substituição dos municípios sem nowcast
+
+### Contexto
+
+Ao remover o painel em Streamlit, apareceu um cuidado que ele tinha e o painel estático não: nos municípios em que o InfoDengue não publica o *nowcast*, as semanas recentes têm só os casos já notificados, e a antepenúltima semana, que o painel estático usa como "confirmada", ainda está incompleta. O painel anterior partia, nesses municípios, da 4ª semana mais recente. Em 10/2026, eram 12 municípios (eram 39 em 09/2026; o InfoDengue passou a publicar o nowcast para mais municípios), todos de treino.
+
+### Alternativas
+
+* **Tratamento diferente (adotado e depois descartado):** partir da semana atual menos 3 nesses municípios, com o alerta calibrado e a avaliação feita com 3 semanas de atraso. Com 3 semanas de atraso, o alerta avisava 49% das epidemias antes de começarem (contra 57% com 2 semanas) e 77% antes de os dados mostrarem o início. Funcionava, mas criava dois tipos de município no painel e na avaliação.
+* **Substituir os municípios (decisão):** para que todos tenham o mesmo tratamento. Como os critérios originais por tamanho e por histórico de surtos escolhiam entre candidatos praticamente equivalentes, os substitutos foram sorteados entre os elegíveis da mesma UF (ou da macrorregião, quando a UF não tinha elegível), com o nowcast como exigência a mais.
+
+### Resultado
+
+Lista, critérios e consequências na decisão 1 do README (etapa 4); elegíveis de cada vaga em `reports/substituicao_municipios.csv`. A troca mudou os dados de 12 dos 115 municípios, então o pipeline completo foi refeito em 11/10/2026, e todos os números do README foram atualizados. As seções anteriores desta história ficam como registro do que foi visto em cada etapa, com a lista de municípios da época.
+
+As conclusões não mudaram. Os números mudaram pouco, a maioria em menos de 1 ponto. Os principais:
+
+| | Antes da troca | Depois da troca |
+|---|---|---|
+| Classificador de tendência em produção, acerto balanceado com 4 semanas (validação cruzada) | 0,633 | 0,628 |
+| Modelo de quantis, razão de erro com 4 semanas (treino / validação) | 0,71 / 0,67 | 0,71 / 0,67 |
+| Alerta de entrada no vermelho (MEM): epidemias avisadas / alarmes corretos / falsos por município por ano | 74% / 52% / 0,49 | 72% / 51% / 0,53 |
+| Alerta nos 15 municípios de validação | 71% / 54% / 0,46 | 71% / 57% / 0,43 |
+| Desmobilização: fins indicados nas 2 semanas antes | 79% | 78% |
+| Casos aproximados com 2 semanas de atraso, 4 semanas à frente: erro / faixa de 80% | 0,69 / 78% | 0,69 / 78% |
+| Validação do MEM contra o InfoDengue: correlação dos limiares pré-epidêmico / epidêmico | 0,996 / 0,992 | 0,995 / 0,992 |
+
+O experimento de classificadores estourou a memória na primeira tentativa (8 processos treinando Random Forest e LSTM ao mesmo tempo num computador de 28 GB); passou a rodar com 6 processos, o que não muda os resultados.
+
+### Como reproduzir
+
+```bash
+python -m scripts.substituir_sem_nowcast            # mostra os sorteados
+python -m scripts.substituir_sem_nowcast --aplicar  # troca em data/config/cidades.csv
+python -m src.pipeline_completo --baixar
+```
+
+<a id="s25"></a>
+## 25. Um modelo só para os casos e os níveis
+
+### Contexto
+
+Ao revisar o painel, o grupo notou que, em Macapá, os casos previstos para as próximas semanas ficavam acima do limiar epidêmico (cerca de 121 casos contra 92), enquanto o nível mais provável era amarelo. Não era um erro de exibição: os casos vinham do modelo de quantis (seção 19) e o nível do classificador de níveis (seção 22), dois modelos avaliados separadamente, que não precisavam concordar.
+
+### Etapa 1: medir a discordância
+
+Com as previsões fora da amostra exportadas para o painel (2 semanas de atraso; 344.770 previsões, 115 municípios, 2015 a 2026), o nível do classificador foi comparado com o nível dado pela mediana dos casos, lida nos limiares da semana prevista:
+
+* discordavam em 9,6% das previsões (6,3% na semana atual, 13,4% com 4 semanas de antecedência), quase sempre por um nível (verde contra vermelho em menos de 0,5% das discordâncias);
+* a hipótese de que a troca de temporada (os limiares mudam na semana 41) explicasse a discordância foi descartada: 9,3% nas previsões que cruzam a troca contra 9,6% nas demais;
+* o nível pela mediana dos casos acertava um pouco mais que o classificador (de +0,4 a +0,7 ponto, com intervalos de confiança de 95% por bootstrap sobre municípios que excluem zero até 3 semanas), e, quando os dois discordavam, a mediana acertava 51% das vezes e o classificador 46%.
+
+Calcular o nível pela mediana não bastava: o alerta usa a probabilidade de vermelho, e o modelo de casos só tinha três quantis (10%, 50% e 90%).
+
+### Etapa 2: a chance de cada nível pelos quantis
+
+Cada quantil diz "X% de chance de vir menos de tantos casos". Com vários quantis, a curva dessa chance fica conhecida em vários pontos, e a chance de cada nível sai dela, lida nos limiares: P(vermelho) = 1 − F(limiar epidêmico), P(verde) = F(limiar pré-epidêmico), P(amarelo) = o resto, com F interpolada linearmente em log(1 + casos) entre dois quantis e prolongada com a mesma inclinação até 0 ou 1 fora deles (`src/modelos/lightgbm_quantis_niveis.py`; testada com uma distribuição log-normal, em que a resposta exata é conhecida). No exemplo de Macapá, com o limiar de 92 entre os quantis de 10% (74) e 50% (121), a chance de vermelho fica entre 50% e 90%, e o classificador dava 39%.
+
+Os limiares são os **conhecidos na data da previsão**: quando a semana prevista é da temporada seguinte, o MEM é refeito só com as temporadas completas até a semana confirmada. Nas previsões que cruzam a troca, esse limiar difere do definitivo em até ±25% (mediana de 0%). O nível real continua sendo o dos limiares definitivos.
+
+O experimento (`src/experimento_niveis_quantis.py`) usa o mesmo esquema dos níveis: walk-forward com retreino trimestral desde 2015, validação cruzada por município em 5 grupos e validação final, de 2 a 6 semanas à frente da semana confirmada. A avaliação é a mesma de `src/experimento_niveis_robustez.py` (tabela por semana de emissão, alerta com o corte escolhido de novo para cada modelo pelo mesmo critério, desmobilização), nas mesmas semanas e municípios do classificador, mais o erro das chances (RPS e Brier) e a calibração.
+
+**Primeira rodada: 19 quantis (5% a 95%), com as variáveis do modelo de casos.** Empate no geral, com perdas e ganhos em pontos diferentes (validação cruzada, 2 semanas de atraso):
+
+| | Classificador | 19 quantis |
+|---|---|---|
+| Acerto do nível, semana atual / 4 semanas à frente | 83,7% / 74,3% | 84,2% / 74,4% |
+| Acerto quando o nível muda (2 semanas à frente) | 40,6% | 33,7% |
+| Alerta: avisadas antes de os dados mostrarem / alarmes corretos | 80% / 54% | 80% / 52% |
+| Desmobilização: fins antes de os dados mostrarem / avisos prematuros | 91% / 1,47 | 81% / 0,72 |
+| Calibração: chance prevista de 30% a 40% de vermelho, vermelho observado | 43% | 35% |
+
+Os quantis eram "inerciais": tendiam a prever que o nível continua, o que empata no acerto geral (o nível muda pouco), mas antecipa menos as mudanças e os fins de epidemia. A explicação mais provável era a informação: o classificador usa também o clima de S-1 a S-4 e a distância da semana atual a cada limiar.
+
+**Quantos quantis?** A pergunta do grupo foi se seria preciso calcular tantos, já que os mais baixos pareciam nunca ser usados. Com as mesmas previsões, foi medido onde os limiares caem na curva prevista: em boa parte das semanas, fora dela (num município verde, o limiar epidêmico fica acima do quantil de 95% em 90% das vezes), mas os quantis baixos importam nas semanas amarelas (o limiar pré-epidêmico cai entre 0% e 35% na maioria das vezes: a chance de voltar ao verde) e vermelhas (o epidêmico se espalha entre 0% e 50%: a chance de sair da epidemia). Refazendo a conversão só com parte dos quantis, as grades de 9, 7, 5 e 3 quantis deram o mesmo resultado que a de 19, com diferenças de décimos de ponto: a interpolação entre poucos pontos já basta.
+
+**Segunda rodada: 5 quantis (10%, 30%, 50%, 70% e 90%), com as variáveis do classificador.**
+
+| | Classificador | 5 quantis com clima | Diferença (IC 95%) |
+|---|---|---|---|
+| Acerto do nível, semana atual / 2 / 4 semanas à frente | 83,7% / 78,9% / 74,3% | 84,2% / 79,4% / 75,1% | de +0,5 a +0,7 ponto, em todas |
+| Acerto quando o nível muda (2 semanas à frente) | 40,6% | 39,4% | −1,2 (−1,9 a −0,4) |
+| RPS (2 semanas à frente) | 0,0763 | 0,0748 | melhor em todas as antecedências |
+| Alerta: epidemias avisadas antes de começar | 56,3% | 62,5% | +6,1 (+3,3 a +9,1) |
+| Alerta: avisadas antes de os dados mostrarem | 79,6% | 84,8% | +5,1 (+2,1 a +8,0) |
+| Alerta: alarmes corretos / falsos por município por ano | 53,6% / 0,59 | 52,9% / 0,64 | empate |
+| Desmobilização: fins antes de os dados mostrarem | 90,9% | 87,3% | −3,6 (−6,4 a −1,1) |
+| Desmobilização: avisos prematuros por epidemia | 1,47 | 1,23 | −0,24 (−0,37 a −0,12) |
+
+**Conferência: 19 quantis com clima.** Como a comparação das grades tinha sido feita sem o clima, a grade de 19 quantis foi treinada também com as variáveis do classificador. Empatou com a de 5 em tudo (RPS de 0,0745 contra 0,0748 com 2 semanas; epidemias avisadas de 62,1% contra 62,5%; alarmes corretos de 53,3% contra 52,9%; fins antes dos dados de 86,7% contra 87,3%), com casos idênticos, porque os quantis de 10%, 50% e 90% são os mesmos modelos. Ficaram os 5 quantis, com um quarto do custo de treino.
+
+O clima resolveu a maior parte da inércia. A calibração deixou de ser vantagem (na faixa de 30% a 40%, o vermelho vem em 42%, como no classificador). Os casos aproximados, que passariam a vir do mesmo modelo, ficaram com o mesmo erro do modelo de quantis anterior (razão de erro de −0,017 a +0,003 de diferença, não significativa), e a faixa de 80% um pouco mais estreita (75% a 79% das semanas contra 78% a 82%). Nos 15 municípios de validação, os sinais foram os mesmos, com intervalos mais largos (alarmes falsos: +0,08 por ano, no limite da significância).
+
+**Latitude e longitude.** A sazonalidade da dengue não é a mesma no país (no Sul, o inverno interrompe a transmissão; no Norte, a temporada segue as chuvas), e o modelo só tem a semana do ano e o clima recente. Duas variantes acrescentaram a latitude, e a latitude e a longitude, da sede do município. Contra o modelo de 5 quantis com clima, com bootstrap pareado sobre municípios:
+
+| | Com latitude | Com latitude e longitude |
+|---|---|---|
+| Acerto quando o nível muda, 2 / 4 semanas à frente (validação cruzada) | +0,7 / +0,9 ponto (significativos) | +1,1 / +1,2 ponto (significativos) |
+| Acerto do nível, 4 semanas à frente (validação cruzada / validação final) | −0,1 / +0,8 ponto | −0,2 / +0,8 ponto |
+| Epidemias avisadas (validação cruzada) | −1,6 ponto (−3,8 a +0,6) | −2,4 pontos (−4,8 a −0,2) |
+| Epidemias avisadas (15 municípios de validação) | −5,1 pontos (−9,5 a −1,2) | −7,6 pontos (−13,4 a −2,6) |
+| Avisos prematuros de fim por epidemia (validação cruzada) | +0,10 | +0,08 |
+
+Por macrorregião, o efeito não foi o esperado: as coordenadas melhoraram o acerto e as chances no Nordeste (com 4 semanas, +0,5 a +0,6 ponto de acerto e +1,1 a +1,7 nas mudanças), melhoraram as mudanças no Sudeste com pior acerto geral e chances piores, e pioraram as chances no Sul, onde se esperava o maior ganho. Como a perda está no alerta, que é a principal função do painel, e cresce nos municípios nunca vistos (sinal de que o modelo usa as coordenadas para reconhecer os municípios de treino), as coordenadas ficaram de fora.
+
+### Decisão
+
+O painel passa a usar um modelo só, o de 5 quantis com as variáveis do classificador, para os casos, os níveis e o alerta. Na prática, avisa mais epidemias e mais cedo, com a mesma credibilidade, e os números nunca se contradizem; o custo é antecipar um pouco menos o fim das epidemias.
+
+### Consequências
+
+* **Robustez com dados atrasados de 0 a 4 semanas** (`src/experimento_niveis_robustez.py`, que passou a avaliar o novo modelo, com o classificador como comparação; antes, só 0, 2 e 4 semanas): a vantagem nas epidemias avisadas vai de +1 a +9 pontos (significativa em todos os atrasos menos 1 semana), com alarmes corretos empatados; na desmobilização, de −2 a −5 pontos nos fins antecipados e de −0,24 a −0,30 aviso prematuro por epidemia; no nível com 4 semanas, de +0,4 a +1,0 ponto. Os números do classificador reproduzem os já publicados (72%, 56% e 42% das epidemias avisadas, com 0, 2 e 4 semanas de atraso).
+* **Corte do alerta:** escolhido pelo mesmo critério, com as chances do novo modelo, ficou em 29% no 3º trimestre de 2026 (37% com o classificador).
+* **Limiares da temporada seguinte no painel:** passaram a ser os conhecidos na semana confirmada, como na avaliação. Em Macapá, os de 2026/27 ficaram iguais aos de 2025/26 (17 e 84 casos por semana); antes, o painel mostrava 30 e 92, calculados com a temporada 2025/26 ainda incompleta (ela era contada como completa por ter 52 semanas, num ano de 53).
+* **Avaliação dos casos** (`src/experimento_casos_atraso.py`): passou a ler as mesmas previsões fora da amostra do novo modelo, em vez de treinar outro.
+* **Painel:** o nível mais provável aparece também abaixo do gráfico de casos, numa faixa de quadradinhos hachurados nas semanas previstas, no mesmo eixo dos casos, o que deixava visível a discordância de antes.
+
+### Limitações
+
+* A faixa de 80% dos casos cobre um pouco menos do que deveria, mais nas antecedências maiores.
+* Na faixa do meio, a chance de vermelho é subestimada, como no classificador.
+* Os quantis são estimados separadamente e podem se cruzar (são ordenados antes do uso); entre dois quantis, a interpolação supõe uma curva suave em escala logarítmica.
+* O alerta e a desmobilização foram avaliados com o mesmo critério de corte do classificador, escolhido de novo; outros critérios não foram testados com o novo modelo.
+
+### Como reproduzir
+
+```bash
+python -m src.experimento_niveis_quantis    # 19 quantis, 5 com clima e o classificador; reports/niveis_quantis*.csv
+python -m src.experimento_niveis_robustez   # atrasos de 0 a 4 semanas; reports/niveis_robustez.csv
+python -m src.experimento_casos_atraso      # casos do novo modelo; reports/casos_atraso.csv
+python -m src.exportar_painel
+```
+
+
+<a id="s26"></a>
+## 26. Limiares fixos do Ministério da Saúde x MEM
+
+### Contexto
+
+O cálculo e a explicação do MEM são a parte mais longa da definição dos níveis. O grupo encontrou uma definição bem mais simples, atribuída ao Ministério da Saúde: incidência baixa abaixo de 100 casos por 100 mil habitantes, média de 100 a 300 e alta acima de 300 (por exemplo, numa nota do Cofen sobre dados de 2011). A pergunta foi como os modelos ficariam com esses limiares.
+
+### Que definição é essa
+
+A nota não dizia a que período a incidência se refere, e isso muda tudo: 300 casos por 100 mil numa semana acontecem em só 3% das semanas; no ano acumulado, em 65%. O 17º boletim da dengue de 2025 da Secretaria de Saúde do Espírito Santo esclarece: "O Ministério da Saúde considera três níveis de incidência acumulada das quatro últimas semanas", e classifica os municípios toda semana por essa soma. Não foi encontrado documento normativo do Ministério com esses limiares: o Plano de Contingência de 2025 define os estágios de resposta pelo diagrama de controle (o canal endêmico, definição C) e indica os limiares do InfoDengue (o MEM) como apoio. Os boletins nacionais usam o patamar de 300 para descrever o ano acumulado (em 2020, "69 regiões de saúde com incidência maior ou igual a 300 casos/100 mil hab.", da semana 1 à 10), sem defini-lo como nível de alerta.
+
+### O que foi testado
+
+Duas definições novas em `src/estados.py`, sem mexer nas anteriores: **E**, os limiares aplicados à incidência da semana (leitura literal), e **F**, à incidência acumulada nas 4 últimas semanas (a dos boletins). O experimento (`src/experimento_niveis_ms.py`) usa o modelo final sem novo treino: ele prevê casos, e a chance de cada nível sai da faixa prevista lida nos limiares. Na F, a soma de 4 semanas junta semanas conhecidas e previstas; os quantis da soma são a soma dos quantis de cada semana prevista (supõe que as semanas sobem e descem juntas, o que alarga um pouco a faixa) mais os casos já conhecidos. Foi preciso só treinar a previsão de 1 semana à frente, que o painel não usa. A avaliação é a mesma da decisão 18 (alerta, desmobilização e nível, com o corte do alerta escolhido de novo pelo mesmo critério).
+
+### Resultados
+
+**Frequência dos níveis** (2015 em diante, 115 municípios; `reports/niveis_ms_descricao.csv`):
+
+| Definição | Baixa / verde | Média / amarelo | Alta / vermelho | Municípios que nunca chegam ao alto | Saídas do alto por município por ano |
+|---|---|---|---|---|---|
+| MEM, semana (D) | 40% | 43% | 17% | 0 | 0,93 |
+| Ministério, 4 semanas (F) | 72% | 16% | 12% | 13 | 0,41 |
+| Ministério, 1 semana (E) | 91% | 6% | 3% | 38 | 0,18 |
+| Ministério, acumulada na temporada | 36% | 20% | 44% | 0 | só na virada da temporada |
+| Ministério, acumulada em 52 semanas | 20% | 15% | 65% | 0 | 0,13 |
+
+Os limiares fixos não se ajustam ao município: o limiar epidêmico do MEM, em casos por 100 mil por semana, tem mediana de 42 e vai de 9 a 115 entre municípios e temporadas (percentis 10 e 90). As acumuladas na temporada e em 52 semanas deixam a maioria dos municípios no nível alto por meses e não servem para mobilizar e desmobilizar; não foram levadas ao modelo.
+
+**Alerta e nível com o modelo** (validação cruzada, 2 semanas de atraso; `reports/niveis_ms.csv`):
+
+| | MEM | Ministério, 4 semanas (F) |
+|---|---|---|
+| Epidemias (episódios no nível alto, 2019 em diante) | 506 | 331 |
+| Epidemias avisadas antes de começar / antes de os dados mostrarem | 62% / 85% | 89% / 100% |
+| Alarmes corretos / falsos por município por ano | 53% / 0,64 | 52% / 0,48 |
+| Fins indicados antes de os dados mostrarem / avisos prematuros por epidemia | 87% / 1,23 | 99% / 0,81 |
+| Nível em 4 semanas: acerto / ganho sobre a persistência | 75% / +4,8 pontos | 87% / +7,9 pontos |
+| Corte do alerta no 3º trimestre de 2026 | 29% | 21% |
+
+Os números da F parecem melhores, mas cada definição tem as suas epidemias. Pela F, a epidemia "começa" uma mediana de 2 semanas depois do início pelo MEM (entre 1 e 4 semanas na metade central; 78% começam depois), porque a soma de 4 semanas reage com atraso: quando ela passa de 300, os casos semanais já estão altos há semanas, e prever esse cruzamento é fácil. Pela mesma razão, a persistência acerta mais (79% contra 70% com 4 semanas). Das 501 epidemias pelo MEM, só 58% chegam ao nível alto pela F.
+
+**No calendário** (`reports/niveis_ms_calendario.csv`): para cada epidemia pelo MEM, de 8 semanas antes a 4 depois do início, a semana do primeiro alerta de cada definição, com 2 semanas de atraso:
+
+| Mesmas epidemias (pelo MEM) | MEM | Ministério, 4 semanas (F) | Ministério, 1 semana (E) |
+|---|---|---|---|
+| Validação cruzada (501): alerta até o início | **77%** | 42% | 9% |
+| Alerta 2 semanas antes ou mais | **59%** | 31% | 5% |
+| Nenhum alerta até 4 semanas depois do início | **14%** | 35% | 74% |
+| Semana do primeiro alerta (mediana, em relação ao início) | −3 | −1 | +2 |
+| Validação (78 epidemias, 15 municípios): alerta até o início | **77%** | 56% | 17% |
+
+### Decisão
+
+O MEM continua. O objetivo do alerta é avisar quando os casos chegam a um patamar alto **para aquele município**, e o MEM foi a definição que mais antecipou as epidemias: avisou até o início em 77% delas, contra 42% pelos limiares fixos acumulados em 4 semanas. Os limiares fixos simplificam o cálculo e a explicação e servem para comparar municípios, mas não se ajustam ao padrão de cada um e reagem com atraso. As definições E e F ficam em `src/estados.py`, e o experimento fica fora do pipeline, para comparação.
+
+### Consequência para o futuro
+
+Como a chance de cada nível é lida na faixa de casos prevista, o mesmo modelo serve para qualquer limiar sem novo treino, como neste experimento. Um município poderia definir os próprios limiares no painel. Para isso, seria preciso recalcular o corte do alerta para esses limiares (calibrado hoje para o MEM: 29%, contra 21% com os do Ministério), medir o desempenho com eles e exportar os 5 quantis (hoje o painel recebe a mediana e os quantis de 10% e 90%).
+
+### Limitações
+
+* A soma dos quantis supõe que as semanas sobem e descem juntas, o que alarga a faixa da soma; uma previsão direta da soma de 4 semanas poderia ser um pouco melhor.
+* As variáveis de distância aos limiares do modelo continuam as do MEM; retreinar com as do Ministério poderia mudar um pouco o resultado.
+* A comparação no calendário toma o início pelo MEM como referência; ela mede a antecedência em relação a epidemias definidas pelo MEM.
+
+### Como reproduzir
+
+```bash
+python -m src.experimento_niveis_ms   # reports/niveis_ms.csv, niveis_ms_descricao.csv e niveis_ms_calendario.csv
+```

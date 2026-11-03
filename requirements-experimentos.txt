@@ -1,0 +1,8 @@
+# Dependências extras do experimento de classificadores (src/experimento_classificadores.py).
+# O painel e o pipeline principal usam só requirements.txt.
+# O torch para CPU é bem menor que a versão padrão:
+#   pip install -r requirements-experimentos.txt --extra-index-url https://download.pytorch.org/whl/cpu
+-r requirements.txt
+xgboost==3.4.1
+torch==2.14.1
+pyarrow==25.0.1

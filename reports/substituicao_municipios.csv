@@ -1,0 +1,92 @@
+substitui,uf_original,escopo,geocode,nome,uf,populacao,dist_lista_km,tem_nowcast,sorteado
+balsas,MA,macrorregião,2100055,Açailândia,MA,106550,262,False,False
+balsas,MA,macrorregião,2101202,Bacabal,MA,103711,196,False,False
+balsas,MA,macrorregião,2103000,Caxias,MA,156973,67,False,False
+balsas,MA,macrorregião,2103307,Codó,MA,114275,140,False,False
+balsas,MA,macrorregião,2510808,Patos,PB,103165,156,True,True
+balsas,MA,macrorregião,2900702,Alagoinhas,BA,151055,61,True,False
+balsas,MA,macrorregião,2910727,Eunápolis,BA,113710,131,True,False
+balsas,MA,macrorregião,2918001,Jequié,BA,158813,136,True,False
+balsas,MA,macrorregião,2924009,Paulo Afonso,BA,112870,176,False,False
+balsas,MA,macrorregião,2925303,Porto Seguro,BA,168326,142,True,False
+balsas,MA,macrorregião,2928703,Santo Antônio de Jesus,BA,103055,82,True,False
+barreiras,BA,UF,2900702,Alagoinhas,BA,151055,61,True,False
+barreiras,BA,UF,2910727,Eunápolis,BA,113710,131,True,False
+barreiras,BA,UF,2918001,Jequié,BA,158813,136,True,False
+barreiras,BA,UF,2924009,Paulo Afonso,BA,112870,176,False,False
+barreiras,BA,UF,2925303,Porto Seguro,BA,168326,142,True,True
+barreiras,BA,UF,2928703,Santo Antônio de Jesus,BA,103055,82,True,False
+caxias_do_sul,RS,UF,4301602,Bagé,RS,117938,185,False,False
+caxias_do_sul,RS,UF,4302105,Bento Gonçalves,RS,123151,101,False,False
+caxias_do_sul,RS,UF,4314100,Passo Fundo,RS,206215,70,True,False
+caxias_do_sul,RS,UF,4314407,Pelotas,RS,325685,221,True,True
+caxias_do_sul,RS,UF,4315602,Rio Grande,RS,191900,239,False,False
+caxias_do_sul,RS,UF,4322400,Uruguaiana,RS,117210,316,False,False
+dourados,MS,UF,5008305,Três Lagoas,MS,132152,139,True,True
+imperatriz,MA,macrorregião,2100055,Açailândia,MA,106550,262,False,False
+imperatriz,MA,macrorregião,2101202,Bacabal,MA,103711,196,False,False
+imperatriz,MA,macrorregião,2103000,Caxias,MA,156973,67,False,False
+imperatriz,MA,macrorregião,2103307,Codó,MA,114275,140,False,False
+imperatriz,MA,macrorregião,2900702,Alagoinhas,BA,151055,61,True,False
+imperatriz,MA,macrorregião,2910727,Eunápolis,BA,113710,56,True,True
+imperatriz,MA,macrorregião,2918001,Jequié,BA,158813,136,True,False
+imperatriz,MA,macrorregião,2924009,Paulo Afonso,BA,112870,176,False,False
+imperatriz,MA,macrorregião,2928703,Santo Antônio de Jesus,BA,103055,82,True,False
+itacoatiara,AM,macrorregião,1500107,Abaetetuba,PA,158188,52,True,False
+itacoatiara,AM,macrorregião,1501709,Bragança,PA,123082,195,True,False
+itacoatiara,AM,macrorregião,1501808,Breves,PA,106968,202,False,False
+itacoatiara,AM,macrorregião,1502103,Cametá,PA,134184,142,True,True
+itacoatiara,AM,macrorregião,1502400,Castanhal,PA,192256,66,True,False
+itacoatiara,AM,macrorregião,1504208,Marabá,PA,266533,115,True,False
+itacoatiara,AM,macrorregião,1505502,Paragominas,PA,105550,213,True,False
+itaperuna,RJ,macrorregião,3105608,Barbacena,MG,125317,62,False,False
+itaperuna,RJ,macrorregião,3119401,Coronel Fabriciano,MG,104736,64,True,False
+itaperuna,RJ,macrorregião,3122306,Divinópolis,MG,231091,104,True,False
+itaperuna,RJ,macrorregião,3127701,Governador Valadares,MG,257171,159,True,False
+itaperuna,RJ,macrorregião,3131307,Ipatinga,MG,227731,74,True,False
+itaperuna,RJ,macrorregião,3134202,Ituiutaba,MG,102217,125,True,False
+itaperuna,RJ,macrorregião,3138203,Lavras,MG,104761,57,True,False
+itaperuna,RJ,macrorregião,3143906,Muriaé,MG,104108,122,True,False
+itaperuna,RJ,macrorregião,3145208,Nova Serrana,MG,105552,111,True,False
+itaperuna,RJ,macrorregião,3151800,Poços de Caldas,MG,163742,106,False,False
+itaperuna,RJ,macrorregião,3152501,Pouso Alegre,MG,152217,91,True,False
+itaperuna,RJ,macrorregião,3167202,Sete Lagoas,MG,227397,60,True,False
+itaperuna,RJ,macrorregião,3168606,Teófilo Otoni,MG,137418,191,True,False
+itaperuna,RJ,macrorregião,3169901,Ubá,MG,103365,82,True,False
+itaperuna,RJ,macrorregião,3201506,Colatina,ES,120033,91,True,False
+itaperuna,RJ,macrorregião,3203205,Linhares,ES,166786,106,True,False
+itaperuna,RJ,macrorregião,3204906,São Mateus,ES,123752,132,True,False
+itaperuna,RJ,macrorregião,3300209,Araruama,RJ,129671,56,False,False
+itaperuna,RJ,macrorregião,3302007,Itaguaí,RJ,116841,57,False,False
+itaperuna,RJ,macrorregião,3507506,Botucatu,SP,145155,83,True,False
+itaperuna,RJ,macrorregião,3516200,Franca,SP,352536,82,True,False
+itaperuna,RJ,macrorregião,3518404,Guaratinguetá,SP,118044,82,True,False
+itaperuna,RJ,macrorregião,3522109,Itanhaém,SP,112476,52,True,True
+itaperuna,RJ,macrorregião,3522307,Itapetininga,SP,157790,62,True,False
+itaperuna,RJ,macrorregião,3525300,Jaú,SP,133497,54,True,False
+itaperuna,RJ,macrorregião,3534708,Ourinhos,SP,103970,67,True,False
+itaperuna,RJ,macrorregião,3538006,Pindamonhangaba,SP,165428,52,False,False
+ji_parana,RO,macrorregião,1500107,Abaetetuba,PA,158188,52,True,True
+ji_parana,RO,macrorregião,1501709,Bragança,PA,123082,195,True,False
+ji_parana,RO,macrorregião,1501808,Breves,PA,106968,126,False,False
+ji_parana,RO,macrorregião,1502400,Castanhal,PA,192256,66,True,False
+ji_parana,RO,macrorregião,1504208,Marabá,PA,266533,115,True,False
+ji_parana,RO,macrorregião,1505502,Paragominas,PA,105550,213,True,False
+lagarto,SE,macrorregião,2100055,Açailândia,MA,106550,262,False,False
+lagarto,SE,macrorregião,2101202,Bacabal,MA,103711,196,False,False
+lagarto,SE,macrorregião,2103000,Caxias,MA,156973,67,False,False
+lagarto,SE,macrorregião,2103307,Codó,MA,114275,140,False,False
+lagarto,SE,macrorregião,2900702,Alagoinhas,BA,151055,61,True,False
+lagarto,SE,macrorregião,2918001,Jequié,BA,158813,136,True,False
+lagarto,SE,macrorregião,2924009,Paulo Afonso,BA,112870,176,False,False
+lagarto,SE,macrorregião,2928703,Santo Antônio de Jesus,BA,103055,82,True,True
+luis_eduardo_magalhaes,BA,UF,2900702,Alagoinhas,BA,151055,61,True,True
+luis_eduardo_magalhaes,BA,UF,2918001,Jequié,BA,158813,134,True,False
+luis_eduardo_magalhaes,BA,UF,2924009,Paulo Afonso,BA,112870,176,False,False
+rondonopolis,MT,UF,5107925,Sorriso,MT,110635,79,True,True
+rondonopolis,MT,UF,5107958,Tangará da Serra,MT,106434,185,True,False
+santarem,PA,UF,1501709,Bragança,PA,123082,195,True,False
+santarem,PA,UF,1501808,Breves,PA,106968,126,False,False
+santarem,PA,UF,1502400,Castanhal,PA,192256,66,True,False
+santarem,PA,UF,1504208,Marabá,PA,266533,115,True,True
+santarem,PA,UF,1505502,Paragominas,PA,105550,213,True,False
